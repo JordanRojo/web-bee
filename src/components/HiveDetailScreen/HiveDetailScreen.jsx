@@ -1,0 +1,381 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog } from 'react-icons/fa'; // Añadimos FaChartBar y FaCog
+import { MdOutlineThermostat, MdOutlineWaterDrop, MdOutlineScale, MdAccessTime } from 'react-icons/md';
+import { GiBee } from 'react-icons/gi';
+import './HiveDetailScreen.css';
+
+// Datos de ejemplo para una colmena específica
+const sampleHiveData = {
+    h1: {
+        id: 'h1',
+        name: 'Colmena 001 - Prado Verde',
+        location: 'Sector Norte, Apiario A',
+        status: 'OK',
+        currentMetrics: {
+            temperature: 34.8, // Valor óptimo
+            humidity: 61.2,    // Valor óptimo
+            weight: 47.5,      // Valor óptimo
+            queenStatus: 'Activa'
+        },
+        historicalData: [
+            { name: '10 AM', temp: 34, humidity: 59, weight: 47.8 },
+            { name: '11 AM', temp: 35, humidity: 60, weight: 47.7 },
+            { name: '12 PM', temp: 34.5, humidity: 61, weight: 47.5 },
+            { name: '01 PM', temp: 34.7, humidity: 62, weight: 47.4 },
+            { name: '02 PM', temp: 35.1, humidity: 60, weight: 47.3 },
+            { name: '03 PM', temp: 34.9, humidity: 61, weight: 47.2 },
+            { name: '04 PM', temp: 35.2, humidity: 62, weight: 47.1 },
+            { name: '05 PM', temp: 35.0, humidity: 61, weight: 47.0 },
+        ],
+        alerts: [
+            { id: 1, type: 'Temperatura Alta', description: 'La temperatura ha superado los 38°C durante 30 min.', timestamp: '2025-07-17 14:30', resolved: false },
+            { id: 2, type: 'Humedad Anormal', description: 'Humedad por encima del 70% por 2 horas.', timestamp: '2025-07-16 09:15', resolved: true },
+            { id: 3, type: 'Pérdida de Peso', description: 'Caída significativa de peso en las últimas 24 horas.', timestamp: '2025-07-15 18:00', resolved: false },
+        ]
+    },
+    h2: {
+        id: 'h2',
+        name: 'Colmena 002 - Bosque Nativo',
+        location: 'Sector Oeste, Apiario B',
+        status: 'ALERT',
+        currentMetrics: {
+            temperature: 39.1, // Valor crítico (ej: sobrecalentamiento)
+            humidity: 78.0,    // Valor crítico (ej: humedad muy alta)
+            weight: 32.5,      // Valor crítico (ej: pérdida de peso significativa)
+            queenStatus: 'Inactiva (Posible Alerta)'
+        },
+        historicalData: [
+            { name: '10 AM', temp: 37, humidity: 70, weight: 43.0 },
+            { name: '11 AM', temp: 38.2, humidity: 75, weight: 42.8 },
+            { name: '12 PM', temp: 38.5, humidity: 78, weight: 42.5 },
+            { name: '01 PM', temp: 38.1, humidity: 77, weight: 42.3 },
+            { name: '02 PM', temp: 37.9, humidity: 76, weight: 42.1 },
+            { name: '03 PM', temp: 38.3, humidity: 75, weight: 42.0 },
+            { name: '04 PM', temp: 38.0, humidity: 77, weight: 41.8 },
+            { name: '05 PM', temp: 38.4, humidity: 78, weight: 41.5 },
+        ],
+        alerts: [
+            { id: 4, type: 'Temperatura Crítica', description: '¡ADVERTENCIA! Temperatura constante > 38.5°C. Actuar de inmediato.', timestamp: '2025-07-17 10:00', resolved: false },
+            { id: 5, type: 'Humedad Extrema', description: 'Humedad muy alta, riesgo de moho y enfermedades.', timestamp: '2025-07-17 11:30', resolved: false },
+        ]
+    },
+    h3: {
+        id: 'h3',
+        name: 'Colmena 003 - Campo de Flores',
+        location: 'Sector Este, Apiario C',
+        status: 'OK',
+        currentMetrics: {
+            temperature: 36.5, // Valor de advertencia (alta)
+            humidity: 68.0,    // Valor de advertencia (alta)
+            weight: 40.0,      // Valor de advertencia (ligeramente bajo)
+            queenStatus: 'Activa'
+        },
+        historicalData: [
+            { name: '10 AM', temp: 35, humidity: 60, weight: 41.0 },
+            { name: '11 AM', temp: 35.5, humidity: 62, weight: 40.8 },
+            { name: '12 PM', temp: 36.0, humidity: 65, weight: 40.5 },
+            { name: '01 PM', temp: 36.5, humidity: 68, weight: 40.0 },
+            { name: '02 PM', temp: 36.2, humidity: 67, weight: 39.8 },
+            { name: '03 PM', temp: 36.0, humidity: 66, weight: 39.7 },
+            { name: '04 PM', temp: 36.1, humidity: 67, weight: 39.6 },
+            { name: '05 PM', temp: 36.3, humidity: 67, weight: 39.5 },
+        ],
+        alerts: []
+    }
+};
+
+const HiveDetailScreen = () => {
+    const { hiveId } = useParams();
+    const [hive, setHive] = useState(null);
+    const [activeTab, setActiveTab] = useState('overview');
+    const [filterAlerts, setFilterAlerts] = useState('active');
+    const [lastSyncTime, setLastSyncTime] = useState(null); // Nuevo estado para la última sincronización
+
+    useEffect(() => {
+        const fetchedHive = sampleHiveData[hiveId];
+        if (fetchedHive) {
+            setHive(fetchedHive);
+            setLastSyncTime(Date.now()); // Establece la hora actual como última sincronización
+        } else {
+            console.error('Colmena no encontrada:', hiveId);
+            setHive(null);
+        }
+    }, [hiveId]);
+
+    if (!hive) {
+        return (
+            <div className="loading-screen">
+                <p>Cargando detalles de la colmena...</p>
+                <div className="spinner"></div>
+            </div>
+        );
+    }
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'OK': return 'status-ok';
+            case 'ALERT': return 'status-alert';
+            case 'CRITICAL': return 'status-critical';
+            default: return 'status-unknown';
+        }
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case 'OK': return 'Saludable';
+            case 'ALERT': return 'Alerta';
+            case 'CRITICAL': return 'Crítico';
+            default: return 'Desconocido';
+        }
+    };
+
+    // --- NUEVA FUNCIÓN: Determinar estado de la métrica por valor ---
+    const getMetricStatus = (metricType, value) => {
+        switch (metricType) {
+            case 'temperature':
+                // Rango óptimo: 32-36°C (temperatura del nido de cría)
+                if (value >= 32 && value <= 36) return { status: 'ok', icon: <MdOutlineThermostat />, label: 'Normal' };
+                // Advertencia: 30-31.9°C o 36.1-38°C
+                if ((value >= 30 && value < 32) || (value > 36 && value <= 38)) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
+                // Crítico: <30°C o >38°C
+                if (value < 30 || value > 38) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
+                return { status: 'unknown', icon: <MdOutlineThermostat />, label: 'Desconocido' };
+
+            case 'humidity':
+                // Rango óptimo: 50-70% (humedad ideal para el nido de cría y miel)
+                if (value >= 50 && value <= 70) return { status: 'ok', icon: <MdOutlineWaterDrop />, label: 'Normal' };
+                // Advertencia: 40-49.9% o 70.1-75%
+                if ((value >= 40 && value < 50) || (value > 70 && value <= 75)) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
+                // Crítico: <40% o >75%
+                if (value < 40 || value > 75) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
+                return { status: 'unknown', icon: <MdOutlineWaterDrop />, label: 'Desconocido' };
+
+            case 'weight':
+                // Rango óptimo: >40 kg (peso saludable, indica buena reserva de miel y población)
+                if (value > 40) return { status: 'ok', icon: <MdOutlineScale />, label: 'Normal' };
+                // Advertencia: 30-40 kg (podría indicar falta de reservas o problema de población)
+                if (value >= 30 && value <= 40) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
+                // Crítico: <30 kg (pérdida de peso severa, posible inanición o colapso)
+                if (value < 30) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
+                return { status: 'unknown', icon: <MdOutlineScale />, label: 'Desconocido' };
+
+            case 'queenStatus':
+                // Simplemente para dar un ejemplo, no se basa en un rango numérico
+                if (value === 'Activa') return { status: 'ok', icon: <GiBee />, label: 'Activa' };
+                return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
+            default:
+                return { status: 'unknown', icon: null, label: 'Desconocido' };
+        }
+    };
+
+    // --- FUNCIÓN: Formatear la hora de última sincronización ---
+    const formatLastSyncTime = (timestamp) => {
+        if (!timestamp) return 'N/A';
+        const now = Date.now();
+        const diffSeconds = Math.floor((now - timestamp) / 1000);
+
+        if (diffSeconds < 60) {
+            return `hace ${diffSeconds} segundo${diffSeconds === 1 ? '' : 's'}`;
+        } else if (diffSeconds < 3600) {
+            const minutes = Math.floor(diffSeconds / 60);
+            return `hace ${minutes} minuto${minutes === 1 ? '' : 's'}`;
+        } else if (diffSeconds < 86400) {
+            const hours = Math.floor(diffSeconds / 3600);
+            return `hace ${hours} hora${hours === 1 ? '' : 's'}`;
+        } else {
+            const days = Math.floor(diffSeconds / 86400);
+            return `hace ${days} día${days === 1 ? '' : 's'}`;
+        }
+    };
+
+
+    const getFilteredAlerts = () => {
+        if (filterAlerts === 'active') {
+            return hive.alerts.filter(alert => !alert.resolved);
+        } else if (filterAlerts === 'resolved') {
+            return hive.alerts.filter(alert => alert.resolved);
+        }
+        return hive.alerts;
+    };
+
+    // Obtenemos los estados para cada métrica
+    const tempStatus = getMetricStatus('temperature', hive.currentMetrics.temperature);
+    const humidityStatus = getMetricStatus('humidity', hive.currentMetrics.humidity);
+    const weightStatus = getMetricStatus('weight', hive.currentMetrics.weight);
+    const queenStatusInfo = getMetricStatus('queenStatus', hive.currentMetrics.queenStatus);
+
+
+    return (
+        <div className="hive-detail-screen-container">
+            <nav className="detail-navbar">
+                <div className="navbar-logo">
+                    <GiBee className="nav-bee-icon" />
+                    <span>Monitor Beehive</span>
+                </div>
+                <div className="navbar-links">
+                    <Link to="/dashboard" className="nav-link"><FaArrowLeft /> Volver al Dashboard</Link>
+                    <Link to="/reports" className="nav-link"><FaFileAlt /> Reportes</Link> {/* Icono para Reportes */}
+                    <Link to="/settings" className="nav-link"><FaCog /> Configuración</Link> {/* Icono para Configuración */}
+                </div>
+            </nav>
+
+            <div className="detail-content">
+                <div className="hive-header-section">
+                    <div className="hive-header-info">
+                        <FaHive className="hive-detail-icon" />
+                        <div className="hive-title-group">
+                            <h1 className="hive-detail-title">{hive.name}</h1>
+                            <p className="hive-location">{hive.location}</p>
+                        </div>
+                    </div>
+                    <div className={`hive-detail-status ${getStatusClass(hive.status)}`}>
+                        <FaCheckCircle />
+                        <span>Estado: {getStatusText(hive.status)}</span>
+                    </div>
+                </div>
+
+                <div className="detail-tabs">
+                    <button
+                        className={activeTab === 'overview' ? 'tab-button active' : 'tab-button'}
+                        onClick={() => setActiveTab('overview')}
+                    >
+                        Resumen Actual
+                    </button>
+                    <button
+                        className={activeTab === 'historical' ? 'tab-button active' : 'tab-button'}
+                        onClick={() => setActiveTab('historical')}
+                    >
+                        Datos Históricos
+                    </button>
+                    <button
+                        className={activeTab === 'alerts' ? 'tab-button active' : 'tab-button'}
+                        onClick={() => setActiveTab('alerts')}
+                    >
+                        Alertas ({hive.alerts.filter(a => !a.resolved).length})
+                    </button>
+                </div>
+
+                {activeTab === 'overview' && (
+                    <div className="tab-content overview-content">
+                        <h2 className="current-metrics-title">Métricas Actuales</h2>
+                        <div className="current-metrics-grid">
+                            {/* Tarjeta de Temperatura */}
+                            <div className={`metric-card ${tempStatus.status}`}>
+                                {tempStatus.icon}
+                                <span className="metric-value">{hive.currentMetrics.temperature}°C</span>
+                                <span className="metric-label">Temperatura</span>
+                                <span className="metric-status-label">{tempStatus.label}</span>
+                            </div>
+                            {/* Tarjeta de Humedad */}
+                            <div className={`metric-card ${humidityStatus.status}`}>
+                                {humidityStatus.icon}
+                                <span className="metric-value">{hive.currentMetrics.humidity}%</span>
+                                <span className="metric-label">Humedad</span>
+                                <span className="metric-status-label">{humidityStatus.label}</span>
+                            </div>
+                            {/* Tarjeta de Peso */}
+                            <div className={`metric-card ${weightStatus.status}`}>
+                                {weightStatus.icon}
+                                <span className="metric-value">{hive.currentMetrics.weight} kg</span>
+                                <span className="metric-label">Peso</span>
+                                <span className="metric-status-label">{weightStatus.label}</span>
+                            </div>
+                            {/* Tarjeta de Estado de la Reina */}
+                            <div className={`metric-card ${queenStatusInfo.status}`}>
+                                {queenStatusInfo.icon}
+                                <span className="metric-value">{hive.currentMetrics.queenStatus}</span>
+                                <span className="metric-label">Estado de la Reina</span>
+                                <span className="metric-status-label">{queenStatusInfo.label}</span>
+                            </div>
+                        </div>
+                        <p className="last-sync-time">Última sincronización: <MdAccessTime /> {formatLastSyncTime(lastSyncTime)}</p>
+                    </div>
+                )}
+
+                {activeTab === 'historical' && (
+                    <div className="tab-content historical-content">
+                        <h2 className="historical-chart-title">Gráfico de Datos Históricos (Últimas 8 Horas)</h2>
+                        <div className="chart-container">
+                            <ResponsiveContainer width="100%" height={400}>
+                                <LineChart
+                                    data={hive.historicalData}
+                                    margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke={getComputedStyle(document.documentElement).getPropertyValue('--color-border-light')} />
+                                    <XAxis dataKey="name" stroke={getComputedStyle(document.documentElement).getPropertyValue('--color-mid-text')} />
+                                    <YAxis yAxisId="left" stroke={getComputedStyle(document.documentElement).getPropertyValue('--color-accent-orange')} label={{ value: 'Temperatura (°C)', angle: -90, position: 'insideLeft', fill: getComputedStyle(document.documentElement).getPropertyValue('--color-accent-orange') }} />
+                                    <YAxis yAxisId="right" orientation="right" stroke={getComputedStyle(document.documentElement).getPropertyValue('--color-status-ok')} label={{ value: 'Humedad (%) / Peso (kg)', angle: 90, position: 'insideRight', fill: getComputedStyle(document.documentElement).getPropertyValue('--color-status-ok') }} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-light)', borderRadius: '8px' }}
+                                        labelStyle={{ color: 'var(--color-dark-text)', fontWeight: 'bold' }}
+                                        itemStyle={{ color: 'var(--color-mid-text)' }}
+                                    />
+                                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                    <Line yAxisId="left" type="monotone" dataKey="temp" stroke="var(--color-accent-orange)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} />
+                                    <Line yAxisId="right" type="monotone" dataKey="humidity" stroke="var(--color-status-ok)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} />
+                                    <Line yAxisId="right" type="monotone" dataKey="weight" stroke="var(--color-status-critical)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'alerts' && (
+                    <div className="tab-content alerts-content">
+                        <h2 className="alerts-title">Alertas Registradas</h2>
+                        <div className="alert-filter-buttons">
+                            <button
+                                className={filterAlerts === 'active' ? 'filter-button active' : 'filter-button'}
+                                onClick={() => setFilterAlerts('active')}
+                            >
+                                Activas ({hive.alerts.filter(a => !a.resolved).length})
+                            </button>
+                            <button
+                                className={filterAlerts === 'resolved' ? 'filter-button active' : 'filter-button'}
+                                onClick={() => setFilterAlerts('resolved')}
+                            >
+                                Resueltas ({hive.alerts.filter(a => a.resolved).length})
+                            </button>
+                            <button
+                                className={filterAlerts === 'all' ? 'filter-button active' : 'filter-button'}
+                                onClick={() => setFilterAlerts('all')}
+                            >
+                                Todas ({hive.alerts.length})
+                            </button>
+                        </div>
+
+                        {getFilteredAlerts().length === 0 ? (
+                            <p className="no-alerts-message">No hay alertas {filterAlerts === 'active' ? 'activas' : filterAlerts === 'resolved' ? 'resueltas' : ''} para mostrar.</p>
+                        ) : (
+                            <div className="alerts-list">
+                                {getFilteredAlerts().map(alert => (
+                                    <div key={alert.id} className={`alert-item ${alert.resolved ? 'resolved' : 'active'}`}>
+                                        <div className="alert-icon-wrapper">
+                                            {alert.resolved ? (
+                                                <FaCheckCircle className="alert-status-icon resolved-icon" />
+                                            ) : (
+                                                <FaExclamationTriangle className="alert-status-icon active-icon" />
+                                            )}
+                                        </div>
+                                        <div className="alert-details">
+                                            <h3 className="alert-type">{alert.type}</h3>
+                                            <p className="alert-description">{alert.description}</p>
+                                            <span className="alert-timestamp"><FaCalendarAlt /> {new Date(alert.timestamp).toLocaleString()}</span>
+                                        </div>
+                                        {!alert.resolved && (
+                                            <button className="resolve-button">Marcar como Resuelta</button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default HiveDetailScreen;

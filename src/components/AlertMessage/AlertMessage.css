@@ -1,0 +1,127 @@
+/* src/components/AlertMessage/AlertMessage.css */
+
+.alert-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--color-surface); /* Color de texto claro */
+    box-shadow: var(--shadow-elevated);
+    z-index: 1000;
+    
+    /* Estado inicial: invisible y fuera de la pantalla. */
+    /* La opacidad inicial se establece aquí para cuando el componente se monta por primera vez. */
+    opacity: 0;
+    transform: translateX(100%); 
+    
+    /* La transición se aplica a ambas propiedades para la animación */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 250px;
+}
+
+/* --- FASES DE ENTRADA (cuando 'in' pasa de false a true) --- */
+
+/* Estado inicial de la entrada: antes de que la animación empiece */
+.alert-message-enter {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* Estado activo de la entrada: durante la animación de entrada, mueve hacia la posición final */
+.alert-message-enter-active {
+    opacity: 1; /* ¡Aquí debe volverse visible! */
+    transform: translateX(0); /* Vuelve a la posición normal */
+}
+
+/* Estado final de la entrada: después de que la animación de entrada termina */
+/* (CSSTransition añade .alert-message-enter-done, que por defecto sería el estado de .alert-message-enter-active) */
+.alert-message-enter-done {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* --- FASES DE SALIDA (cuando 'in' pasa de true a false) --- */
+
+/* Estado inicial de la salida: cuando la animación de salida empieza (es el estado final de la entrada) */
+.alert-message-exit {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Estado activo de la salida: durante la animación de salida, se vuelve transparente y se mueve fuera */
+.alert-message-exit-active {
+    opacity: 0; /* ¡Aquí debe volverse transparente! */
+    transform: translateX(100%); /* Se mueve fuera de la pantalla */
+}
+
+/* Estado final de la salida: después de que la animación de salida termina */
+/* (CSSTransition elimina el elemento del DOM con unmountOnExit, por lo que este estado rara vez se ve) */
+.alert-message-exit-done {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+
+/* Tipos de mensajes (colores) */
+.alert-message.success {
+    background-color: var(--color-status-ok); /* Verde para éxito */
+}
+
+.alert-message.error {
+    background-color: var(--color-status-critical); /* Rojo para error */
+}
+
+.alert-message.info {
+    background-color: var(--color-secondary-blue); /* Azul para información */
+}
+
+/* Opcional: Iconos dentro del mensaje */
+.alert-message.success::before {
+    content: '✔'; /* O un ícono SVG/FontAwesome */
+    font-size: 1.2em;
+    margin-right: 5px; /* Espacio entre icono y texto */
+}
+.alert-message.error::before {
+    content: '✖';
+    font-size: 1.2em;
+    margin-right: 5px;
+}
+.alert-message.info::before {
+    content: 'ℹ';
+    font-size: 1.2em;
+    margin-right: 5px;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 600px) {
+    .alert-message {
+        top: auto;
+        bottom: 20px;
+        left: 50%;
+        right: auto;
+        width: 90%;
+        max-width: 350px;
+        /* Ajustar el transform para empezar desde abajo y centrado */
+        transform: translateX(-50%) translateY(100%); 
+    }
+
+    .alert-message-enter {
+        transform: translateX(-50%) translateY(100%);
+    }
+    .alert-message-enter-active {
+        transform: translateX(-50%) translateY(0);
+    }
+    .alert-message-exit {
+        transform: translateX(-50%) translateY(0);
+    }
+    .alert-message-exit-active {
+        transform: translateX(-50%) translateY(100%);
+    }
+}

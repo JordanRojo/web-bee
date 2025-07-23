@@ -1,0 +1,689 @@
+/* src/pages/WelcomeScreen.css */
+
+/* --- Variables de Color --- */
+:root {
+  --primary-color: #030303; /* Verde más vibrante para acciones y títulos */
+  --secondary-color: #2196F3; /* Azul para elementos interactivos */
+  --accent-color: #FFC107; /* Amarillo miel para énfasis */
+  --text-color-dark: #333;
+  --text-color-light: #f8f9fa;
+  --bg-light: #f9fbfd; /* Fondo muy claro */
+  --bg-medium: #e8f5e9; /* Fondo suave para secciones */
+  --bg-dark: #2c3e50; /* Azul oscuro para footer/header oscuro */
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+/* --- Estilos Generales y Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box; /* Fundamental: asegura que padding y border se incluyan en el ancho/alto */
+  margin: 0; /* Reinicia márgenes por defecto */
+  padding: 0; /* Reinicia paddings por defecto */
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color-dark);
+  background-color: var(--bg-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* ¡Clave! Previene el scroll horizontal en todo el documento */
+  width: 100%; /* Asegura que el body no exceda el 100% del ancho */
+}
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* overflow-x: hidden; <-- Se movió al body */
+}
+
+/* --- Animaciones al hacer scroll (Ajustadas para entrada lateral) --- */
+
+/* El wrapper ahora solo controla la opacidad y es un contenedor flex para centrar la sección */
+.animation-wrapper {
+  opacity: 0;
+  transition: opacity 0.7s ease-out; /* Solo transiciona la opacidad para el wrapper */
+  display: flex; /* Añadido para centrar la sección interna */
+  justify-content: center; /* Centra horizontalmente la sección */
+  width: 100%; /* Asegura que el wrapper ocupa todo el ancho */
+}
+
+.animation-wrapper.is-visible {
+  opacity: 1;
+}
+
+/* Las animaciones de transformación se aplican a la .section dentro del wrapper */
+.animation-wrapper .section {
+  transition: transform 0.7s ease-out; /* Transición de transformación para la sección */
+}
+
+.animation-wrapper:not(.from-left):not(.from-right) .section {
+  transform: translateY(40px); /* Por defecto, viene de abajo */
+}
+
+.animation-wrapper.is-visible:not(.from-left):not(.from-right) .section {
+  transform: translateY(0);
+}
+
+.animation-wrapper.from-left .section {
+  transform: translateX(-100px); /* Empieza fuera de la pantalla a la izquierda */
+}
+
+.animation-wrapper.is-visible.from-left .section {
+  transform: translateX(0); /* Vuelve a la posición original */
+}
+
+.animation-wrapper.from-right .section {
+  transform: translateX(100px); /* Empieza fuera de la pantalla a la derecha */
+}
+
+.animation-wrapper.is-visible.from-right .section {
+  transform: translateX(0); /* Vuelve a la posición original */
+}
+
+/* --- Header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 4rem;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 3px 12px var(--shadow-light);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%; /* Aseguramos que ocupe todo el ancho disponible */
+}
+
+.header-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-bee-icon {
+  font-size: 2.8rem;
+  color: var(--accent-color);
+}
+
+.header-title {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--primary-color);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.header-login-btn {
+  text-decoration: none;
+  color: var(--secondary-color);
+  font-weight: 600;
+  padding: 0.8rem 1.8rem;
+  border: 2px solid var(--secondary-color);
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  font-size: 1.05rem;
+  background-color: transparent;
+}
+
+.header-login-btn:hover {
+  background-color: var(--secondary-color);
+  color: var(--text-color-light);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(var(--secondary-color), 0.3);
+}
+
+/* --- Hero Section --- */
+.hero-section {
+  background-color: var(--bg-dark);
+  color: var(--text-color-light);
+  padding: 8rem 2rem;
+  text-align: center;
+  background-image: url('/hero-bees.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 75vh;
+  width: 100%; /* Aseguramos que ocupe todo el ancho disponible */
+}
+
+.hero-overlay {
+  position: absolute; /* Debe estar en la misma posición que la imagen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto; /* Centra el contenido horizontalmente */
+  padding: 0 1rem; /* Añade un poco de padding horizontal para evitar que el texto toque los bordes */
+  width: 100%; /* Asegura que no crezca más de su contenedor padre */
+  /* --- CAMBIOS CLAVE AQUÍ --- */
+  display: flex; /* Convierte hero-content en un contenedor flex */
+  flex-direction: column; /* Apila sus elementos verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  justify-content: center; /* Centra los elementos verticalmente si hay espacio */
+  height: 100%; /* Asegura que ocupe todo el espacio disponible en su padre flex */
+}
+
+.hero-title {
+  font-size: 4.5rem;
+  margin-bottom: 1.8rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-shadow: 2px 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-highlight {
+  color: var(--accent-color);
+}
+
+.hero-subtitle {
+  font-size: 1.7rem;
+  margin-bottom: 3.5rem; /* Espacio debajo del subtítulo */
+  font-weight: 300;
+  max-width: 700px; /* Asegura que el subtítulo no sea demasiado ancho */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-cta-button {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: var(--text-color-dark);
+  padding: 1.4rem 3.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(var(--accent-color), 0.4);
+  margin-bottom: 2rem; /* Añade un margen inferior para separar del scroll-indicator */
+}
+
+.hero-cta-button:hover {
+  background-color: #f0a820;
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(var(--accent-color), 0.5);
+}
+
+.scroll-indicator {
+  /* No necesitamos position absolute aquí si el padre es flex y lo centramos */
+  /* position: absolute; */
+  /* bottom: 3rem; */ /* Esto ya no es necesario, lo apilaremos con flex */
+  /* left: 50%; */
+  /* transform: translateX(-50%); */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-color-light);
+  font-size: 1rem;
+  opacity: 0.8;
+  animation: bounce 2s infinite;
+  z-index: 1;
+  margin-top: auto; /* Empuja el scroll-indicator al final del hero-content */
+}
+
+.scroll-arrow {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  color: var(--accent-color);
+}
+
+.scroll-text {
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0); /* Ajustamos para que no tenga translateX si lo quitamos de la posición absoluta */
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* --- Secciones de Contenido (Propósito, Características, Beneficios) --- */
+.section {
+  padding: 6rem 3rem;
+  text-align: center;
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
+  max-width: 1300px; /* Ancho máximo para el contenido de la sección */
+  margin: 0 auto; /* Centra la sección dentro del animation-wrapper */
+  /* NO poner overflow-x: hidden aquí, ya está en el body */
+}
+
+.section-title {
+  font-size: 3.5rem;
+  margin-bottom: 3rem;
+  color: var(--primary-color);
+  position: relative;
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 7px;
+  background-color: var(--accent-color);
+  border-radius: 4px;
+}
+
+.purpose-section {
+  background-color: var(--card-bg);
+}
+
+.purpose-text {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 1.3rem;
+  line-height: 1.8;
+  color: var(--text-color-dark);
+}
+
+.features-section {
+  background-color: var(--bg-medium);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 3rem;
+  max-width: 100%; /* Asegura que el grid no exceda el ancho de su padre (.section) */
+  margin: 0 auto; /* Centra el grid dentro de la sección */
+  padding: 0 1rem; /* Padding interno para que las tarjetas no toquen los bordes */
+}
+
+/* --- Estilos para las Tarjetas de Giro (Flip Cards) --- */
+.feature-flip-card-container {
+  background-color: transparent;
+  width: 100%;
+  height: 220px;
+  perspective: 1200px;
+  cursor: pointer;
+  transition: transform 0.2s ease-out;
+}
+
+.feature-flip-card-container:hover {
+  transform: scale(1.02);
+}
+
+.feature-flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-style: preserve-3d;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px var(--shadow-light);
+}
+
+.feature-flip-card-container.flipped .feature-flip-card-inner {
+  transform: rotateY(180deg);
+  box-shadow: 0 15px 40px var(--shadow-medium);
+}
+
+.feature-flip-card-front,
+.feature-flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.feature-flip-card-front {
+  background-color: var(--card-bg);
+  color: var(--text-color-dark);
+  border: 1px solid var(--border-color);
+}
+
+.feature-flip-card-back {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.feature-card-title {
+  font-size: 2rem;
+  margin-bottom: 0;
+  color: var(--secondary-color);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.feature-flip-card-back .feature-card-description {
+  font-size: 1.15rem;
+  color: var(--text-color-light);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* --- Beneficios --- */
+.benefits-section {
+  background-color: var(--card-bg);
+}
+
+.benefits-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 100%; /* Asegura que el grid no exceda el ancho de su padre (.section) */
+  margin: 0 auto;
+  padding: 0 1rem; /* Padding interno para que las tarjetas no toquen los bordes */
+}
+
+.benefit-card {
+  flex: 1 1 350px;
+  padding: 2.5rem;
+  background-color: var(--bg-medium);
+  border-radius: 15px;
+  box-shadow: 0 8px 25px var(--shadow-light);
+  transition: all 0.4s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.benefit-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 35px var(--shadow-medium);
+}
+
+.benefit-icon {
+  font-size: 3.5rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.benefit-card:hover .benefit-icon {
+  transform: scale(1.1);
+}
+
+.benefit-card-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.benefit-card-description {
+  color: var(--text-color-dark);
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.benefits-cta-container {
+  margin-top: 5rem;
+}
+
+.benefits-cta-button {
+  display: inline-block;
+  background-color: var(--secondary-color);
+  color: var(--text-color-light);
+  padding: 1.4rem 3.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(var(--secondary-color), 0.4);
+}
+
+.benefits-cta-button:hover {
+  background-color: #2980b9;
+  color: var(--text-color-dark);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(var(--secondary-color), 0.5);
+}
+
+/* --- Footer --- */
+.footer {
+  text-align: center;
+  padding: 3rem;
+  background-color: var(--bg-dark);
+  color: var(--text-color-light);
+  margin-top: auto;
+  font-size: 1rem;
+  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Aseguramos que ocupe todo el ancho disponible */
+}
+
+.footer-link {
+  color: #aebacd;
+  text-decoration: none;
+  margin: 0 20px;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: var(--text-color-light);
+}
+
+.footer-links {
+  margin-top: 20px;
+}
+
+/* --- Media Queries para Responsividad (Refinadas) --- */
+@media (max-width: 1200px) {
+  .header, .section {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+  /* Ajusta el padding de los grids para que no se aprieten demasiado */
+  .features-grid, .benefits-grid {
+    padding: 0 1.5rem; /* Un poco más de margen en los lados */
+  }
+  .hero-title {
+    font-size: 4rem;
+  }
+  .hero-subtitle {
+    font-size: 1.5rem;
+  }
+  .section-title {
+    font-size: 3rem;
+  }
+  .features-grid, .benefits-grid {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .header {
+    padding: 1rem 2rem;
+  }
+  .hero-section {
+    padding: 6rem 2rem;
+    min-height: 65vh;
+  }
+  .hero-title {
+    font-size: 3.5rem;
+  }
+  .hero-subtitle {
+    font-size: 1.3rem;
+  }
+  .section {
+    padding: 4rem 2rem;
+  }
+  .section-title {
+    font-size: 2.8rem;
+  }
+  .feature-flip-card-container {
+    height: 200px;
+  }
+  .feature-card-title {
+    font-size: 1.8rem;
+  }
+  .feature-flip-card-back .feature-card-description {
+    font-size: 1.05rem;
+  }
+  /* Ajusta el padding de los grids para que no se aprieten demasiado */
+  .features-grid, .benefits-grid {
+    padding: 0 1rem; /* Margen en los lados */
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .header-login-btn {
+    margin-top: 1.5rem;
+  }
+  .hero-section {
+    padding: 5rem 1.5rem;
+    min-height: 55vh;
+  }
+  .hero-title {
+    font-size: 2.8rem;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  .hero-cta-button {
+    padding: 1.1rem 2.5rem;
+    font-size: 1.3rem;
+  }
+  .section {
+    padding: 3rem 1.5rem;
+  }
+  .section-title {
+    font-size: 2.3rem;
+    margin-bottom: 2.5rem;
+  }
+  .section-title::after {
+    bottom: -12px;
+    height: 5px;
+    width: 70px;
+  }
+  .purpose-text {
+    font-size: 1.1rem;
+  }
+  .features-grid, .benefits-grid {
+    grid-template-columns: 1fr; /* Una columna en móviles */
+    gap: 2rem;
+    padding: 0 1.5rem; /* Asegura un padding adecuado en móviles */
+  }
+  .feature-flip-card-container {
+    height: 180px;
+  }
+  .feature-card-title {
+    font-size: 1.6rem;
+  }
+  .feature-flip-card-back .feature-card-description {
+    font-size: 1rem;
+  }
+  .benefit-card {
+    padding: 2rem;
+  }
+  .benefit-card-title {
+    font-size: 1.5rem;
+  }
+  .benefit-card-description {
+    font-size: 1rem;
+  }
+  .benefits-cta-container {
+    margin-top: 3.5rem;
+  }
+  .scroll-indicator {
+    /* bottom: 2rem; ya no es necesario */
+    font-size: 0.8rem;
+  }
+  .scroll-arrow {
+    font-size: 2rem;
+  }
+  .benefit-icon {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 1.6rem;
+  }
+  .nav-bee-icon {
+    font-size: 2.2rem;
+  }
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+  .hero-cta-button {
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+  }
+  .section-title {
+    font-size: 1.9rem;
+    margin-bottom: 2rem;
+  }
+  .section-title::after {
+    bottom: -10px;
+    height: 4px;
+    width: 50px;
+  }
+  .purpose-text, .feature-flip-card-back .feature-card-description, .benefit-card-description {
+    font-size: 0.9rem;
+  }
+  .feature-flip-card-container {
+    height: 160px;
+  }
+  .feature-card-title {
+    font-size: 1.4rem;
+  }
+  .benefit-card-title {
+    font-size: 1.3rem;
+  }
+  .footer {
+    padding: 2rem 1rem;
+  }
+  .footer-link {
+    margin: 0 10px;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .features-grid, .benefits-grid {
+    padding: 0 1rem; /* Asegura un padding adecuado en móviles pequeños */
+  }
+}

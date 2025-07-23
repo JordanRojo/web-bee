@@ -1,0 +1,709 @@
+/* src/components/LoginScreen/LoginScreen.css */
+
+/* --- 1. Variables CSS (Refinadas) --- */
+:root {
+  /* Colores temáticos de abejas */
+  --color-honey-gold: #FFC300; /* Un dorado brillante como la miel */
+  --color-honey-orange: #FF8C00; /* Un naranja cálido y vibrante */
+  --color-bee-black: #2A2A2A; /* Negro profundo para la abeja y texto principal */
+  --color-bee-brown: #5C4033; /* Marrón oscuro para los detalles y enlaces */
+  --color-background-light: #FDF9EC; /* Fondo cremoso y cálido para inputs */
+  --color-text-dark: var(--color-bee-black);
+  --color-text-light: #777777;
+  --color-button-hover: #E0B400; /* Dorado más oscuro para hover del botón */
+  --color-error: #D32F2F; /* Rojo estándar para errores */
+  --color-border: #D0D0D0; /* Borde gris claro para inputs */
+  --color-focus-accent: var(--color-honey-orange); /* Naranja para enfoque de inputs */
+
+  /* Variables para el fondo degradado (más vibrante) */
+  --color-bg-start: #FFD700;   /* Amarillo oro brillante */
+  --color-bg-mid: #FFA500;     /* Naranja brillante */
+  --color-bg-end: #FF8C00;     /* Naranja oscuro y cálido */
+  /* Opacidad ajustada para el patrón de panal para que no sea demasiado dominante */
+  --color-bg-overlay: rgba(255, 255, 255, 0.05); /* Ligeramente más transparente */
+
+  /* Sombras y transiciones */
+  --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.2);
+  --shadow-strong: 0 15px 40px rgba(0, 0, 0, 0.3);
+  --transition-fast: 0.2s ease-out;
+  --transition-medium: 0.3s ease-in-out;
+}
+
+/* --- 2. Animaciones Keyframes (Optimizadas) --- */
+
+/* Animación para el efecto de "zumbido" del ícono de abeja (más suave y sutil) */
+@keyframes bee-buzz {
+  0%, 100% { transform: rotate(0deg) translateY(0px) scale(1); }
+  25% { transform: rotate(1deg) translateY(-1px) scale(1.01); }
+  50% { transform: rotate(-1deg) translateY(0px) scale(1); }
+  75% { transform: rotate(0.5deg) translateY(1px) scale(1.01); }
+}
+
+/* Animación de brillo para la caja de login (más sutil) */
+@keyframes honey-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 195, 0, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 140, 0, 0.5); }
+}
+
+/* Animación para el fondo degradado (ciclo completo y más suave) */
+@keyframes background-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Animación de entrada para el formulario (aparece suavemente) */
+@keyframes fadeInScale {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Animación para inputs al autocompletar */
+@keyframes autofill {
+  to {
+    background-color: var(--color-background-light);
+    color: var(--color-text-dark);
+  }
+}
+
+/* --- Nuevas Animaciones para Abejas Voladoras (rutas variadas y fluidas) --- */
+@keyframes fly-bee-1 {
+  0% { transform: translate(-100vw, 50vh) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.7; }
+  100% { transform: translate(150vw, 70vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes fly-bee-2 {
+  0% { transform: translate(100vw, 10vh) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.6; }
+  100% { transform: translate(-150vw, 80vh) rotate(-360deg); opacity: 0; }
+}
+
+@keyframes fly-bee-3 {
+  0% { transform: translate(20vw, -100vh) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.5; }
+  85% { opacity: 0.5; }
+  100% { transform: translate(80vw, 150vh) rotate(180deg); opacity: 0; }
+}
+
+/* --- 3. Contenedor Principal de la Pantalla de Login --- */
+.login-screen-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-mid), var(--color-bg-end));
+  background-size: 200% 200%;
+  animation: background-pan 25s ease infinite alternate;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-text-dark);
+  box-sizing: border-box;
+  z-index: 0;
+  padding: 20px;
+}
+
+/* --- Fondo de Panal (Honeycomb Pattern) --- */
+.honeycomb-background-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image:
+        linear-gradient(60deg, var(--color-bg-overlay) 12%, transparent 12.5%, transparent 87.5%, var(--color-bg-overlay) 88%),
+        linear-gradient(-60deg, var(--color-bg-overlay) 12%, transparent 12.5%, transparent 87.5%, var(--color-bg-overlay) 88%),
+        linear-gradient(90deg, var(--color-bg-overlay) 12%, transparent 12.5%, transparent 87.5%, var(--color-bg-overlay) 88%),
+        linear-gradient(60deg, var(--color-bg-overlay) 12%, transparent 12.5%, transparent 87.5%, var(--color-bg-overlay) 88%),
+        linear-gradient(-60deg, var(--color-bg-overlay) 12%, transparent 12.5%, transparent 87.5%, var(--color-bg-overlay) 88%),
+        linear-gradient(90deg, var(--color-bg-overlay) 12%, transparent 12.5%, transparent 87.5%, var(--color-bg-overlay) 88%);
+    background-size: 100px 173.2px;
+    background-position:
+        0 0, 0 0, 0 0,
+        50px 86.6px, 50px 86.6px, 50px 86.6px;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- Elementos de Abejas Animadas --- */
+.animated-bee {
+    position: absolute;
+    font-size: 3.5rem;
+    color: var(--color-honey-gold);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    z-index: 1;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.bee-1 {
+    top: 15%;
+    left: -20%;
+    animation: fly-bee-1 25s infinite linear;
+    animation-delay: 0s;
+}
+
+.bee-2 {
+    bottom: 25%;
+    right: -20%;
+    animation: fly-bee-2 30s infinite linear;
+    animation-delay: 8s;
+}
+
+.bee-3 {
+    top: 55%;
+    left: -30%;
+    animation: fly-bee-3 20s infinite linear;
+    animation-delay: 15s;
+}
+
+/* --- 4. Caja del Formulario de Login (AJUSTES CLAVE AQUÍ) --- */
+.login-box {
+  background-color: rgba(255, 255, 255, 0.98);
+  /* Ajuste de padding para reducir el espacio general si se ve muy separado */
+  padding: 25px 30px; /* Ligeramente más padding para que no se sienta apretado */
+  border-radius: 15px;
+  box-shadow: var(--shadow-strong);
+  width: 90%;
+  max-width: 450px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto; /* Permite que la altura se ajuste al contenido */
+  /* AJUSTE CLAVE: Asegurar que max-height sea suficientemente grande */
+  max-height: 98vh; /* Permite que ocupe casi toda la altura de la vista */
+  overflow-y: hidden; /* Mantiene la barra de desplazamiento oculta */
+  -webkit-overflow-scrolling: touch;
+
+  position: relative;
+  overflow-x: hidden;
+  animation: honey-glow 3s infinite alternate ease-in-out,
+             fadeInScale var(--transition-medium) forwards;
+  border: 1px solid rgba(255, 195, 0, 0.3);
+  backdrop-filter: blur(5px);
+  z-index: 10;
+}
+
+/* No son necesarios si overflow-y es hidden */
+.login-box::-webkit-scrollbar {
+  display: none;
+}
+.login-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.login-box::-webkit-box {
+  background-color: transparent;
+}
+
+
+/* --- 5. Elementos del Formulario (Ajustes de tamaño para encajar) --- */
+
+.login-bee-icon {
+  font-size: 100px;
+  color: var(--color-honey-gold);
+  margin-bottom: 10px; /* Ligeramente reducido para acercar al título */
+  animation: bee-buzz 0.8s infinite alternate ease-in-out;
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.25));
+}
+
+.login-title {
+  color: var(--color-bee-black);
+  margin-bottom: 5px;
+  font-size: 2em;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+}
+
+/* Estilos mejorados para la frase de bienvenida */
+.welcome-phrase {
+  color: var(--color-bee-brown);
+  font-size: 1.05em;
+  margin-top: 0px;
+  margin-bottom: 20px; /* Ligeramente reducido */
+  text-align: center;
+  font-weight: 600;
+  opacity: 0.95;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+}
+
+
+.form-group {
+  width: 100%;
+  margin-bottom: 12px; /* Reducido para compactar un poco más */
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-dark);
+  font-weight: 700;
+  font-size: 1em;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .login-input {
+  padding-right: 45px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.toggle-password-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--color-text-light);
+  padding: 5px;
+  border-radius: 50%;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.toggle-password-button:hover:not(:disabled) {
+  color: var(--color-bee-black);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.toggle-password-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
+.login-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 0.95em;
+  color: var(--color-text-dark);
+  background-color: var(--color-background-light);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  box-sizing: border-box;
+
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-background-light) inset;
+  -webkit-text-fill-color: var(--color-text-dark) !important;
+  animation: autofill forwards;
+  animation-duration: 0.01s;
+  animation-delay: 0.01s;
+}
+
+.login-input::placeholder {
+  color: #A9A9A9;
+  opacity: 0.8;
+}
+
+.login-input:focus {
+  border-color: var(--color-focus-accent);
+  outline: none;
+  box-shadow: 0 0 0 5px rgba(255, 140, 0, 0.25);
+  background-color: #FFF;
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: 0.85em;
+  margin-top: -8px;
+  margin-bottom: 12px; /* Reducido */
+  text-align: center;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--transition-medium), transform var(--transition-medium);
+  background-color: #ffe6e6;
+  border-radius: 5px;
+  padding: 8px;
+  border: 1px solid var(--color-error);
+}
+
+.error-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.login-button {
+  background-color: var(--color-honey-gold);
+  color: var(--color-bee-black);
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1em;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 8px 20px rgba(255, 195, 0, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  width: 100%;
+  max-width: 250px;
+  margin-top: 10px;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--color-button-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255, 195, 0, 0.7);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: var(--shadow-light);
+}
+
+.login-button:disabled {
+  background-color: #fdd835;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+.forgot-password {
+  margin-top: 15px;
+  font-size: 0.85em;
+}
+
+.forgot-password a {
+  color: var(--color-bee-brown);
+  text-decoration: none;
+  font-weight: 700;
+  transition: text-decoration var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast); /* Added transitions for consistency */
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+  color: var(--color-honey-orange);
+  transform: translateY(-2px); /* Lift effect */
+  background-color: rgba(255, 140, 0, 0.08); /* Light background on hover */
+  border-color: rgba(255, 140, 0, 0.2); /* Subtle border color */
+  box-shadow: 0 4px 10px rgba(255, 140, 0, 0.2); /* Subtle shadow for lift */
+}
+
+/* --- AJUSTES ESPECÍFICOS PARA EL FORMULARIO DE "OLVIDÉ MI CONTRASEÑA" --- */
+
+/* Contenedor general para el formulario de restablecimiento */
+.forgot-password-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Título principal del formulario de restablecimiento */
+.form-subtitle {
+  color: var(--color-bee-black);
+  font-size: 1.8em;
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: -0.5px;
+}
+
+/* Descripción debajo del título */
+.form-description {
+  color: var(--color-text-dark);
+  font-size: 0.95em;
+  margin-bottom: 25px; /* Reducido ligeramente */
+  text-align: justify;
+  line-height: 1.6;
+  opacity: 0.9;
+  max-width: 320px;
+  padding: 0 5px;
+}
+
+/* Estilos para el mensaje de éxito */
+.success-message {
+  color: #28a745;
+  background-color: #e6ffed;
+  border: 1px solid #a8e6b9;
+  font-size: 0.9em;
+  margin-top: 5px;
+  margin-bottom: 15px; /* Reducido */
+  padding: 12px 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--transition-medium), transform var(--transition-medium);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.success-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Estilos para el enlace de "Volver al Inicio de Sesión" */
+.back-to-login {
+  margin-top: 30px; /* Reducido para que no se vea tan separado */
+  font-size: 0.95em;
+  text-align: center;
+  width: 100%;
+}
+
+.back-to-login a {
+  color: var(--color-bee-brown);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.back-to-login a:hover {
+  color: var(--color-honey-orange);
+  transform: translateY(-2px);
+  background-color: rgba(255, 140, 0, 0.08);
+  border-color: rgba(255, 140, 0, 0.2);
+}
+
+.back-to-login .back-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+  transition: transform var(--transition-fast);
+}
+
+.back-to-login a:hover .back-icon {
+  transform: translateX(-3px);
+}
+
+/* --- 6. Media Queries (Ajustadas para una mejor responsividad) --- */
+/* Ajustadas a los nuevos tamaños base */
+@media (max-width: 992px) {
+  .login-box {
+    max-width: 90%;
+    padding: 20px 30px; /* Ajuste para tablets */
+    max-height: 95vh;
+  }
+  .login-title {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+  }
+  .welcome-phrase {
+    font-size: 1em;
+    margin-bottom: 18px; /* Ajustado */
+  }
+  .login-bee-icon {
+    font-size: 80px;
+    margin-bottom: 10px; /* Ajustado */
+  }
+  .input-label {
+    font-size: 0.9em;
+  }
+  .login-input {
+    padding: 9px 10px;
+    font-size: 0.9em;
+  }
+  .login-button {
+    padding: 10px 18px;
+    font-size: 0.95em;
+  }
+  .form-group {
+    margin-bottom: 10px; /* Ajustado */
+  }
+  .forgot-password {
+    margin-top: 10px;
+    font-size: 0.8em;
+  }
+
+  /* Media query specific adjustments for Forgot Password form */
+  .form-subtitle {
+    font-size: 1.6em;
+  }
+  .form-description {
+    font-size: 0.9em;
+    margin-bottom: 20px; /* Ajustado */
+  }
+  .success-message {
+    font-size: 0.85em;
+    padding: 10px 12px;
+    margin-bottom: 12px; /* Ajustado */
+  }
+  .back-to-login {
+    margin-top: 25px; /* Ajustado */
+  }
+}
+
+@media (max-width: 768px) {
+  .login-screen-container {
+    padding: 10px;
+  }
+  .login-box {
+    width: 95%;
+    padding: 18px 25px; /* Ajuste para móviles grandes */
+    max-height: 98vh;
+  }
+  .login-title {
+    font-size: 1.5em;
+    margin-bottom: 8px;
+  }
+  .welcome-phrase {
+    font-size: 0.95em;
+    margin-bottom: 15px; /* Ajustado */
+  }
+  .login-bee-icon {
+    font-size: 70px;
+    margin-bottom: 8px; /* Ajustado */
+  }
+  .input-label {
+    font-size: 0.85em;
+  }
+  .login-input {
+    padding: 8px 10px;
+    font-size: 0.85em;
+  }
+  .login-button {
+    padding: 9px 16px;
+    font-size: 0.9em;
+  }
+  .form-group {
+    margin-bottom: 8px; /* Ajustado */
+  }
+  .forgot-password {
+    margin-top: 8px;
+    font-size: 0.75em;
+  }
+
+  /* Media query specific adjustments for Forgot Password form */
+  .form-subtitle {
+    font-size: 1.4em;
+  }
+  .form-description {
+    font-size: 0.85em;
+    margin-bottom: 15px; /* Ajustado */
+  }
+  .success-message {
+    font-size: 0.8em;
+    padding: 8px 10px;
+    margin-bottom: 10px; /* Ajustado */
+  }
+  .back-to-login {
+    margin-top: 20px; /* Ajustado */
+    font-size: 0.9em;
+  }
+  .back-to-login a {
+    padding: 8px 15px;
+  }
+  .back-to-login .back-icon {
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-screen-container {
+    padding: 5px;
+  }
+  .login-box {
+    margin: 0;
+    padding: 15px 20px; /* Ajuste para móviles pequeños */
+    max-width: 100%;
+    min-width: unset;
+    max-height: 98vh;
+  }
+  .login-title {
+    font-size: 1.3em;
+    margin-bottom: 6px;
+  }
+  .welcome-phrase {
+    font-size: 0.9em;
+    margin-bottom: 12px; /* Ajustado */
+  }
+  .login-bee-icon {
+    font-size: 60px;
+    margin-bottom: 6px; /* Ajustado */
+  }
+  .login-button {
+    font-size: 0.85em;
+    padding: 8px 12px;
+  }
+  .form-group {
+    margin-bottom: 6px; /* Ajustado */
+  }
+  .input-label {
+    font-size: 0.8em;
+  }
+  .login-input {
+    padding: 7px 9px;
+    font-size: 0.8em;
+  }
+  .error-message {
+    font-size: 0.75em;
+    margin-top: -6px;
+    margin-bottom: 8px; /* Ajustado */
+  }
+  .forgot-password {
+    font-size: 0.7em;
+    margin-top: 6px;
+  }
+
+  /* Media query specific adjustments for Forgot Password form */
+  .form-subtitle {
+    font-size: 1.3em;
+  }
+  .form-description {
+    font-size: 0.8em;
+    margin-bottom: 12px; /* Ajustado */
+  }
+  .success-message {
+    font-size: 0.75em;
+    padding: 7px 9px;
+    margin-bottom: 8px; /* Ajustado */
+  }
+  .back-to-login {
+    font-size: 0.8em;
+    margin-top: 15px; /* Ajustado */
+  }
+  .back-to-login a {
+    padding: 6px 10px;
+  }
+  .back-to-login .back-icon {
+    font-size: 0.8em;
+  }
+}

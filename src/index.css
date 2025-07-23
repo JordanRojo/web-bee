@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+/* src/index.css */
+
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif; /* Fuente global */
+    /* Eliminamos overflow aquí; que un contenedor específico lo maneje si es necesario */
+}
+
+#root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Variables CSS Globales --- */
+:root {
+    --color-primary-gold: #FFC107;
+    --color-accent-orange: #FF9800;
+    --color-dark-text: #212121;
+    --color-mid-text: #424242;
+    --color-light-text: #757575;
+    --color-background-soft: #F9F9F9;
+    --color-surface: #FFFFFF;
+    --color-border-light: #ECECEC;
+    --color-shadow-base: rgba(0, 0, 0, 0.08);
+    --color-hover-overlay: rgba(255, 193, 7, 0.08);
+
+    --color-status-ok: #4CAF50;
+    --color-status-alert: #FFEB3B;
+    --color-status-critical: #F44336;
+
+    --shadow-subtle: 0 4px 12px var(--color-shadow-base);
+    --shadow-elevated: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Asegúrate de que esto esté presente */
+
+    --transition-duration: 0.3s;
+    --transition-timing-function: ease-in-out;
+    --transition-fast: 0.15s ease-out; /* Asegúrate de que esto esté presente */
+
+    /* Si aún usas estas, inclúyelas, de lo contrario, elimina las antiguas */
+    /* --color-honey-gold: #FFC300; */
+    /* --color-honey-orange: #FF8C00; */
+    /* ... otras honey colors si son necesarias ... */
+}
+
+/* Estilos generales de enlaces */
+a {
+    font-weight: 500;
+    color: #646cff;
+    text-decoration: inherit;
+}
+a:hover {
+    color: #535bf2;
+}
+
+/* ... otros estilos globales como h1, button, etc. ... */
+
+@media (prefers-color-scheme: light) {
+    :root {
+        color: #213547;
+        background-color: #ffffff;
+    }
+    a:hover {
+        color: #747bff;
+    }
+    button {
+        background-color: #f9f9f9;
+    }
+}

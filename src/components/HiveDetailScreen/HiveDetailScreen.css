@@ -1,0 +1,738 @@
+/* src/components/HiveDetailScreen/HiveDetailScreen.css */
+
+/* --- Importante: Las variables CSS deben estar en un archivo global (ej: src/index.css) --- */
+/* Elimina el bloque :root {} de aquí si ya las tienes centralizadas. */
+:root {
+    /* Paleta de Colores "Monitor Beehive" */
+    --color-primary-gold: #FFC107;
+    --color-accent-orange: #FF9800;
+    --color-dark-text: #212121;
+    --color-mid-text: #424242;
+    --color-light-text: #757575;
+    --color-background-soft: #F9F9F9;
+    --color-surface: #FFFFFF;
+    --color-border-light: #ECECEC;
+    --color-shadow-base: rgba(0, 0, 0, 0.08);
+    --color-hover-overlay: rgba(255, 193, 7, 0.08);
+
+    /* Colores de Estado Semánticos */
+    --color-status-ok: #4CAF50;
+    --color-status-alert: #FFEB3B;
+    --color-status-critical: #F44336;
+
+    /* Sombras Limpias y Coherentes */
+    --shadow-subtle: 0 4px 12px var(--color-shadow-base);
+    --shadow-elevated: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    /* Transiciones Consistentes y Suaves */
+    --transition-duration: 0.3s;
+    --transition-timing-function: ease-in-out;
+    --transition-fast: 0.15s ease-out;
+}
+
+/* --- Animaciones Keyframes (Mismas que en Dashboard) --- */
+@keyframes honey-pulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.7)); }
+    50% { transform: scale(1.02); filter: drop-shadow(0 0 10px rgba(255, 152, 0, 0.8)); }
+}
+
+@keyframes buzz {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(0.5px) translateY(-0.5px); }
+    50% { transform: translateX(-0.5px) translateY(0.5px); }
+    75% { transform: translateX(0.5px) translateY(0.5px); }
+}
+
+@keyframes bell-ring {
+    0%, 100% { transform: rotate(0deg); }
+    15% { transform: rotate(5deg); }
+    30% { transform: rotate(-5deg); }
+    45% { transform: rotate(3deg); }
+    60% { transform: rotate(-3deg); }
+    75% { transform: rotate(1deg); }
+}
+
+@keyframes background-honeycomb-pan {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+
+/* --- Contenedor Principal de la Pantalla de Detalle --- */
+.hive-detail-screen-container {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background-soft);
+    font-family: 'Inter', sans-serif;
+    color: var(--color-dark-text);
+    overflow-x: hidden;
+    position: relative;
+    /* Fondo de panal sutil */
+    background-image:
+        linear-gradient(45deg, rgba(255,193,7,0.015) 12%, transparent 12.5%, transparent 87.5%, rgba(255,193,7,0.015) 88%),
+        linear-gradient(-45deg, rgba(255,193,7,0.015) 12%, transparent 12.5%, transparent 87.5%, rgba(255,193,7,0.015) 88%),
+        linear-gradient(90deg, rgba(255,193,7,0.015) 12%, transparent 12.5%, transparent 87.5%, rgba(255,193,7,0.015) 88%),
+        linear-gradient(45deg, rgba(255,193,7,0.015) 12%, transparent 12.5%, transparent 87.5%, rgba(255,193,7,0.015) 88%),
+        linear-gradient(-45deg, rgba(255,193,7,0.015) 12%, transparent 12.5%, transparent 87.5%, rgba(255,193,7,0.015) 88%),
+        linear-gradient(90deg, rgba(255,193,7,0.015) 12%, transparent 12.5%, transparent 87.5%, rgba(255,193,7,0.015) 88%);
+    background-size: 80px 138.56px;
+    background-position:
+        0 0, 0 0, 0 0,
+        40px 69.28px, 40px 69.28px, 40px 69.28px;
+    animation: background-honeycomb-pan 60s linear infinite;
+}
+
+/* Asegurar que el scroll principal esté en el body/html */
+/* (Este bloque debería estar en tu CSS global, ej: src/index.css) */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* --- Navbar para la Pantalla de Detalle (Similar al Dashboard) --- */
+.detail-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-subtle);
+    border-bottom: 1px solid var(--color-border-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    min-height: 70px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.detail-navbar .navbar-logo {
+    display: flex;
+    align-items: center;
+    font-size: 2.2em;
+    font-weight: 800;
+    color: var(--color-dark-text);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.detail-navbar .nav-bee-icon {
+    font-size: 2.8em;
+    margin-right: 15px;
+    color: var(--color-primary-gold);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+    animation: honey-pulse 3s infinite ease-in-out, buzz 0.8s infinite alternate ease-in-out;
+}
+
+.detail-navbar .navbar-links {
+    display: flex;
+    align-items: center;
+}
+
+.detail-navbar .nav-link {
+    margin-left: 30px;
+    text-decoration: none;
+    color: var(--color-mid-text);
+    font-weight: 600;
+    font-size: 1em;
+    padding: 12px 18px;
+    border-radius: 12px;
+    transition: all var(--transition-duration) var(--transition-timing-function);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.detail-navbar .nav-link svg { /* Estilo para el icono de flecha "volver" */
+    margin-right: 8px;
+    font-size: 1.1em;
+    vertical-align: middle;
+}
+
+.detail-navbar .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--color-primary-gold);
+    transition: left var(--transition-duration) var(--transition-timing-function);
+    z-index: -1;
+    border-radius: inherit;
+}
+
+.detail-navbar .nav-link:hover {
+    color: var(--color-dark-text);
+    box-shadow: var(--shadow-subtle);
+    transform: translateY(-2px);
+}
+.detail-navbar .nav-link:hover::before {
+    left: 0;
+}
+
+/* --- Contenido Principal de Detalle --- */
+.detail-content {
+    flex-grow: 1;
+    padding: 50px;
+    max-width: 1300px; /* Ancho máximo para el contenido principal */
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1;
+    position: relative;
+}
+
+/* --- Sección de Encabezado de la Colmena --- */
+.hive-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-surface);
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-subtle);
+    margin-bottom: 50px;
+    border: 1px solid var(--color-border-light);
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
+    gap: 20px; /* Espacio entre los elementos */
+}
+
+.hive-header-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1; /* Permite que el info tome el espacio */
+    min-width: 280px; /* Asegura que no sea demasiado pequeño */
+}
+
+.hive-detail-icon {
+    font-size: 5.5em; /* Icono de colmena grande */
+    color: var(--color-primary-gold);
+    margin-right: 25px;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
+}
+
+.hive-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.hive-detail-title {
+    font-size: 3.5em;
+    font-weight: 800;
+    color: var(--color-dark-text);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.hive-location {
+    font-size: 1.2em;
+    color: var(--color-mid-text);
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.hive-detail-status {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 1.3em;
+    color: white; /* Texto blanco para todos los estados */
+    box-shadow: var(--shadow-subtle);
+    white-space: nowrap; /* Evita que el texto de estado se rompa */
+}
+
+.hive-detail-status svg {
+    margin-right: 12px;
+    font-size: 1.4em;
+}
+
+.hive-detail-status.status-ok { background-color: var(--color-status-ok); }
+.hive-detail-status.status-alert { background-color: var(--color-status-alert); color: var(--color-dark-text); } /* Texto oscuro para alerta para contraste */
+.hive-detail-status.status-critical { background-color: var(--color-status-critical); }
+.hive-detail-status.status-unknown { background-color: var(--color-light-text); }
+
+
+/* --- Pestañas de Navegación (Tabs) --- */
+.detail-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    background-color: var(--color-surface);
+    border-radius: 15px;
+    box-shadow: var(--shadow-subtle);
+    padding: 10px;
+    gap: 10px; /* Espacio entre botones */
+    flex-wrap: wrap; /* Permite que las pestañas se envuelvan si hay muchas */
+}
+
+.tab-button {
+    flex-grow: 1; /* Para que ocupen el espacio disponible */
+    padding: 18px 25px;
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--color-mid-text);
+    background-color: transparent;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap; /* Evita que el texto del botón se rompa */
+}
+
+.tab-button:hover {
+    background-color: var(--color-hover-overlay);
+    color: var(--color-dark-text);
+}
+
+.tab-button.active {
+    background-color: var(--color-primary-gold);
+    color: var(--color-dark-text); /* Texto oscuro para el tab activo */
+    box-shadow: var(--shadow-subtle);
+}
+
+
+/* --- Contenido de Pestañas (Común) --- */
+.tab-content {
+    background-color: var(--color-surface);
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--color-border-light);
+    min-height: 400px; /* Asegura un tamaño mínimo para el contenido */
+}
+
+/* --- Resumen Actual (Overview) --- */
+.current-metrics-title, .historical-chart-title, .alerts-title {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: var(--color-dark-text);
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+    padding-bottom: 15px;
+}
+.current-metrics-title::after, .historical-chart-title::after, .alerts-title::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--color-accent-orange);
+    border-radius: 2px;
+}
+
+
+.current-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.metric-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 30px 20px;
+    background-color: var(--color-background-soft);
+    border-radius: 15px;
+    box-shadow: var(--shadow-inset);
+    border: 1px solid var(--color-border-light);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast); /* Agregamos transiciones para color de fondo y borde */
+    position: relative; /* Para el nuevo label de estado */
+}
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(255, 193, 7, 0.2), var(--shadow-elevated);
+    border-color: var(--color-primary-gold);
+}
+
+.metric-card .metric-icon {
+    font-size: 3.5em;
+    /* Color inicial, será sobrescrito por las clases de estado */
+    color: var(--color-primary-gold);
+    margin-bottom: 15px;
+    transition: color var(--transition-fast); /* Transición para el color del icono */
+}
+
+.metric-card .metric-value {
+    font-size: 2.5em;
+    font-weight: 800;
+    color: var(--color-dark-text);
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.metric-card .metric-label {
+    font-size: 1em;
+    color: var(--color-mid-text);
+    font-weight: 500;
+}
+
+.metric-status-label { /* Nuevo estilo para el label de estado de la métrica */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.85em;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background-color: rgba(0,0,0,0.1);
+    color: white;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+
+/* --- Colores de estado para las tarjetas de métricas --- */
+.metric-card.ok {
+    border-color: var(--color-status-ok);
+    background-color: var(--color-surface); /* Fondo estándar */
+}
+.metric-card.ok .metric-icon {
+    color: var(--color-status-ok);
+}
+.metric-card.ok .metric-status-label {
+    background-color: var(--color-status-ok);
+    color: white;
+}
+
+.metric-card.alert {
+    border-color: var(--color-status-alert);
+    background-color: rgba(255, 235, 59, 0.1); /* Fondo muy sutil amarillo */
+}
+.metric-card.alert .metric-icon {
+    color: var(--color-status-alert);
+}
+.metric-card.alert .metric-status-label {
+    background-color: var(--color-status-alert);
+    color: var(--color-dark-text); /* Texto oscuro para contraste en amarillo */
+}
+
+.metric-card.critical {
+    border-color: var(--color-status-critical);
+    background-color: rgba(244, 67, 54, 0.1); /* Fondo muy sutil rojo */
+    animation: pulse-red-border 2s infinite ease-in-out; /* Animación para crítico */
+}
+.metric-card.critical .metric-icon {
+    color: var(--color-status-critical);
+}
+.metric-card.critical .metric-status-label {
+    background-color: var(--color-status-critical);
+    color: white;
+}
+
+/* Animación para el estado crítico */
+@keyframes pulse-red-border {
+    0%, 100% { border-color: var(--color-status-critical); }
+    50% { border-color: rgba(244, 67, 54, 0.5); }
+}
+
+
+.last-sync-time {
+    text-align: center;
+    font-size: 0.95em;
+    color: var(--color-light-text);
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-style: italic;
+}
+.last-sync-time svg {
+    font-size: 1.1em;
+    color: var(--color-mid-text);
+}
+
+
+/* --- Datos Históricos (Gráfico) --- */
+.chart-container {
+    height: 400px; /* Altura fija para el gráfico */
+    width: 100%;
+    /* No hay background-color específico aquí, ya que el gráfico tiene su propio estilo */
+}
+
+/* --- Alertas --- */
+.alert-filter-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.alert-filter-buttons .filter-button {
+    padding: 12px 22px;
+    border: 1px solid var(--color-border-light);
+    border-radius: 10px;
+    background-color: var(--color-background-soft);
+    color: var(--color-mid-text);
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.alert-filter-buttons .filter-button:hover {
+    background-color: var(--color-hover-overlay);
+    color: var(--color-dark-text);
+    border-color: var(--color-primary-gold);
+}
+
+.alert-filter-buttons .filter-button.active {
+    background-color: var(--color-primary-gold);
+    color: var(--color-dark-text);
+    border-color: var(--color-primary-gold);
+    box-shadow: var(--shadow-subtle);
+}
+
+.no-alerts-message {
+    text-align: center;
+    font-size: 1.1em;
+    color: var(--color-light-text);
+    margin-top: 60px;
+    padding: 30px;
+    background-color: var(--color-background-soft);
+    border-radius: 15px;
+    border: 1px dashed var(--color-border-light);
+}
+
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    padding: 25px 30px;
+    background-color: var(--color-background-soft);
+    border-radius: 15px;
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--color-border-light);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.alert-item.resolved {
+    opacity: 0.8;
+    background-color: rgba(76, 175, 80, 0.05); /* Muy sutil */
+    border-color: rgba(76, 175, 80, 0.2);
+}
+
+.alert-item.active {
+    border-left: 8px solid var(--color-status-critical);
+    animation: pulse-border 2s infinite ease-in-out; /* Animación sutil para alertas activas */
+}
+@keyframes pulse-border {
+    0%, 100% { border-color: var(--color-status-critical); }
+    50% { border-color: rgba(244, 67, 54, 0.6); }
+}
+
+
+.alert-icon-wrapper {
+    flex-shrink: 0; /* No se encoge */
+    margin-right: 25px;
+}
+
+.alert-status-icon {
+    font-size: 2.8em;
+}
+
+.alert-status-icon.active-icon { color: var(--color-status-critical); }
+.alert-status-icon.resolved-icon { color: var(--color-status-ok); }
+
+.alert-details {
+    flex-grow: 1; /* Permite que los detalles ocupen el espacio */
+}
+
+.alert-type {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--color-dark-text);
+    margin: 0 0 8px 0;
+}
+
+.alert-description {
+    font-size: 1em;
+    color: var(--color-mid-text);
+    margin: 0 0 10px 0;
+}
+
+.alert-timestamp {
+    font-size: 0.9em;
+    color: var(--color-light-text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-style: italic;
+}
+.alert-timestamp svg {
+    font-size: 1em;
+    color: var(--color-light-text);
+}
+
+.resolve-button {
+    flex-shrink: 0; /* No se encoge */
+    margin-left: 30px;
+    padding: 12px 20px;
+    background-color: var(--color-primary-gold);
+    color: var(--color-dark-text);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-subtle);
+    white-space: nowrap;
+}
+
+.resolve-button:hover {
+    background-color: var(--color-accent-orange);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* --- Pantalla de Carga (Loading Screen) --- */
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-background-soft);
+    color: var(--color-mid-text);
+    font-size: 1.5em;
+}
+
+.spinner {
+    border: 8px solid var(--color-border-light);
+    border-top: 8px solid var(--color-primary-gold);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* --- Media Queries (Responsividad) --- */
+@media (max-width: 1200px) {
+    .detail-content { padding: 40px; max-width: 1100px; }
+    .detail-navbar { padding: 18px 40px; }
+    .detail-navbar .nav-link { margin-left: 25px; font-size: 0.95em; padding: 10px 16px; }
+    .hive-header-section { padding: 30px 40px; }
+    .hive-detail-icon { font-size: 4.8em; margin-right: 20px; }
+    .hive-detail-title { font-size: 3em; }
+    .hive-location { font-size: 1.1em; }
+    .hive-detail-status { font-size: 1.2em; padding: 12px 20px; }
+    .detail-tabs { margin-bottom: 30px; padding: 8px; }
+    .tab-button { padding: 15px 20px; font-size: 1.05em; }
+    .tab-content { padding: 40px; }
+    .current-metrics-title, .historical-chart-title, .alerts-title { font-size: 2em; margin-bottom: 30px; }
+    .current-metrics-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; }
+    .metric-card { padding: 25px 15px; }
+    .metric-card .metric-icon { font-size: 3em; margin-bottom: 12px; }
+    .metric-card .metric-value { font-size: 2.2em; }
+    .chart-container { height: 350px; }
+    .alert-item { padding: 20px 25px; }
+    .alert-icon-wrapper { margin-right: 20px; }
+    .alert-status-icon { font-size: 2.5em; }
+    .alert-type { font-size: 1.4em; }
+    .alert-description { font-size: 0.95em; }
+    .resolve-button { margin-left: 25px; padding: 10px 18px; }
+}
+
+@media (max-width: 992px) {
+    .detail-navbar { flex-direction: column; align-items: center; padding: 15px 30px; min-height: auto; }
+    .detail-navbar .navbar-logo { margin-bottom: 10px; font-size: 1.9em; }
+    .detail-navbar .nav-bee-icon { font-size: 2.5em; }
+    .detail-navbar .navbar-links { margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+    .detail-navbar .nav-link { margin: 5px 10px; padding: 10px 15px; font-size: 0.9em; }
+
+    .detail-content { padding: 30px; }
+    .hive-header-section { flex-direction: column; text-align: center; padding: 25px 30px; align-items: flex-start; }
+    .hive-header-info { flex-direction: column; align-items: flex-start; margin-bottom: 20px; width: 100%; }
+    .hive-detail-icon { margin-right: 0; margin-bottom: 15px; font-size: 4.5em; }
+    .hive-title-group { align-items: flex-start; }
+    .hive-detail-status { width: 100%; justify-content: center; font-size: 1.1em; padding: 10px 15px; }
+    .detail-tabs { margin-bottom: 25px; padding: 5px; gap: 8px; }
+    .tab-button { padding: 12px 18px; font-size: 1em; }
+    .tab-content { padding: 30px; }
+    .current-metrics-title, .historical-chart-title, .alerts-title { font-size: 1.8em; margin-bottom: 25px; }
+    .current-metrics-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+    .metric-card { padding: 20px 10px; }
+    .metric-card .metric-icon { font-size: 2.8em; }
+    .metric-card .metric-value { font-size: 2em; }
+    .chart-container { height: 300px; }
+    .alert-item { flex-direction: column; align-items: flex-start; padding: 20px; text-align: left; }
+    .alert-icon-wrapper { margin-right: 0; margin-bottom: 15px; }
+    .alert-details { width: 100%; }
+    .resolve-button { margin-left: 0; margin-top: 15px; width: 100%; text-align: center; }
+}
+
+@media (max-width: 768px) {
+    .detail-navbar { padding: 15px 20px; flex-direction: row; justify-content: center; }
+    .detail-navbar .navbar-links { display: none; } /* Ocultar para hamburguesa */
+    .detail-content { padding: 20px; }
+    .hive-header-section { padding: 20px 25px; }
+    .hive-detail-icon { font-size: 4em; }
+    .hive-detail-title { font-size: 2.8em; }
+    .hive-location { font-size: 1em; }
+    .hive-detail-status { font-size: 1em; padding: 8px 12px; }
+    .detail-tabs { flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+    .tab-button { flex-basis: 48%; /* Dos botones por fila */ padding: 10px 15px; font-size: 0.95em; }
+    .tab-content { padding: 25px; }
+    .current-metrics-title, .historical-chart-title, .alerts-title { font-size: 1.6em; margin-bottom: 20px; }
+    .current-metrics-grid { grid-template-columns: 1fr; /* Una columna en móviles */ gap: 15px; }
+    .metric-card { padding: 20px; }
+    .metric-card .metric-icon { font-size: 2.5em; }
+    .metric-card .metric-value { font-size: 1.8em; }
+    .chart-container { height: 250px; }
+    .alert-filter-buttons { flex-wrap: wrap; gap: 10px; }
+    .alert-filter-buttons .filter-button { flex-basis: 48%; padding: 10px; font-size: 0.9em; }
+    .alert-item { padding: 15px; }
+    .alert-status-icon { font-size: 2.2em; }
+    .alert-type { font-size: 1.2em; }
+    .alert-description { font-size: 0.9em; }
+    .resolve-button { padding: 10px; font-size: 0.9em; }
+}
+
+@media (max-width: 480px) {
+    .detail-content { padding: 15px; }
+    .hive-header-section { padding: 15px 20px; }
+    .hive-detail-icon { font-size: 3.5em; }
+    .hive-detail-title { font-size: 2.2em; }
+    .hive-location { font-size: 0.9em; }
+    .hive-detail-status { font-size: 0.9em; padding: 6px 10px; }
+    .tab-button { flex-basis: 100%; /* Un botón por fila en pantallas muy pequeñas */ padding: 8px 12px; font-size: 0.85em; }
+    .tab-content { padding: 20px; }
+    .current-metrics-title, .historical-chart-title, .alerts-title { font-size: 1.4em; margin-bottom: 15px; }
+    .metric-card .metric-icon { font-size: 2em; }
+    .metric-card .metric-value { font-size: 1.6em; }
+    .chart-container { height: 200px; }
+    .alert-filter-buttons .filter-button { flex-basis: 100%; }
+    .alert-item { padding: 12px; }
+    .alert-status-icon { font-size: 2em; }
+    .alert-type { font-size: 1.1em; }
+    .alert-description { font-size: 0.85em; }
+    .resolve-button { font-size: 0.8em; }
+}

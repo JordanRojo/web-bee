@@ -1,0 +1,117 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0; /* Inicialmente invisible */
+    transition: opacity 0.3s ease-out; /* Transición para el fondo */
+
+    /* MUY IMPORTANTE: Permite clics a través del overlay cuando está invisible */
+    pointer-events: none;
+}
+
+.modal-overlay.active {
+    opacity: 1; /* Visible cuando está activo */
+    /* MUY IMPORTANTE: Bloquea clics cuando está activo y visible */
+    pointer-events: all;
+}
+
+.modal-content {
+    background-color: var(--color-surface);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-elevated);
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    transform: translateY(-20px); /* Posición inicial ligeramente arriba */
+    opacity: 0; /* Inicialmente invisible */
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Transición para el contenido */
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0); /* Posición final */
+    opacity: 1; /* Visible cuando está activo */
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    color: var(--color-dark-text);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.modal-message {
+    font-size: 1.1rem;
+    color: var(--color-mid-text);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.modal-button {
+    padding: 0.9rem 1.8rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.modal-button.confirm {
+    background-color: var(--color-status-critical); /* Rojo para confirmar eliminación */
+    color: var(--color-surface); /* Texto blanco */
+}
+
+.modal-button.confirm:hover {
+    background-color: #c0392b; /* Rojo más oscuro al pasar el ratón */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-subtle);
+}
+
+.modal-button.cancel {
+    background-color: var(--color-border-light); /* Gris claro para cancelar */
+    color: var(--color-dark-text);
+}
+
+.modal-button.cancel:hover {
+    background-color: #d1d1d1; /* Gris más oscuro al pasar el ratón */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-subtle);
+}
+
+/* Responsividad básica */
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
+
+    .modal-message {
+        font-size: 1rem;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .modal-button {
+        width: 100%;
+    }
+}
