@@ -1,0 +1,54 @@
+.image-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Asegura que esté por encima de todo */
+    backdrop-filter: blur(5px); /* Efecto de desenfoque opcional */
+}
+
+.image-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-width: 90vw; /* Máximo 90% del ancho de la vista */
+    max-height: 90vh; /* Máximo 90% de la altura de la vista */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Oculta cualquier desbordamiento de la imagen */
+}
+
+.image-modal-image {
+    max-width: 100%; /* La imagen se ajusta al ancho del modal */
+    max-height: 100%; /* La imagen se ajusta a la altura del modal */
+    object-fit: contain; /* Asegura que la imagen completa sea visible */
+    border-radius: 5px;
+}
+
+.image-modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    color: #fff; /* Blanco para contraste con el overlay oscuro */
+    cursor: pointer;
+    z-index: 2001; /* Por encima del modal y el overlay */
+    padding: 5px;
+    border-radius: 50%;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.image-modal-close-button:hover {
+    color: var(--color-primary-gold); /* Color de resaltado al pasar el ratón */
+    background-color: rgba(255, 255, 255, 0.1);
+}

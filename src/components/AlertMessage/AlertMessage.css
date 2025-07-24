@@ -79,7 +79,8 @@
 }
 
 .alert-message.info {
-    background-color: var(--color-secondary-blue); /* Azul para información */
+    background-color: var(--color-secondary-blue);
+    color: var(--color-dark-text); /* Azul para información */
 }
 
 /* Opcional: Iconos dentro del mensaje */

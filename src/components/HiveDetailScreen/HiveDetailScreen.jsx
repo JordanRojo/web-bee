@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog } from 'react-icons/fa'; // Añadimos FaChartBar y FaCog
+import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog, FaTimes } from 'react-icons/fa'; // Añadimos FaTimes para el botón de cerrar modal
 import { MdOutlineThermostat, MdOutlineWaterDrop, MdOutlineScale, MdAccessTime } from 'react-icons/md';
 import { GiBee } from 'react-icons/gi';
 import './HiveDetailScreen.css';
@@ -12,11 +12,12 @@ const sampleHiveData = {
         id: 'h1',
         name: 'Colmena 001 - Prado Verde',
         location: 'Sector Norte, Apiario A',
+        hiveImage: 'https://images.unsplash.com/photo-1616053303666-888941f173b9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Ejemplo de URL real
         status: 'OK',
         currentMetrics: {
-            temperature: 34.8, // Valor óptimo
-            humidity: 61.2,    // Valor óptimo
-            weight: 47.5,      // Valor óptimo
+            temperature: 34.8,
+            humidity: 61.2,
+            weight: 47.5,
             queenStatus: 'Activa'
         },
         historicalData: [
@@ -39,11 +40,12 @@ const sampleHiveData = {
         id: 'h2',
         name: 'Colmena 002 - Bosque Nativo',
         location: 'Sector Oeste, Apiario B',
+        hiveImage: 'https://images.unsplash.com/photo-1613133610996-03714b7e9c90?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Ejemplo de URL real
         status: 'ALERT',
         currentMetrics: {
-            temperature: 39.1, // Valor crítico (ej: sobrecalentamiento)
-            humidity: 78.0,    // Valor crítico (ej: humedad muy alta)
-            weight: 32.5,      // Valor crítico (ej: pérdida de peso significativa)
+            temperature: 39.1,
+            humidity: 78.0,
+            weight: 32.5,
             queenStatus: 'Inactiva (Posible Alerta)'
         },
         historicalData: [
@@ -65,11 +67,12 @@ const sampleHiveData = {
         id: 'h3',
         name: 'Colmena 003 - Campo de Flores',
         location: 'Sector Este, Apiario C',
+        hiveImage: 'https://images.unsplash.com/photo-1627883907797-17072a2e411b?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Ejemplo de URL real
         status: 'OK',
         currentMetrics: {
-            temperature: 36.5, // Valor de advertencia (alta)
-            humidity: 68.0,    // Valor de advertencia (alta)
-            weight: 40.0,      // Valor de advertencia (ligeramente bajo)
+            temperature: 36.5,
+            humidity: 68.0,
+            weight: 40.0,
             queenStatus: 'Activa'
         },
         historicalData: [
@@ -83,6 +86,21 @@ const sampleHiveData = {
             { name: '05 PM', temp: 36.3, humidity: 67, weight: 39.5 },
         ],
         alerts: []
+    },
+    h4: {
+        id: 'h4',
+        name: 'Colmena 004 - Apiario de la Montaña',
+        location: 'Zona Alpina, Apiario D',
+        hiveImage: 'https://placehold.co/150x150/D3D3D3/000000?text=Colmena004', // Default placeholder for h4
+        status: 'OK',
+        currentMetrics: {
+            temperature: 33.0,
+            humidity: 55.0,
+            weight: 45.0,
+            queenStatus: 'Activa'
+        },
+        historicalData: [],
+        alerts: []
     }
 };
 
@@ -91,18 +109,33 @@ const HiveDetailScreen = () => {
     const [hive, setHive] = useState(null);
     const [activeTab, setActiveTab] = useState('overview');
     const [filterAlerts, setFilterAlerts] = useState('active');
-    const [lastSyncTime, setLastSyncTime] = useState(null); // Nuevo estado para la última sincronización
+    const [lastSyncTime, setLastSyncTime] = useState(null);
+
+    // --- NUEVOS ESTADOS PARA EL MODAL DE IMAGEN ---
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [currentImageModalUrl, setCurrentImageModalUrl] = useState('');
 
     useEffect(() => {
         const fetchedHive = sampleHiveData[hiveId];
         if (fetchedHive) {
             setHive(fetchedHive);
-            setLastSyncTime(Date.now()); // Establece la hora actual como última sincronización
+            setLastSyncTime(Date.now());
         } else {
             console.error('Colmena no encontrada:', hiveId);
             setHive(null);
         }
     }, [hiveId]);
+
+    // --- FUNCIONES PARA ABRIR Y CERRAR EL MODAL ---
+    const openImageModal = (imageUrl) => {
+        setCurrentImageModalUrl(imageUrl);
+        setIsImageModalOpen(true);
+    };
+
+    const closeImageModal = () => {
+        setIsImageModalOpen(false);
+        setCurrentImageModalUrl('');
+    };
 
     if (!hive) {
         return (
@@ -131,38 +164,27 @@ const HiveDetailScreen = () => {
         }
     };
 
-    // --- NUEVA FUNCIÓN: Determinar estado de la métrica por valor ---
     const getMetricStatus = (metricType, value) => {
         switch (metricType) {
             case 'temperature':
-                // Rango óptimo: 32-36°C (temperatura del nido de cría)
                 if (value >= 32 && value <= 36) return { status: 'ok', icon: <MdOutlineThermostat />, label: 'Normal' };
-                // Advertencia: 30-31.9°C o 36.1-38°C
                 if ((value >= 30 && value < 32) || (value > 36 && value <= 38)) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
-                // Crítico: <30°C o >38°C
                 if (value < 30 || value > 38) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
                 return { status: 'unknown', icon: <MdOutlineThermostat />, label: 'Desconocido' };
 
             case 'humidity':
-                // Rango óptimo: 50-70% (humedad ideal para el nido de cría y miel)
                 if (value >= 50 && value <= 70) return { status: 'ok', icon: <MdOutlineWaterDrop />, label: 'Normal' };
-                // Advertencia: 40-49.9% o 70.1-75%
                 if ((value >= 40 && value < 50) || (value > 70 && value <= 75)) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
-                // Crítico: <40% o >75%
                 if (value < 40 || value > 75) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
                 return { status: 'unknown', icon: <MdOutlineWaterDrop />, label: 'Desconocido' };
 
             case 'weight':
-                // Rango óptimo: >40 kg (peso saludable, indica buena reserva de miel y población)
                 if (value > 40) return { status: 'ok', icon: <MdOutlineScale />, label: 'Normal' };
-                // Advertencia: 30-40 kg (podría indicar falta de reservas o problema de población)
                 if (value >= 30 && value <= 40) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
-                // Crítico: <30 kg (pérdida de peso severa, posible inanición o colapso)
                 if (value < 30) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
                 return { status: 'unknown', icon: <MdOutlineScale />, label: 'Desconocido' };
 
             case 'queenStatus':
-                // Simplemente para dar un ejemplo, no se basa en un rango numérico
                 if (value === 'Activa') return { status: 'ok', icon: <GiBee />, label: 'Activa' };
                 return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
             default:
@@ -170,7 +192,6 @@ const HiveDetailScreen = () => {
         }
     };
 
-    // --- FUNCIÓN: Formatear la hora de última sincronización ---
     const formatLastSyncTime = (timestamp) => {
         if (!timestamp) return 'N/A';
         const now = Date.now();
@@ -190,7 +211,6 @@ const HiveDetailScreen = () => {
         }
     };
 
-
     const getFilteredAlerts = () => {
         if (filterAlerts === 'active') {
             return hive.alerts.filter(alert => !alert.resolved);
@@ -200,12 +220,10 @@ const HiveDetailScreen = () => {
         return hive.alerts;
     };
 
-    // Obtenemos los estados para cada métrica
     const tempStatus = getMetricStatus('temperature', hive.currentMetrics.temperature);
     const humidityStatus = getMetricStatus('humidity', hive.currentMetrics.humidity);
     const weightStatus = getMetricStatus('weight', hive.currentMetrics.weight);
     const queenStatusInfo = getMetricStatus('queenStatus', hive.currentMetrics.queenStatus);
-
 
     return (
         <div className="hive-detail-screen-container">
@@ -216,14 +234,24 @@ const HiveDetailScreen = () => {
                 </div>
                 <div className="navbar-links">
                     <Link to="/dashboard" className="nav-link"><FaArrowLeft /> Volver al Dashboard</Link>
-                    <Link to="/reports" className="nav-link"><FaFileAlt /> Reportes</Link> {/* Icono para Reportes */}
-                    <Link to="/settings" className="nav-link"><FaCog /> Configuración</Link> {/* Icono para Configuración */}
+                    <Link to="/reports" className="nav-link"><FaFileAlt /> Reportes</Link>
+                    <Link to="/settings" className="nav-link"><FaCog /> Configuración</Link>
                 </div>
             </nav>
 
             <div className="detail-content">
                 <div className="hive-header-section">
                     <div className="hive-header-info">
+                        {hive.hiveImage && (
+                            <img
+                                src={hive.hiveImage}
+                                alt={`Imagen de ${hive.name}`}
+                                className="hive-detail-image"
+                                // AÑADIDO: Click para abrir el modal
+                                onClick={() => openImageModal(hive.hiveImage)}
+                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image'; }}
+                            />
+                        )}
                         <FaHive className="hive-detail-icon" />
                         <div className="hive-title-group">
                             <h1 className="hive-detail-title">{hive.name}</h1>
@@ -261,28 +289,24 @@ const HiveDetailScreen = () => {
                     <div className="tab-content overview-content">
                         <h2 className="current-metrics-title">Métricas Actuales</h2>
                         <div className="current-metrics-grid">
-                            {/* Tarjeta de Temperatura */}
                             <div className={`metric-card ${tempStatus.status}`}>
                                 {tempStatus.icon}
                                 <span className="metric-value">{hive.currentMetrics.temperature}°C</span>
                                 <span className="metric-label">Temperatura</span>
                                 <span className="metric-status-label">{tempStatus.label}</span>
                             </div>
-                            {/* Tarjeta de Humedad */}
                             <div className={`metric-card ${humidityStatus.status}`}>
                                 {humidityStatus.icon}
                                 <span className="metric-value">{hive.currentMetrics.humidity}%</span>
                                 <span className="metric-label">Humedad</span>
                                 <span className="metric-status-label">{humidityStatus.label}</span>
                             </div>
-                            {/* Tarjeta de Peso */}
                             <div className={`metric-card ${weightStatus.status}`}>
                                 {weightStatus.icon}
                                 <span className="metric-value">{hive.currentMetrics.weight} kg</span>
                                 <span className="metric-label">Peso</span>
                                 <span className="metric-status-label">{weightStatus.label}</span>
                             </div>
-                            {/* Tarjeta de Estado de la Reina */}
                             <div className={`metric-card ${queenStatusInfo.status}`}>
                                 {queenStatusInfo.icon}
                                 <span className="metric-value">{hive.currentMetrics.queenStatus}</span>
@@ -374,6 +398,14 @@ const HiveDetailScreen = () => {
                     </div>
                 )}
             </div>
+
+            {/* AÑADIDO: Modal de Imagen */}
+            {isImageModalOpen && (
+                <div className="image-modal" onClick={closeImageModal}>
+                    <FaTimes className="image-modal-close" onClick={closeImageModal} />
+                    <img className="image-modal-content" src={currentImageModalUrl} alt="Imagen ampliada de la colmena" />
+                </div>
+            )}
         </div>
     );
 };

@@ -10,73 +10,63 @@
 
 .hive-management-navbar {
     background-color: var(--color-surface);
-    padding: 20px 50px; /* Ajustado para ser consistente con otras navbars */
+    padding: 20px 50px;
     box-shadow: var(--shadow-subtle);
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    /* gap: 1.5rem;  Puedes eliminar esto si el margen izquierdo del nav-link lo maneja */
-    min-height: 70px; /* Consistente con otras navbars */
+    min-height: 70px;
     width: 100%;
     box-sizing: border-box;
-    position: sticky; /* Para que se mantenga en la parte superior al hacer scroll */
+    position: sticky;
     top: 0;
     z-index: 1000;
 }
 
 .hive-management-navbar .nav-link {
-    /* Propiedades para la animación completa */
     text-decoration: none;
     color: var(--color-mid-text);
-    font-weight: 600; /* Consistente con Dashboard/Reports/Settings */
+    font-weight: 600;
     font-size: 1em;
     padding: 12px 18px;
     border-radius: 12px;
-    /* --- ¡IMPORTANTE! Transición para TODAS las propiedades --- */
     transition: all var(--transition-duration) var(--transition-timing-function);
-    /* --- ¡IMPORTANTE! Posicionamiento para el pseudo-elemento --- */
     position: relative;
-    overflow: hidden; /* Oculta el ::before antes de que se deslice */
-    white-space: nowrap; /* Evita que el texto se rompa */
-    display: flex; /* Para alinear el ícono y el texto */
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
     align-items: center;
-    gap: 8px; /* Espacio entre el ícono y el texto */
-    /* margin-left: 30px; /* Si quieres un margen a la izquierda como en el dashboard */
+    gap: 8px;
 }
 
-/* Pseudo-elemento para el fondo deslizante */
 .hive-management-navbar .nav-link::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%; /* Inicia fuera de la pantalla a la izquierda */
+    left: -100%;
     width: 100%;
     height: 100%;
-    background: var(--color-primary-gold); /* Color dorado que se desliza */
-    /* --- ¡IMPORTANTE! Transición específica para el deslizamiento --- */
+    background: var(--color-primary-gold);
     transition: left var(--transition-duration) var(--transition-timing-function);
-    z-index: -1; /* Se asegura de que esté detrás del texto */
-    border-radius: inherit; /* Hereda el border-radius del enlace principal */
+    z-index: -1;
+    border-radius: inherit;
 }
 
-/* Estado hover para el enlace principal */
 .hive-management-navbar .nav-link:hover {
-    color: var(--color-dark-text); /* Cambia el color del texto */
-    box-shadow: var(--shadow-subtle); /* Añade una sombra sutil */
-    transform: translateY(-2px); /* Eleva ligeramente el botón */
+    color: var(--color-dark-text);
+    box-shadow: var(--shadow-subtle);
+    transform: translateY(-2px);
 }
 
-/* Estado hover para el pseudo-elemento ::before */
 .hive-management-navbar .nav-link:hover::before {
-    left: 0; /* Desliza el fondo dorado hasta que cubre el botón */
+    left: 0;
 }
 
-/* --- Resto de tus estilos de HiveManagementScreen.css (sin cambios, solo asegúrate de que estén después) --- */
-
+/* --- CONTENIDO PRINCIPAL --- */
 .hive-management-content {
     flex-grow: 1;
     padding: 2rem;
-    max-width: 1000px; /* Un poco más ancho para las tarjetas */
+    max-width: 1000px;
     margin: 2rem auto;
     background-color: var(--color-surface);
     border-radius: 12px;
@@ -90,8 +80,8 @@
     margin-bottom: 2.5rem;
     border-bottom: 1px solid var(--color-border-light);
     padding-bottom: 1.5rem;
-    flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
-    justify-content: space-between; /* Espacio entre el título y el botón */
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .hive-management-icon {
@@ -115,7 +105,7 @@
 
 .add-hive-button {
     background-color: var(--color-accent-orange);
-    color: var(--color-surface); /* Texto blanco para el naranja */
+    color: var(--color-surface);
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -129,39 +119,18 @@
 }
 
 .add-hive-button:hover {
-    background-color: #e08e00; /* Un tono más oscuro de naranja */
+    background-color: #e08e00;
     transform: translateY(-2px);
     box-shadow: var(--shadow-subtle);
 }
 
-/* Mensajes de feedback */
-.message-banner {
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-.message-banner.success {
-    background-color: #e6ffe6; /* Verde muy claro */
-    color: var(--color-status-ok);
-    border: 1px solid var(--color-status-ok);
-}
-
-.message-banner.error {
-    background-color: #ffe6e6; /* Rojo muy claro */
-    color: var(--color-status-critical);
-    border: 1px solid var(--color-status-critical);
-}
-
+/* --- FORMULARIO DE COLMENA --- */
 .hive-form-container {
     background-color: var(--color-background-soft);
     border-radius: 10px;
     padding: 1.5rem;
     box-shadow: var(--shadow-inset);
     margin-bottom: 2.5rem;
-    /* Añadir transición para que la aparición/desaparición sea suave */
     transition: all 0.3s ease-in-out;
 }
 
@@ -172,32 +141,26 @@
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--color-border-light);
-    display: flex; /* Para alinear el título con un posible ícono */
+    display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-/* Aplicamos Grid Layout al formulario para mejor control */
 .hive-form {
-    display: grid; /* Usamos grid para organizar los grupos de formulario */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Columnas responsivas */
-    gap: 1.5rem; /* Espacio entre los grupos de formulario */
-}
-
-/* Aseguramos que el textarea para la descripción ocupe todo el ancho si es necesario */
-.hive-form .form-group.full-width {
-    grid-column: 1 / -1; /* Hace que este grupo ocupe todas las columnas disponibles */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
 .hive-form .form-group label {
     font-weight: 600;
     color: var(--color-mid-text);
     margin-bottom: 0.5rem;
-    display: block; /* Asegura que la etiqueta tome su propia línea */
+    display: block;
 }
 
 .hive-form .form-input {
-    width: 100%; /* Ocupa todo el ancho de su contenedor */
+    width: 100%;
     padding: 0.8rem 1rem;
     border: 1px solid var(--color-border-light);
     border-radius: 6px;
@@ -205,7 +168,7 @@
     color: var(--color-dark-text);
     background-color: var(--color-surface);
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    box-sizing: border-box; /* Importante para que el padding no aumente el ancho */
+    box-sizing: border-box;
 }
 
 .hive-form .form-input:focus {
@@ -214,14 +177,146 @@
     box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
 }
 
-.hive-form .form-actions {
-    grid-column: 1 / -1; /* Ocupa todo el ancho en el grid */
+/* Estilos para el input de tipo file y previsualización */
+.file-input-group {
+    grid-column: 1 / -1;
     display: flex;
-    justify-content: flex-end; /* Alinea los botones a la derecha */
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-input-file {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--color-border-light);
+    border-radius: 6px;
+    background-color: var(--color-surface);
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--color-mid-text);
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-input-file::-webkit-file-upload-button {
+    visibility: hidden;
+    width: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.form-input-file::before {
+    content: 'Seleccionar Imagen';
+    display: inline-block;
+    background: var(--color-primary-gold);
+    color: var(--color-dark-text);
+    padding: 8px 15px;
+    border-radius: 6px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-right: 15px;
+    border: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.form-input-file:hover::before {
+    background-color: #e6b000;
+    transform: translateY(-1px);
+}
+
+.form-input-file:active::before {
+    background-color: #d1a000;
+}
+
+.image-preview {
+    margin-top: 15px;
+    border: 1px solid var(--color-border-light);
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--color-background-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 280px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: var(--shadow-subtle);
+    position: relative; /* Para posicionar los botones de acción */
+}
+
+.form-image-preview {
+    max-width: 100%;
+    height: auto;
+    max-height: 180px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    object-fit: contain;
+}
+
+.image-preview-text {
+    font-size: 0.85em;
+    color: var(--color-mid-text);
+    margin: 0;
+}
+
+/* Contenedor de los botones de acción en la previsualización */
+.image-preview-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center; /* Centra los botones */
+}
+
+.image-preview-actions .action-button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.image-preview-actions .expand-button {
+    background-color: var(--color-primary-gold);
+    color: var(--color-dark-text);
+    border: none;
+}
+
+.image-preview-actions .expand-button:hover {
+    background-color: #e6b000;
+    transform: translateY(-1px);
+}
+
+.image-preview-actions .discard-button {
+    background-color: var(--color-status-critical);
+    color: var(--color-surface);
+    border: none;
+}
+
+.image-preview-actions .discard-button:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
+}
+
+
+.hive-form .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
     gap: 1rem;
-    margin-top: 1rem; /* Ajustado el margen superior */
-    padding-top: 1rem; /* Espacio de los botones con los campos */
-    border-top: 1px solid var(--color-border-light); /* Una línea divisoria sutil */
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border-light);
 }
 
 .hive-form .save-button,
@@ -264,6 +359,7 @@
     background-color: #5a5a5a;
 }
 
+/* --- LISTA DE COLMENAS --- */
 .hive-list-section .section-title {
     font-size: 1.5rem;
     color: var(--color-dark-text);
@@ -292,11 +388,23 @@
     background-color: var(--color-surface);
     border-radius: 10px;
     box-shadow: var(--shadow-subtle);
-    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    position: relative; /* Para el enlace de detalle */
+    position: relative;
+    transition: all 0.4s ease-in-out;
+    transform: scale(1);
+    opacity: 1;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* Importante para el overlay de la imagen */
+}
+
+.hive-card > *:not(.hive-card-image-container) {
+    padding: 0 1.5rem;
+}
+.hive-card > h3 {
+    padding-top: 1.5rem;
 }
 
 .hive-card h3 {
@@ -326,6 +434,7 @@
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+    padding-bottom: 1.5rem;
 }
 
 .hive-card-actions .edit-button,
@@ -371,6 +480,7 @@
     text-decoration: none;
     font-weight: 600;
     transition: color var(--transition-fast);
+    padding: 0 1.5rem 1.5rem;
 }
 
 .view-detail-link:hover {
@@ -378,39 +488,70 @@
     text-decoration: underline;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .hive-management-content {
-        padding: 1.5rem;
-        margin: 1rem auto;
-    }
-
-    .hive-management-header-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .hive-management-title-group .hive-management-title {
-        font-size: 1.8rem;
-    }
-
-    .add-hive-button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .hive-form .form-actions {
-        flex-direction: column;
-    }
+/* Estilos para la imagen en las tarjetas de colmena */
+.hive-card-image-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border-light);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border-radius: 8px 8px 0 0;
+    position: relative; /* Necesario para posicionar el overlay */
 }
 
-@media (max-width: 480px) {
-    .hive-management-header-section {
-        align-items: center; /* Centrar elementos en pantallas muy pequeñas */
-        text-align: center;
-    }
+.hive-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
+
+/* Overlay para el botón de ampliar en las tarjetas */
+.hive-card-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0; /* Inicialmente oculto */
+    transition: opacity 0.3s ease;
+    border-radius: 8px 8px 0 0; /* Hereda el border-radius del contenedor */
+}
+
+.hive-card-image-container:hover .hive-card-image-overlay {
+    opacity: 1; /* Visible al pasar el ratón */
+}
+
+.expand-card-image-button {
+    background-color: var(--color-primary-gold);
+    color: var(--color-dark-text);
+    border: none;
+    border-radius: 50%; /* Botón circular */
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    box-shadow: var(--shadow-subtle);
+}
+
+.expand-card-image-button:hover {
+    background-color: #e6b000;
+    transform: scale(1.1);
+}
+
+/* --- ANIMACIONES --- */
 .hive-form-enter {
     opacity: 0;
     transform: translateY(-20px);
@@ -433,22 +574,16 @@
     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
-/* Animaciones para las tarjetas de colmena */
 .hive-card {
-    /* ... (mantén las propiedades existentes de .hive-card) ... */
-    transition: all 0.4s ease-in-out; /* Transición para cambios de propiedad */
-    transform: scale(1); /* Base para la animación de escala */
-    opacity: 1; /* Base para la animación de opacidad */
+    transition: all 0.4s ease-in-out;
+    transform: scale(1);
+    opacity: 1;
 }
 
-/* Animación de "entrada" para nuevas colmenas */
-/* Cuando una colmena se añade, se le podría dar una clase temporal para animar su aparición */
 .hive-card.added {
     animation: fadeInScaleUp 0.5s ease-out forwards;
 }
 
-/* Animación de "salida" para colmenas eliminadas */
-/* Esta clase se aplicará *antes* de que se elimine del DOM */
 .hive-card.removing {
     animation: fadeOutShrink 0.4s ease-in forwards;
 }
@@ -474,16 +609,56 @@
         transform: scale(0.7);
     }
 }
+
+/* --- MEDIA QUERIES (RESPONSIVE) --- */
 @media (max-width: 768px) {
-    /* ... (mantén el CSS responsivo existente) ... */
+    .hive-management-navbar {
+        padding: 15px 20px;
+    }
+
+    .hive-management-content {
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+
+    .hive-management-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .hive-management-title-group .hive-management-title {
+        font-size: 1.8rem;
+    }
+
+    .add-hive-button {
+        width: 100%;
+        justify-content: center;
+    }
 
     .hive-form {
-        grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
-        gap: 1.2rem; /* Reduce un poco el espacio */
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
     }
 
     .hive-form .form-actions {
-        flex-direction: column; /* Apila los botones en pantallas pequeñas */
-        align-items: stretch; /* Estira los botones para que ocupen todo el ancho */
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .image-preview {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .hive-management-header-section {
+        align-items: center;
+        text-align: center;
+    }
+    .form-input-file::before {
+        margin-right: 10px;
+        padding: 6px 12px;
+        font-size: 0.8em;
     }
 }
