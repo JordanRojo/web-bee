@@ -264,7 +264,7 @@ const ReportsScreen = () => {
                             <span className="summary-value">{reportData.overview.averageWeight.toFixed(1)} kg</span>
                             <span className="summary-label">Peso Promedio Apiario</span>
                         </div>
-                        <div className="summary-card highlight-card">
+                        {/*<div className="summary-card highlight-card">
                             <GiBee className="summary-icon" />
                             <span className="summary-value">{reportData.overview.totalHoneyHarvestedLastMonth} kg</span>
                             <span className="summary-label">Miel Cosechada (Últ. Mes)</span>
@@ -273,7 +273,7 @@ const ReportsScreen = () => {
                             <FaChartLine className="summary-icon" />
                             <span className="summary-value">{reportData.overview.averageDailyWeightGain.toFixed(1)} kg/día</span>
                             <span className="summary-label">Ganancia de Peso Diaria Prom.</span>
-                        </div>
+                        </div>*/}
                     </div>
                 </div>
 
