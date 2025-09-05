@@ -1,37 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaHive, FaMapMarkerAlt, FaInfoCircle, FaArrowLeft, FaSave, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaHive, FaMapMarkerAlt, FaImage, FaArrowLeft, FaSave, FaTimes, FaExpandAlt, FaRegTimesCircle } from 'react-icons/fa'; // Importa nuevos íconos
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './HiveManagementScreen.css';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
-import AlertMessage from '../AlertMessage/AlertMessage'; // <-- Importa el nuevo componente
+import AlertMessage from '../AlertMessage/AlertMessage';
+import ImageModal from '../ImageModal/ImageModal'; // Importa el nuevo componente de modal de imagen
 
-// Datos de colmenas de ejemplo (se actualizarán a medida que agreguemos/editemos)
+// Datos de colmenas de ejemplo (se actualizarán a medida que agregemos/editemos)
 const initialHives = [
-    { id: 'h1', name: 'Colmena 001', location: 'Sector Norte, Fila A', description: 'Colmena principal, producción alta.' },
-    { id: 'h2', name: 'Colmena 002', location: 'Sector Norte, Fila B', description: 'Colmena joven, crecimiento estable.' },
-    { id: 'h3', name: 'Colmena 003', location: 'Sector Sur, Fila A', description: 'Colmena recientemente dividida.' },
-    { id: 'h4', name: 'Colmena 004', location: 'Sector Oeste, Fila C', description: 'Colmena para investigación de comportamiento.' },
+    { id: 'h1', name: 'Colmena 001', apiaryName: 'Apiario del Sol', hiveImage: 'https://placehold.co/150x150/FFD700/000000?text=Colmena001' },
+    { id: 'h2', name: 'Colmena 002', apiaryName: 'Apiario de la Luna', hiveImage: 'https://placehold.co/150x150/C0C0C0/000000?text=Colmena002' },
+    { id: 'h3', name: 'Colmena 003', apiaryName: 'Apiario del Río', hiveImage: 'https://placehold.co/150x150/ADD8E6/000000?text=Colmena003' },
+    { id: 'h4', name: 'Colmena 004', apiaryName: 'Apiario de la Montaña', hiveImage: '' }, // Colmena sin imagen para probar el placeholder
 ];
 
 const HiveManagementScreen = () => {
     const [hives, setHives] = useState([]);
     const [loading, setLoading] = useState(true);
-    // Cambiamos 'message' a un objeto para incluir el tipo
     const [alert, setAlert] = useState({ message: '', type: '' });
     const [showForm, setShowForm] = useState(false);
     const [editingHive, setEditingHive] = useState(null);
     const [hiveName, setHiveName] = useState('');
-    const [hiveLocation, setHiveLocation] = useState('');
-    const [hiveDescription, setHiveDescription] = useState('');
-    const [removingHiveId, setRemovingHiveId] = useState(null);
+    const [apiaryName, setApiaryName] = useState('');
+    const [hiveImagePreview, setHiveImagePreview] = useState('');
+    const [hiveImageFile, setHiveImageFile] = useState(null);
+    const [hiveImageBase64, setHiveImageBase64] = useState(''); // <-- NUEVO ESTADO para la imagen en Base64
 
-    // Nuevos estados para el modal de confirmación
+    const [removingHiveId, setRemovingHiveId] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [hiveToDelete, setHiveToDelete] = useState(null);
 
+    // Nuevos estados para la ampliación de imagen
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [imageToDisplayInModal, setImageToDisplayInModal] = useState('');
+
     const navigate = useNavigate();
     const formRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         setLoading(true);
@@ -41,19 +47,71 @@ const HiveManagementScreen = () => {
         }, 500);
     }, []);
 
+    // Limpiar la URL de objeto cuando el componente se desmonte o la imagen de previsualización cambie
+    useEffect(() => {
+        return () => {
+            if (hiveImagePreview && hiveImagePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(hiveImagePreview);
+            }
+        };
+    }, [hiveImagePreview]);
+
     const generateUniqueId = () => {
         return `h_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Revocar URL blob: anterior si existe
+            if (hiveImagePreview && hiveImagePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(hiveImagePreview);
+            }
+
+            // Crear URL blob: para la previsualización inmediata en el formulario
+            const objectUrl = URL.createObjectURL(file);
+            setHiveImagePreview(objectUrl);
+            setHiveImageFile(file);
+
+            // Leer archivo como Base64 para guardarlo de forma "persistente" en el estado
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setHiveImageBase64(reader.result); // Guarda la cadena Base64
+            };
+            reader.readAsDataURL(file); // Lee el archivo como una URL de datos (Base64)
+
+        } else {
+            setHiveImagePreview('');
+            setHiveImageFile(null);
+            setHiveImageBase64(''); // Limpiar también la cadena Base64
+        }
     };
 
     const handleSaveHive = (e) => {
         e.preventDefault();
         setLoading(true);
-        setAlert({ message: '', type: '' }); // Limpiar cualquier alerta previa
+        setAlert({ message: '', type: '' });
+
+        let imageToSave = '';
+        if (hiveImageFile && hiveImageBase64) {
+            // Si hay un nuevo archivo seleccionado Y ya se ha convertido a Base64, usamos el Base64
+            imageToSave = hiveImageBase64; // <-- ¡Este es el cambio clave!
+        } else if (editingHive && editingHive.hiveImage) {
+            // Si estamos editando y no se seleccionó un nuevo archivo, mantenemos la imagen existente.
+            imageToSave = editingHive.hiveImage;
+        } else if (hiveImagePreview && hiveImagePreview.startsWith('http')) {
+            // Caso donde hiveImagePreview podría ser una URL remota de una edición
+            imageToSave = hiveImagePreview;
+        } else {
+            // Si no hay imagen, usar el placeholder genérico de "No Image"
+            imageToSave = 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image';
+        }
+
 
         const newHiveData = {
             name: hiveName,
-            location: hiveLocation,
-            description: hiveDescription,
+            apiaryName: apiaryName,
+            hiveImage: imageToSave, // Esta será la URL (Base64 o remota) que se guardará en el estado 'hives'
         };
 
         setTimeout(() => {
@@ -61,25 +119,26 @@ const HiveManagementScreen = () => {
                 setHives(hives.map(hive =>
                     hive.id === editingHive.id ? { ...hive, ...newHiveData } : hive
                 ));
-                setAlert({ message: '¡Colmena actualizada con éxito!', type: 'success' }); // Usar setAlert
+                setAlert({ message: '¡Colmena actualizada con éxito!', type: 'success' });
             } else {
                 const newId = generateUniqueId();
                 setHives(prevHives => [...prevHives, { id: newId, ...newHiveData }]);
-                setAlert({ message: '¡Nueva colmena agregada con éxito!', type: 'success' }); // Usar setAlert
+                setAlert({ message: '¡Nueva colmena agregada con éxito!', type: 'success' });
             }
             setLoading(false);
             setShowForm(false);
-            resetForm();
-            // No necesitamos un setTimeout aquí para borrar el mensaje, el AlertMessage lo maneja
+            resetForm(); // Esto limpiará la URL blob: y Base64 de la previsualización del formulario.
         }, 800);
     };
 
     const handleEditHive = (hive) => {
-        setAlert({ message: '', type: '' }); // Limpiar cualquier alerta al abrir el formulario
+        setAlert({ message: '', type: '' });
         setEditingHive(hive);
         setHiveName(hive.name);
-        setHiveLocation(hive.location);
-        setHiveDescription(hive.description);
+        setApiaryName(hive.apiaryName || '');
+        setHiveImagePreview(hive.hiveImage || ''); // Muestra la URL existente (sea remota o Base64) o vacía
+        setHiveImageFile(null); // Asegura que no haya un archivo pendiente de una carga anterior
+        setHiveImageBase64(hive.hiveImage && hive.hiveImage.startsWith('data:') ? hive.hiveImage : ''); // Carga Base64 si ya existía
         setShowForm(true);
 
         setTimeout(() => {
@@ -89,47 +148,53 @@ const HiveManagementScreen = () => {
         }, 100);
     };
 
-    // Abre el modal de confirmación
     const confirmDeleteHive = (hiveId) => {
-        setAlert({ message: '', type: '' }); // Limpiar cualquier alerta al abrir el modal de confirmación
+        setAlert({ message: '', type: '' });
         setHiveToDelete(hiveId);
         setIsConfirmModalOpen(true);
     };
 
-    // Lógica para eliminar la colmena (llamada desde el modal)
     const handleActualDeleteHive = () => {
         if (hiveToDelete) {
             setLoading(true);
-            setAlert({ message: '', type: '' }); // Limpiar alerta antes de la operación de eliminación
-            setRemovingHiveId(hiveToDelete); // Para la animación de salida de la tarjeta
+            setAlert({ message: '', type: '' });
+            setRemovingHiveId(hiveToDelete);
 
             setTimeout(() => {
                 setHives(hives.filter(hive => hive.id !== hiveToDelete));
-                setAlert({ message: 'Colmena eliminada con éxito.', type: 'success' }); // Usar setAlert
+                setAlert({ message: 'Colmena eliminada con éxito.', type: 'success' });
                 setLoading(false);
                 setRemovingHiveId(null);
-                setHiveToDelete(null); // Limpiar el estado de la colmena a eliminar
-                setIsConfirmModalOpen(false); // Cerrar el modal después de la operación
-                // No necesitamos un setTimeout aquí para borrar el mensaje, el AlertMessage lo maneja
-            }, 400); // Coincide con la duración de la animación CSS de la tarjeta
+                setHiveToDelete(null);
+                setIsConfirmModalOpen(false);
+            }, 400);
         }
     };
 
     const handleCancelDelete = () => {
-        setIsConfirmModalOpen(false); // Cierra el modal
-        setHiveToDelete(null); // Limpiar el estado si se cancela
-        setAlert({ message: 'Operación de eliminación cancelada.', type: 'info' }); // Mensaje de cancelación (opcional, o déjalo vacío)
+        setIsConfirmModalOpen(false);
+        setHiveToDelete(null);
+        setAlert({ message: 'Operación de eliminación cancelada.', type: 'info' });
     };
 
     const resetForm = () => {
         setEditingHive(null);
         setHiveName('');
-        setHiveLocation('');
-        setHiveDescription('');
+        setApiaryName('');
+        // Importante: si hiveImagePreview es un blob, hay que revocarlo para liberar memoria
+        if (hiveImagePreview && hiveImagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(hiveImagePreview);
+        }
+        setHiveImagePreview('');
+        setHiveImageFile(null);
+        setHiveImageBase64(''); // <-- Limpiar también el Base64
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Limpia el input de archivo visualmente
+        }
     };
 
     const handleAddHiveClick = () => {
-        setAlert({ message: '', type: '' }); // Limpiar cualquier alerta al abrir el formulario de añadir
+        setAlert({ message: '', type: '' });
         resetForm();
         setShowForm(true);
         setTimeout(() => {
@@ -139,9 +204,34 @@ const HiveManagementScreen = () => {
         }, 100);
     };
 
-    // Función para que AlertMessage pueda limpiar el estado 'alert' en el padre
     const handleDismissAlert = () => {
         setAlert({ message: '', type: '' });
+    };
+
+    // Funciones para el modal de imagen
+    const openImageModal = (imageSrc) => {
+        setImageToDisplayInModal(imageSrc);
+        setIsImageModalOpen(true);
+    };
+
+    const closeImageModal = () => {
+        setIsImageModalOpen(false);
+        setImageToDisplayInModal('');
+    };
+
+    // Función para descartar la imagen de previsualización (del formulario)
+    const handleDiscardImage = () => {
+        if (hiveImagePreview && hiveImagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(hiveImagePreview);
+        }
+        setHiveImagePreview('');
+        setHiveImageFile(null);
+        setHiveImageBase64(''); // <-- Limpiar también el Base64
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Limpia el input de archivo visualmente
+        }
+                setAlert({ message: 'Imágen descartada correctamente.', type: 'success' });
+        // No enviamos un alert aquí, ya que el descarte es una acción del usuario en el formulario
     };
 
     if (loading && hives.length === 0) {
@@ -171,7 +261,6 @@ const HiveManagementScreen = () => {
                     </button>
                 </div>
 
-                {/* Reemplaza el message-banner antiguo con el nuevo AlertMessage */}
                 <AlertMessage
                     message={alert.message}
                     type={alert.type}
@@ -200,24 +289,47 @@ const HiveManagementScreen = () => {
                                 />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="hiveLocation">Ubicación:</label>
+                                <label htmlFor="apiaryName">Nombre del Apiario:</label>
                                 <input
                                     type="text"
-                                    id="hiveLocation"
-                                    value={hiveLocation}
-                                    onChange={(e) => setHiveLocation(e.target.value)}
+                                    id="apiaryName"
+                                    value={apiaryName}
+                                    onChange={(e) => setApiaryName(e.target.value)}
                                     className="form-input"
                                 />
                             </div>
-                            <div className="form-group full-width">
-                                <label htmlFor="hiveDescription">Descripción:</label>
-                                <textarea
-                                    id="hiveDescription"
-                                    value={hiveDescription}
-                                    onChange={(e) => setHiveDescription(e.target.value)}
-                                    rows="3"
-                                    className="form-input"
-                                ></textarea>
+                            <div className="form-group full-width file-input-group">
+                                <label htmlFor="hiveImageFile">Imagen de la Colmena:</label>
+                                <input
+                                    type="file"
+                                    id="hiveImageFile"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    ref={fileInputRef}
+                                    className="form-input-file"
+                                />
+                                {/* Se muestra la previsualización: preferimos hiveImagePreview (blob) si está, sino la imagen actual (Base64 o URL remota) */}
+                                {(hiveImagePreview || (editingHive && editingHive.hiveImage)) && (
+                                    <div className="image-preview">
+                                        <img
+                                            src={hiveImagePreview || editingHive.hiveImage}
+                                            alt="Vista previa de la colmena"
+                                            className="form-image-preview"
+                                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image'; }}
+                                        />
+                                        <p className="image-preview-text">
+                                            {hiveImagePreview.startsWith('blob:') ? 'Imagen local seleccionada' : 'Imagen actual (URL)'}
+                                        </p>
+                                        <div className="image-preview-actions"> {/* Nuevos botones */}
+                                            <button type="button" className="action-button expand-button" onClick={() => openImageModal(hiveImagePreview || (editingHive && editingHive.hiveImage) || 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image')}>
+                                                <FaExpandAlt /> Ampliar
+                                            </button>
+                                            <button type="button" className="action-button discard-button" onClick={handleDiscardImage}>
+                                                <FaRegTimesCircle /> Descartar
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div className="form-actions">
                                 <button type="submit" className="save-button" disabled={loading}>
@@ -251,9 +363,23 @@ const HiveManagementScreen = () => {
                                         className={`hive-card ${removingHiveId === hive.id ? 'removing' : ''}`}
                                         ref={React.createRef()}
                                     >
+                                        {/* El contenedor de imagen siempre se renderiza */}
+                                        <div className="hive-card-image-container">
+                                            <img
+                                                // Aquí se aplica la lógica para mostrar la imagen o el placeholder
+                                                src={hive.hiveImage ? hive.hiveImage : 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image'}
+                                                alt={`Colmena ${hive.name}`}
+                                                className="hive-card-image"
+                                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image'; }}
+                                            />
+                                            <div className="hive-card-image-overlay"> {/* Overlay para botón de ampliar */}
+                                                <button className="expand-card-image-button" onClick={() => openImageModal(hive.hiveImage ? hive.hiveImage : 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image')}>
+                                                    <FaExpandAlt />
+                                                </button>
+                                            </div>
+                                        </div>
                                         <h3><FaHive /> {hive.name}</h3>
-                                        <p><FaMapMarkerAlt /> Ubicación: {hive.location}</p>
-                                        <p><FaInfoCircle /> Descripción: {hive.description}</p>
+                                        <p><FaMapMarkerAlt /> Apiario: {hive.apiaryName}</p>
                                         <div className="hive-card-actions">
                                             <button className="edit-button" onClick={() => handleEditHive(hive)}>
                                                 <FaEdit /> Editar
@@ -271,7 +397,6 @@ const HiveManagementScreen = () => {
                 </div>
             </div>
 
-            {/* Agrega el componente ConfirmationModal aquí */}
             <ConfirmationModal
                 isOpen={isConfirmModalOpen}
                 onClose={handleCancelDelete}
@@ -282,6 +407,12 @@ const HiveManagementScreen = () => {
                     `Estás a punto de eliminar la colmena "${hives.find(h => h.id === hiveToDelete)?.name}". Esta acción es irreversible.` :
                     "¿Estás seguro de que quieres eliminar este elemento? Esta acción es irreversible."
                 }
+            />
+
+            <ImageModal
+                isOpen={isImageModalOpen}
+                imageUrl={imageToDisplayInModal}
+                onClose={closeImageModal}
             />
         </div>
     );

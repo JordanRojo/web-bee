@@ -29,6 +29,10 @@
     --transition-duration: 0.3s;
     --transition-timing-function: ease-in-out;
     --transition-fast: 0.15s ease-out;
+
+    /* --- Nuevas variables para el modal de imagen --- */
+    --color-modal-background: rgba(0, 0, 0, 0.8);
+    --modal-close-color: #f1f1f1;
 }
 
 /* --- Animaciones Keyframes (Mismas que en Dashboard) --- */
@@ -204,17 +208,36 @@ html, body, #root {
     gap: 20px; /* Espacio entre los elementos */
 }
 
+/* Adjusted: flex-direction row and space between elements */
 .hive-header-info {
     display: flex;
-    align-items: center;
+    align-items: center; /* Align items vertically in the middle */
+    gap: 20px; /* Space between image/icon and text */
     flex-grow: 1; /* Permite que el info tome el espacio */
     min-width: 280px; /* Asegura que no sea demasiado pequeño */
+}
+
+/* NEW: Style for the hive image */
+.hive-detail-image {
+    /* Aumentado el tamaño de la imagen */
+    width: 150px; /* Antes 100px */
+    height: 150px; /* Antes 100px */
+    border-radius: 10px; /* Slightly rounded corners */
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+    border: 2px solid var(--color-border-light); /* Optional: add a subtle border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add a subtle shadow */
+    cursor: pointer; /* Indicar que es clicable */
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hive-detail-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .hive-detail-icon {
     font-size: 5.5em; /* Icono de colmena grande */
     color: var(--color-primary-gold);
-    margin-right: 25px;
     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
 }
 
@@ -633,6 +656,66 @@ html, body, #root {
     100% { transform: rotate(360deg); }
 }
 
+/* --- Estilos del Modal para la Imagen Ampliada --- */
+.image-modal {
+    display: flex; /* Usar flexbox para centrar contenido */
+    position: fixed; /* Ocupa toda la pantalla */
+    z-index: 2000; /* Asegura que esté por encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Permite scroll si la imagen es muy grande */
+    background-color: var(--color-modal-background); /* Fondo semitransparente */
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
+    backdrop-filter: blur(5px); /* Efecto de desenfoque en el fondo */
+    -webkit-backdrop-filter: blur(5px); /* Para compatibilidad con Safari */
+    animation: fadeIn 0.3s ease-out; /* Animación de aparición */
+}
+
+.image-modal-content {
+    margin: auto;
+    display: block;
+    /* Aumentado el tamaño máximo de la imagen en el modal */
+    max-width: 95%; /* Antes 90% */
+    max-height: 95vh; /* Antes 90vh */
+    object-fit: contain; /* Asegura que la imagen se ajuste dentro de los límites */
+    border-radius: 15px;
+    box-shadow: var(--shadow-elevated);
+    animation: zoomIn 0.3s ease-out; /* Animación de "zoom" al abrir */
+}
+
+.image-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: var(--modal-close-color);
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+    z-index: 2001; /* Asegura que el botón de cerrar esté por encima de la imagen */
+}
+
+.image-modal-close:hover,
+.image-modal-close:focus {
+    color: var(--color-primary-gold);
+    text-decoration: none;
+    cursor: pointer;
+    transform: rotate(90deg); /* Pequeña animación al pasar el ratón */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0.8; }
+    to { transform: scale(1); opacity: 1; }
+}
+
 
 /* --- Media Queries (Responsividad) --- */
 @media (max-width: 1200px) {
@@ -640,7 +723,11 @@ html, body, #root {
     .detail-navbar { padding: 18px 40px; }
     .detail-navbar .nav-link { margin-left: 25px; font-size: 0.95em; padding: 10px 16px; }
     .hive-header-section { padding: 30px 40px; }
-    .hive-detail-icon { font-size: 4.8em; margin-right: 20px; }
+    /* Adjustments for image presence */
+    .hive-header-info { gap: 15px; } /* Slightly less gap */
+    /* Aumentado el tamaño de la imagen en media query */
+    .hive-detail-image { width: 120px; height: 120px; } /* Antes 90px */
+    .hive-detail-icon { font-size: 4.8em; } /* Still large, but consider if it's redundant with image */
     .hive-detail-title { font-size: 3em; }
     .hive-location { font-size: 1.1em; }
     .hive-detail-status { font-size: 1.2em; padding: 12px 20px; }
@@ -659,6 +746,9 @@ html, body, #root {
     .alert-type { font-size: 1.4em; }
     .alert-description { font-size: 0.95em; }
     .resolve-button { margin-left: 25px; padding: 10px 18px; }
+
+    .image-modal-close { top: 15px; right: 25px; font-size: 35px; }
+    .image-modal-content { max-width: 98%; max-height: 98vh; } /* Aumentado aún más en el modal para pantallas grandes */
 }
 
 @media (max-width: 992px) {
@@ -669,10 +759,12 @@ html, body, #root {
     .detail-navbar .nav-link { margin: 5px 10px; padding: 10px 15px; font-size: 0.9em; }
 
     .detail-content { padding: 30px; }
-    .hive-header-section { flex-direction: column; text-align: center; padding: 25px 30px; align-items: flex-start; }
-    .hive-header-info { flex-direction: column; align-items: flex-start; margin-bottom: 20px; width: 100%; }
-    .hive-detail-icon { margin-right: 0; margin-bottom: 15px; font-size: 4.5em; }
-    .hive-title-group { align-items: flex-start; }
+    .hive-header-section { flex-direction: column; text-align: center; padding: 25px 30px; align-items: center; } /* Changed to center for mobile */
+    .hive-header-info { flex-direction: column; align-items: center; margin-bottom: 20px; width: 100%; text-align: center; } /* Centered items */
+    /* Aumentado el tamaño de la imagen en media query */
+    .hive-detail-image { width: 100px; height: 100px; margin-bottom: 15px; } /* Antes 90px */ /* Add space below image when stacked */
+    .hive-detail-icon { margin-right: 0; margin-bottom: 10px; font-size: 4.5em; } /* Adjusted spacing */
+    .hive-title-group { align-items: center; } /* Centered text */
     .hive-detail-status { width: 100%; justify-content: center; font-size: 1.1em; padding: 10px 15px; }
     .detail-tabs { margin-bottom: 25px; padding: 5px; gap: 8px; }
     .tab-button { padding: 12px 18px; font-size: 1em; }
@@ -687,6 +779,8 @@ html, body, #root {
     .alert-icon-wrapper { margin-right: 0; margin-bottom: 15px; }
     .alert-details { width: 100%; }
     .resolve-button { margin-left: 0; margin-top: 15px; width: 100%; text-align: center; }
+
+    .image-modal-close { top: 10px; right: 20px; font-size: 30px; }
 }
 
 @media (max-width: 768px) {
@@ -694,7 +788,10 @@ html, body, #root {
     .detail-navbar .navbar-links { display: none; } /* Ocultar para hamburguesa */
     .detail-content { padding: 20px; }
     .hive-header-section { padding: 20px 25px; }
-    .hive-detail-icon { font-size: 4em; }
+    /* Further adjustments for smaller screens */
+    /* Aumentado el tamaño de la imagen en media query */
+    .hive-detail-image { width: 90px; height: 90px; margin-bottom: 10px; } /* Antes 80px */
+    .hive-detail-icon { font-size: 4em; margin-bottom: 8px; }
     .hive-detail-title { font-size: 2.8em; }
     .hive-location { font-size: 1em; }
     .hive-detail-status { font-size: 1em; padding: 8px 12px; }
@@ -714,12 +811,17 @@ html, body, #root {
     .alert-type { font-size: 1.2em; }
     .alert-description { font-size: 0.9em; }
     .resolve-button { padding: 10px; font-size: 0.9em; }
+
+    .image-modal-close { top: 5px; right: 15px; font-size: 25px; }
 }
 
 @media (max-width: 480px) {
     .detail-content { padding: 15px; }
     .hive-header-section { padding: 15px 20px; }
-    .hive-detail-icon { font-size: 3.5em; }
+    /* Even smaller image */
+    /* Aumentado el tamaño de la imagen en media query */
+    .hive-detail-image { width: 80px; height: 80px; margin-bottom: 8px; } /* Antes 70px */
+    .hive-detail-icon { font-size: 3.5em; margin-bottom: 6px; }
     .hive-detail-title { font-size: 2.2em; }
     .hive-location { font-size: 0.9em; }
     .hive-detail-status { font-size: 0.9em; padding: 6px 10px; }
@@ -735,4 +837,58 @@ html, body, #root {
     .alert-type { font-size: 1.1em; }
     .alert-description { font-size: 0.85em; }
     .resolve-button { font-size: 0.8em; }
+
+    .image-modal-close { top: 0px; right: 10px; font-size: 20px; }
+}
+.image-modal {
+    display: flex; /* Para centrar la imagen */
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Fija el modal sobre todo el contenido */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Permite scroll si la imagen es muy grande */
+    background-color: rgba(0, 0, 0, 0.9); /* Fondo semitransparente oscuro */
+}
+
+.image-modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%; /* Limita el ancho de la imagen para que no desborde */
+    max-height: 90%; /* Limita la altura de la imagen */
+    object-fit: contain; /* Asegura que la imagen se vea completa dentro de los límites */
+    border-radius: 8px; /* Opcional: bordes redondeados para la imagen */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.image-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer; /* Indica que es clickeable */
+    z-index: 1001; /* Asegura que el botón esté sobre la imagen del modal */
+}
+
+.image-modal-close:hover,
+.image-modal-close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Agrega un poco de estilo para el cursor en la imagen clicable */
+.hive-detail-image {
+    cursor: pointer; /* Cambia el cursor a una mano cuando pasas por encima */
+    transition: transform 0.2s ease-in-out; /* Animación al hacer hover */
+}
+
+.hive-detail-image:hover {
+    transform: scale(1.02); /* Ligeramente más grande al pasar el mouse */
 }
