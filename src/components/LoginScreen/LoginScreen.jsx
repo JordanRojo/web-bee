@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom'; // 👈 Importa useNavigate
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import './LoginScreen.css';
 
 // Importa los iconos necesarios de React Icons
@@ -71,7 +71,7 @@ function LoginScreen() {
 
   const rutInputRef = useRef(null);
   const forgotRutInputRef = useRef(null);
-  const navigate = useNavigate(); // 👈 Inicializa el hook de navegación
+  const navigate = useNavigate(); // Inicializa el hook de navegación
 
   const handleRutChange = (e) => {
     const input = e.target;
@@ -144,7 +144,7 @@ function LoginScreen() {
 
       if (response.success) {
         console.log('Inicio de sesión exitoso:', response.message);
-        navigate('/dashboard'); // 👈 Redirige al dashboard
+        navigate('/dashboard'); // Redirige al dashboard
       } else {
         setError(response.message);
       }
