@@ -1,27 +1,23 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; // 👈 Importa useNavigate
 import './LoginScreen.css';
 
 // Importa los iconos necesarios de React Icons
 import { GiBee } from 'react-icons/gi';
 import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 
-// --- Funciones de validación y formateo de RUT ---
+// --- Funciones de validación y formateo de RUT (sin cambios) ---
 const formatRut = (rut) => {
   if (!rut) return '';
-
   rut = rut.replace(/[^0-9kK]/g, '').toUpperCase();
-
   if (rut.length <= 1) {
     return rut;
   }
-
   let rutBody = rut.slice(0, -1);
   let dv = rut.slice(-1);
-  
   if (!/^[0-9]+$/.test(rutBody)) {
     return rut;
   }
-
   let formattedRutBody = '';
   let j = 0;
   for (let i = rutBody.length - 1; i >= 0; i--) {
@@ -31,35 +27,27 @@ const formatRut = (rut) => {
       formattedRutBody = '.' + formattedRutBody;
     }
   }
-
   return formattedRutBody + '-' + dv;
 };
 
 const validateRut = (rut) => {
   const rutLimpio = rut.replace(/[^0-9kK]/g, '').toUpperCase();
-  
   if (!rutLimpio || rutLimpio.length <= 1) {
     return false;
   }
-
   const cuerpoRut = rutLimpio.slice(0, -1);
   const digitoVerificador = rutLimpio.slice(-1);
-
   if (!/^[0-9]+$/.test(cuerpoRut)) {
     return false;
   }
-
   let suma = 0;
   let multiplicador = 2;
-
   for (let i = cuerpoRut.length - 1; i >= 0; i--) {
     suma += parseInt(cuerpoRut.charAt(i), 10) * multiplicador;
     multiplicador = (multiplicador === 7) ? 2 : multiplicador + 1;
   }
-
   const resto = suma % 11;
   const dvCalculado = 11 - resto;
-
   if (dvCalculado === 11) {
     return digitoVerificador === '0';
   } else if (dvCalculado === 10) {
@@ -83,17 +71,15 @@ function LoginScreen() {
 
   const rutInputRef = useRef(null);
   const forgotRutInputRef = useRef(null);
+  const navigate = useNavigate(); // 👈 Inicializa el hook de navegación
 
   const handleRutChange = (e) => {
     const input = e.target;
     const prevSelectionStart = input.selectionStart;
     const prevValue = input.value;
-
     const newFormattedRut = formatRut(input.value);
     setRut(newFormattedRut);
-    
     const lengthDiff = newFormattedRut.length - prevValue.length;
-
     if (rutInputRef.current) {
         setTimeout(() => {
             const newCursorPosition = prevSelectionStart + lengthDiff;
@@ -106,12 +92,9 @@ function LoginScreen() {
     const input = e.target;
     const prevSelectionStart = input.selectionStart;
     const prevValue = input.value;
-
     const newFormattedRut = formatRut(input.value);
     setForgotPasswordRut(newFormattedRut);
-
     const lengthDiff = newFormattedRut.length - prevValue.length;
-
     if (forgotRutInputRef.current) {
         setTimeout(() => {
             const newCursorPosition = prevSelectionStart + lengthDiff;
@@ -128,40 +111,32 @@ function LoginScreen() {
     const rutDePrueba = '21.371.531-3';
     const contrasenaDePrueba = '12345';
 
-    // Validar campos vacíos primero
     if (!rut) {
       setError('Por favor, ingresa tu RUT.');
       setLoading(false);
       return;
     }
-
     if (!password) {
       setError('Por favor, ingresa tu contraseña.');
       setLoading(false);
       return;
     }
-    
-    // Validar el formato del RUT
     if (!validateRut(rut)) {
       setError('El RUT ingresado no es válido. Por favor, verifica el formato y el dígito verificador.');
       setLoading(false);
       return;
     }
-    
-    // ✅ CORRECCIÓN: Validaciones de credenciales separadas
     if (rut !== rutDePrueba) {
         setError('RUT incorrecto. Por favor, inténtalo de nuevo.');
         setLoading(false);
         return;
     }
-    
     if (password !== contrasenaDePrueba) {
         setError('Contraseña incorrecta. Por favor, inténtalo de nuevo.');
         setLoading(false);
         return;
     }
 
-    // Si todas las validaciones pasan, se procede a la simulación del login
     try {
       const response = await new Promise(resolve => setTimeout(() => {
         resolve({ success: true, message: 'Inicio de sesión exitoso' });
@@ -169,7 +144,7 @@ function LoginScreen() {
 
       if (response.success) {
         console.log('Inicio de sesión exitoso:', response.message);
-        alert('¡Inicio de sesión exitoso! Redirigiendo al dashboard...');
+        navigate('/dashboard'); // 👈 Redirige al dashboard
       } else {
         setError(response.message);
       }
@@ -192,13 +167,11 @@ function LoginScreen() {
       setLoading(false);
       return;
     }
-
     if (!validateRut(forgotPasswordRut)) {
       setError('El RUT ingresado no es válido. Por favor, verifica el formato y el dígito verificador.');
       setLoading(false);
       return;
     }
-
     try {
       const response = await new Promise(resolve => setTimeout(() => {
         if (validateRut(forgotPasswordRut)) {
@@ -207,7 +180,6 @@ function LoginScreen() {
           resolve({ success: false, message: 'Si el RUT está registrado, recibirás un correo electrónico con instrucciones para restablecer tu contraseña.' });
         }
       }, 2500));
-
       if (response.success) {
         setSuccessMessage(response.message);
         setForgotPasswordRut('');
@@ -256,7 +228,6 @@ function LoginScreen() {
                 ref={rutInputRef}
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="password" className="input-label">Contraseña:</label>
               <div className="password-input-wrapper">
@@ -282,13 +253,10 @@ function LoginScreen() {
                 </button>
               </div>
             </div>
-
             {error && <p className={`error-message ${error ? 'show' : ''}`} role="alert">{error}</p>}
-
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
-
             <p className="forgot-password">
               <a href="#" onClick={(e) => {
                 e.preventDefault();
@@ -302,7 +270,6 @@ function LoginScreen() {
           <form onSubmit={handleForgotPasswordSubmit} className="login-form forgot-password-form">
             <h3 className="form-subtitle">Restablecer Contraseña</h3>
             <p className="form-description">Ingresa tu RUT y te enviaremos instrucciones para restablecer tu contraseña.</p>
-            
             <div className="form-group">
               <label htmlFor="forgotRut" className="input-label">RUT:</label>
               <input
@@ -319,14 +286,11 @@ function LoginScreen() {
                 ref={forgotRutInputRef}
               />
             </div>
-
             {error && <p className={`error-message ${error ? 'show' : ''}`} role="alert">{error}</p>}
             {successMessage && <p className="success-message show" role="status">{successMessage}</p>}
-
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? 'Enviando...' : 'Enviar Instrucciones'}
             </button>
-
             <p className="back-to-login">
               <a href="#" onClick={(e) => {
                 e.preventDefault();
