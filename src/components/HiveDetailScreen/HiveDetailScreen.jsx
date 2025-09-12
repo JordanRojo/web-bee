@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog, FaTimes } from 'react-icons/fa'; // Añadimos FaTimes para el botón de cerrar modal
+import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog, FaTimes, FaTimesCircle } from 'react-icons/fa';
 import { MdOutlineThermostat, MdOutlineWaterDrop, MdOutlineScale, MdAccessTime } from 'react-icons/md';
 import { GiBee } from 'react-icons/gi';
 import './HiveDetailScreen.css';
 
-// Datos de ejemplo para una colmena específica
+// Datos de ejemplo (sin cambios)
 const sampleHiveData = {
     h1: {
         id: 'h1',
         name: 'Colmena 001 - Prado Verde',
         location: 'Sector Norte, Apiario A',
-        hiveImage: 'https://images.unsplash.com/photo-1616053303666-888941f173b9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Ejemplo de URL real
+        hiveImage: 'https://images.unsplash.com/photo-1616053303666-888941f173b9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         status: 'OK',
         currentMetrics: {
             temperature: 34.8,
@@ -21,14 +21,16 @@ const sampleHiveData = {
             queenStatus: 'Activa'
         },
         historicalData: [
-            { name: '10 AM', temp: 34, humidity: 59, weight: 47.8 },
-            { name: '11 AM', temp: 35, humidity: 60, weight: 47.7 },
-            { name: '12 PM', temp: 34.5, humidity: 61, weight: 47.5 },
-            { name: '01 PM', temp: 34.7, humidity: 62, weight: 47.4 },
-            { name: '02 PM', temp: 35.1, humidity: 60, weight: 47.3 },
-            { name: '03 PM', temp: 34.9, humidity: 61, weight: 47.2 },
-            { name: '04 PM', temp: 35.2, humidity: 62, weight: 47.1 },
-            { name: '05 PM', temp: 35.0, humidity: 61, weight: 47.0 },
+            { date: '2025-09-12', time: '08:00 AM', temp: 34.2, humidity: 60.5, weight: 47.9 },
+            { date: '2025-09-12', time: '09:00 AM', temp: 34.5, humidity: 61.1, weight: 47.8 },
+            { date: '2025-09-12', time: '10:00 AM', temp: 36.1, humidity: 62.0, weight: 47.7 },
+            { date: '2025-09-12', time: '11:00 AM', temp: 38.8, humidity: 62.8, weight: 47.5 },
+            { date: '2025-09-12', time: '12:00 PM', temp: 36.5, humidity: 63.5, weight: 47.4 },
+            { date: '2025-09-12', time: '01:00 PM', temp: 35.5, humidity: 63.0, weight: 47.3 },
+            { date: '2025-09-12', time: '02:00 PM', temp: 34.0, humidity: 62.5, weight: 47.2 },
+            { date: '2025-09-12', time: '03:00 PM', temp: 34.8, humidity: 62.1, weight: 47.1 },
+            { date: '2025-09-12', time: '04:00 PM', temp: 34.5, humidity: 61.8, weight: 47.0 },
+            { date: '2025-09-12', time: '05:00 PM', temp: 33.2, humidity: 61.5, weight: 46.9 },
         ],
         alerts: [
             { id: 1, type: 'Temperatura Alta', description: 'La temperatura ha superado los 38°C durante 30 min.', timestamp: '2025-07-17 14:30', resolved: false },
@@ -40,7 +42,7 @@ const sampleHiveData = {
         id: 'h2',
         name: 'Colmena 002 - Bosque Nativo',
         location: 'Sector Oeste, Apiario B',
-        hiveImage: 'https://images.unsplash.com/photo-1613133610996-03714b7e9c90?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Ejemplo de URL real
+        hiveImage: 'https://images.unsplash.com/photo-1613133610996-03714b7e9c90?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         status: 'ALERT',
         currentMetrics: {
             temperature: 39.1,
@@ -49,14 +51,14 @@ const sampleHiveData = {
             queenStatus: 'Inactiva (Posible Alerta)'
         },
         historicalData: [
-            { name: '10 AM', temp: 37, humidity: 70, weight: 43.0 },
-            { name: '11 AM', temp: 38.2, humidity: 75, weight: 42.8 },
-            { name: '12 PM', temp: 38.5, humidity: 78, weight: 42.5 },
-            { name: '01 PM', temp: 38.1, humidity: 77, weight: 42.3 },
-            { name: '02 PM', temp: 37.9, humidity: 76, weight: 42.1 },
-            { name: '03 PM', temp: 38.3, humidity: 75, weight: 42.0 },
-            { name: '04 PM', temp: 38.0, humidity: 77, weight: 41.8 },
-            { name: '05 PM', temp: 38.4, humidity: 78, weight: 41.5 },
+            { date: '2025-09-12', time: '10:00 AM', temp: 37, humidity: 70, weight: 43.0 },
+            { date: '2025-09-12', time: '11:00 AM', temp: 38.2, humidity: 75, weight: 42.8 },
+            { date: '2025-09-12', time: '12:00 PM', temp: 38.5, humidity: 78, weight: 42.5 },
+            { date: '2025-09-12', time: '01:00 PM', temp: 38.1, humidity: 77, weight: 42.3 },
+            { date: '2025-09-12', time: '02:00 PM', temp: 37.9, humidity: 76, weight: 42.1 },
+            { date: '2025-09-12', time: '03:00 PM', temp: 38.3, humidity: 75, weight: 42.0 },
+            { date: '2025-09-12', time: '04:00 PM', temp: 38.0, humidity: 77, weight: 41.8 },
+            { date: '2025-09-12', time: '05:00 PM', temp: 38.4, humidity: 78, weight: 41.5 },
         ],
         alerts: [
             { id: 4, type: 'Temperatura Crítica', description: '¡ADVERTENCIA! Temperatura constante > 38.5°C. Actuar de inmediato.', timestamp: '2025-07-17 10:00', resolved: false },
@@ -67,7 +69,7 @@ const sampleHiveData = {
         id: 'h3',
         name: 'Colmena 003 - Campo de Flores',
         location: 'Sector Este, Apiario C',
-        hiveImage: 'https://images.unsplash.com/photo-1627883907797-17072a2e411b?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', // Ejemplo de URL real
+        hiveImage: 'https://images.unsplash.com/photo-1627883907797-17072a2e411b?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         status: 'OK',
         currentMetrics: {
             temperature: 36.5,
@@ -76,14 +78,14 @@ const sampleHiveData = {
             queenStatus: 'Activa'
         },
         historicalData: [
-            { name: '10 AM', temp: 35, humidity: 60, weight: 41.0 },
-            { name: '11 AM', temp: 35.5, humidity: 62, weight: 40.8 },
-            { name: '12 PM', temp: 36.0, humidity: 65, weight: 40.5 },
-            { name: '01 PM', temp: 36.5, humidity: 68, weight: 40.0 },
-            { name: '02 PM', temp: 36.2, humidity: 67, weight: 39.8 },
-            { name: '03 PM', temp: 36.0, humidity: 66, weight: 39.7 },
-            { name: '04 PM', temp: 36.1, humidity: 67, weight: 39.6 },
-            { name: '05 PM', temp: 36.3, humidity: 67, weight: 39.5 },
+            { date: '2025-09-12', time: '10:00 AM', temp: 35, humidity: 60, weight: 41.0 },
+            { date: '2025-09-12', time: '11:00 AM', temp: 35.5, humidity: 62, weight: 40.8 },
+            { date: '2025-09-12', time: '12:00 PM', temp: 36.0, humidity: 65, weight: 40.5 },
+            { date: '2025-09-12', time: '01:00 PM', temp: 36.5, humidity: 68, weight: 40.0 },
+            { date: '2025-09-12', time: '02:00 PM', temp: 36.2, humidity: 67, weight: 39.8 },
+            { date: '2025-09-12', time: '03:00 PM', temp: 36.0, humidity: 66, weight: 39.7 },
+            { date: '2025-09-12', time: '04:00 PM', temp: 36.1, humidity: 67, weight: 39.6 },
+            { date: '2025-09-12', time: '05:00 PM', temp: 36.3, humidity: 67, weight: 39.5 },
         ],
         alerts: []
     },
@@ -91,7 +93,7 @@ const sampleHiveData = {
         id: 'h4',
         name: 'Colmena 004 - Apiario de la Montaña',
         location: 'Zona Alpina, Apiario D',
-        hiveImage: 'https://placehold.co/150x150/D3D3D3/000000?text=Colmena004', // Default placeholder for h4
+        hiveImage: 'https://placehold.co/150x150/D3D3D3/000000?text=Colmena004',
         status: 'OK',
         currentMetrics: {
             temperature: 33.0,
@@ -111,7 +113,8 @@ const HiveDetailScreen = () => {
     const [filterAlerts, setFilterAlerts] = useState('active');
     const [lastSyncTime, setLastSyncTime] = useState(null);
 
-    // --- NUEVOS ESTADOS PARA EL MODAL DE IMAGEN ---
+    const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
+    const [selectedSensorData, setSelectedSensorData] = useState(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [currentImageModalUrl, setCurrentImageModalUrl] = useState('');
 
@@ -126,7 +129,6 @@ const HiveDetailScreen = () => {
         }
     }, [hiveId]);
 
-    // --- FUNCIONES PARA ABRIR Y CERRAR EL MODAL ---
     const openImageModal = (imageUrl) => {
         setCurrentImageModalUrl(imageUrl);
         setIsImageModalOpen(true);
@@ -136,15 +138,11 @@ const HiveDetailScreen = () => {
         setIsImageModalOpen(false);
         setCurrentImageModalUrl('');
     };
-
-    if (!hive) {
-        return (
-            <div className="loading-screen">
-                <p>Cargando detalles de la colmena...</p>
-                <div className="spinner"></div>
-            </div>
-        );
-    }
+    
+    const closeSensorModal = () => {
+        setIsSensorModalOpen(false);
+        setSelectedSensorData(null);
+    };
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -167,22 +165,22 @@ const HiveDetailScreen = () => {
     const getMetricStatus = (metricType, value) => {
         switch (metricType) {
             case 'temperature':
-                if (value >= 32 && value <= 36) return { status: 'ok', icon: <MdOutlineThermostat />, label: 'Normal' };
+                if (value >= 32 && value <= 36) return { status: 'ok', icon: <FaCheckCircle />, label: 'Normal' };
                 if ((value >= 30 && value < 32) || (value > 36 && value <= 38)) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
-                if (value < 30 || value > 38) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
-                return { status: 'unknown', icon: <MdOutlineThermostat />, label: 'Desconocido' };
+                if (value < 30 || value > 38) return { status: 'critical', icon: <FaTimesCircle />, label: 'Crítico' };
+                return { status: 'unknown', icon: null, label: 'Desconocido' };
 
             case 'humidity':
-                if (value >= 50 && value <= 70) return { status: 'ok', icon: <MdOutlineWaterDrop />, label: 'Normal' };
+                if (value >= 50 && value <= 70) return { status: 'ok', icon: <FaCheckCircle />, label: 'Normal' };
                 if ((value >= 40 && value < 50) || (value > 70 && value <= 75)) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
-                if (value < 40 || value > 75) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
-                return { status: 'unknown', icon: <MdOutlineWaterDrop />, label: 'Desconocido' };
+                if (value < 40 || value > 75) return { status: 'critical', icon: <FaTimesCircle />, label: 'Crítico' };
+                return { status: 'unknown', icon: null, label: 'Desconocido' };
 
             case 'weight':
-                if (value > 40) return { status: 'ok', icon: <MdOutlineScale />, label: 'Normal' };
+                if (value > 40) return { status: 'ok', icon: <FaCheckCircle />, label: 'Normal' };
                 if (value >= 30 && value <= 40) return { status: 'alert', icon: <FaExclamationTriangle />, label: 'Alerta' };
-                if (value < 30) return { status: 'critical', icon: <FaExclamationTriangle />, label: 'Crítico' };
-                return { status: 'unknown', icon: <MdOutlineScale />, label: 'Desconocido' };
+                if (value < 30) return { status: 'critical', icon: <FaTimesCircle />, label: 'Crítico' };
+                return { status: 'unknown', icon: null, label: 'Desconocido' };
 
             case 'queenStatus':
                 if (value === 'Activa') return { status: 'ok', icon: <GiBee />, label: 'Activa' };
@@ -211,6 +209,55 @@ const HiveDetailScreen = () => {
         }
     };
 
+    const openSensorModal = (sensorType) => {
+        const sensorDetails = {
+            temperature: {
+                title: 'Temperatura Diaria',
+                dataKey: 'temp',
+                unit: '°C',
+                icon: <FaThermometerHalf className="modal-icon" />
+            },
+            humidity: {
+                title: 'Humedad Diaria',
+                dataKey: 'humidity',
+                unit: '%',
+                icon: <FaTint className="modal-icon" />
+            },
+            weight: {
+                title: 'Peso Diario',
+                dataKey: 'weight',
+                unit: ' kg',
+                icon: <FaWeightHanging className="modal-icon" />
+            }
+        };
+        
+        const enhancedData = hive.historicalData.map(record => ({
+            ...record,
+            statusInfo: getMetricStatus(sensorType, record[sensorDetails[sensorType].dataKey])
+        }));
+
+        setSelectedSensorData({
+            ...sensorDetails[sensorType],
+            historicalData: enhancedData
+        });
+        setIsSensorModalOpen(true);
+    };
+
+    if (!hive) {
+        return (
+            <div className="loading-screen">
+                <p>Cargando detalles de la colmena...</p>
+                <div className="spinner"></div>
+            </div>
+        );
+    }
+    
+    // 👇 MOVER ESTA LÓGICA AQUÍ, DESPUÉS DE LA COMPROBACIÓN DE `hive`
+    const tempStatus = getMetricStatus('temperature', hive.currentMetrics.temperature);
+    const humidityStatus = getMetricStatus('humidity', hive.currentMetrics.humidity);
+    const weightStatus = getMetricStatus('weight', hive.currentMetrics.weight);
+    const queenStatusInfo = getMetricStatus('queenStatus', hive.currentMetrics.queenStatus);
+    
     const getFilteredAlerts = () => {
         if (filterAlerts === 'active') {
             return hive.alerts.filter(alert => !alert.resolved);
@@ -219,11 +266,6 @@ const HiveDetailScreen = () => {
         }
         return hive.alerts;
     };
-
-    const tempStatus = getMetricStatus('temperature', hive.currentMetrics.temperature);
-    const humidityStatus = getMetricStatus('humidity', hive.currentMetrics.humidity);
-    const weightStatus = getMetricStatus('weight', hive.currentMetrics.weight);
-    const queenStatusInfo = getMetricStatus('queenStatus', hive.currentMetrics.queenStatus);
 
     return (
         <div className="hive-detail-screen-container">
@@ -247,7 +289,6 @@ const HiveDetailScreen = () => {
                                 src={hive.hiveImage}
                                 alt={`Imagen de ${hive.name}`}
                                 className="hive-detail-image"
-                                // AÑADIDO: Click para abrir el modal
                                 onClick={() => openImageModal(hive.hiveImage)}
                                 onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150/CCCCCC/000000?text=No+Image'; }}
                             />
@@ -289,19 +330,19 @@ const HiveDetailScreen = () => {
                     <div className="tab-content overview-content">
                         <h2 className="current-metrics-title">Métricas Actuales</h2>
                         <div className="current-metrics-grid">
-                            <div className={`metric-card ${tempStatus.status}`}>
+                            <div className={`metric-card ${tempStatus.status}`} onClick={() => openSensorModal('temperature')}>
                                 {tempStatus.icon}
                                 <span className="metric-value">{hive.currentMetrics.temperature}°C</span>
                                 <span className="metric-label">Temperatura</span>
                                 <span className="metric-status-label">{tempStatus.label}</span>
                             </div>
-                            <div className={`metric-card ${humidityStatus.status}`}>
+                            <div className={`metric-card ${humidityStatus.status}`} onClick={() => openSensorModal('humidity')}>
                                 {humidityStatus.icon}
                                 <span className="metric-value">{hive.currentMetrics.humidity}%</span>
                                 <span className="metric-label">Humedad</span>
                                 <span className="metric-status-label">{humidityStatus.label}</span>
                             </div>
-                            <div className={`metric-card ${weightStatus.status}`}>
+                            <div className={`metric-card ${weightStatus.status}`} onClick={() => openSensorModal('weight')}>
                                 {weightStatus.icon}
                                 <span className="metric-value">{hive.currentMetrics.weight} kg</span>
                                 <span className="metric-label">Peso</span>
@@ -369,7 +410,6 @@ const HiveDetailScreen = () => {
                                 Todas ({hive.alerts.length})
                             </button>
                         </div>
-
                         {getFilteredAlerts().length === 0 ? (
                             <p className="no-alerts-message">No hay alertas {filterAlerts === 'active' ? 'activas' : filterAlerts === 'resolved' ? 'resueltas' : ''} para mostrar.</p>
                         ) : (
@@ -399,11 +439,59 @@ const HiveDetailScreen = () => {
                 )}
             </div>
 
-            {/* AÑADIDO: Modal de Imagen */}
             {isImageModalOpen && (
                 <div className="image-modal" onClick={closeImageModal}>
                     <FaTimes className="image-modal-close" onClick={closeImageModal} />
                     <img className="image-modal-content" src={currentImageModalUrl} alt="Imagen ampliada de la colmena" />
+                </div>
+            )}
+
+            {isSensorModalOpen && selectedSensorData && (
+                <div className="sensor-modal-overlay" onClick={closeSensorModal}>
+                    <div className="sensor-modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close-button" onClick={closeSensorModal}>
+                            <FaTimes />
+                        </button>
+                        <div className="modal-header">
+                            {selectedSensorData.icon}
+                            <div className="modal-header-text">
+                                <h2 className="modal-title">{selectedSensorData.title}</h2>
+                                <p className="modal-subtitle">Registros del día: {new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                            </div>
+                        </div>
+                        <div className="data-table-container">
+                            {selectedSensorData.historicalData.length > 0 ? (
+                                <table className="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Valor ({selectedSensorData.unit})</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {selectedSensorData.historicalData.map((data, index) => (
+                                            <tr key={index} className={`row-status-${data.statusInfo.status}`}>
+                                                <td>{data.date}</td>
+                                                <td>{data.time}</td>
+                                                <td>{data[selectedSensorData.dataKey]}</td>
+                                                <td className="status-cell">
+                                                    <span className={`status-label status-${data.statusInfo.status}`}>
+                                                        {data.statusInfo.icon} {data.statusInfo.label}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p className="no-data-message">
+                                    <FaBell /> No hay registros disponibles para este sensor en el día.
+                                </p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
