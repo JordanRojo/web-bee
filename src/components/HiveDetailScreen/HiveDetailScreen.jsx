@@ -467,7 +467,6 @@ const HiveDetailScreen = () => {
                                             <th>Fecha</th>
                                             <th>Hora</th>
                                             <th>Valor ({selectedSensorData.unit})</th>
-                                            <th>Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -476,11 +475,6 @@ const HiveDetailScreen = () => {
                                                 <td>{data.date}</td>
                                                 <td>{data.time}</td>
                                                 <td>{data[selectedSensorData.dataKey]}</td>
-                                                <td className="status-cell">
-                                                    <span className={`status-label status-${data.statusInfo.status}`}>
-                                                        {data.statusInfo.icon} {data.statusInfo.label}
-                                                    </span>
-                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
