@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaCog, FaBell, FaThermometerHalf, FaWeightHanging, FaTint, FaUserCircle, FaSave, FaArrowLeft } from 'react-icons/fa';
-import './SettingsScreen.css'; // Asegúrate de crear este archivo CSS
+import './SettingsScreen.css';
 
 const SettingsScreen = () => {
     // Estado para los umbrales de alerta
-    const [tempThreshold, setTempThreshold] = useState(38.0); // Ejemplo: Temperatura alta
-    const [humidityThreshold, setHumidityThreshold] = useState(75.0); // Ejemplo: Humedad alta
-    const [weightThreshold, setWeightThreshold] = useState(30.0); // Ejemplo: Peso bajo
+    const [minTempThreshold, setMinTempThreshold] = useState(35.0);
+    const [maxTempThreshold, setMaxTempThreshold] = useState(38.0);
+    const [minHumidityThreshold, setMinHumidityThreshold] = useState(50.0);
+    const [maxHumidityThreshold, setMaxHumidityThreshold] = useState(75.0);
+    const [minWeightThreshold, setMinWeightThreshold] = useState(30.0);
+    const [maxWeightThreshold, setMaxWeightThreshold] = useState(45.0);
 
     // Estado para las preferencias de notificación
     const [notifyTemp, setNotifyTemp] = useState(true);
     const [notifyHumidity, setNotifyHumidity] = useState(true);
     const [notifyWeight, setNotifyWeight] = useState(true);
-    const [notifyActivity, setNotifyActivity] = useState(false); // Ejemplo: Actividad anormal
+    const [notifyActivity, setNotifyActivity] = useState(false);
 
     // Estado para simular la carga y el guardado
     const [loading, setLoading] = useState(true);
-    const [message, setMessage] = useState(''); // Mensajes de éxito/error
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
-        // Simular carga de configuraciones existentes
         setLoading(true);
         setTimeout(() => {
-            // En una aplicación real, aquí harías una llamada a la API
-            // para obtener las configuraciones guardadas por el usuario.
-            // Por ahora, usamos valores por defecto o simulados.
-            setTempThreshold(38.5);
-            setHumidityThreshold(70.0);
-            setWeightThreshold(35.0);
+            setMinTempThreshold(36.0);
+            setMaxTempThreshold(39.0);
+            setMinHumidityThreshold(60.0);
+            setMaxHumidityThreshold(80.0);
+            setMinWeightThreshold(32.0);
+            setMaxWeightThreshold(40.0);
             setNotifyTemp(true);
             setNotifyHumidity(true);
             setNotifyWeight(true);
@@ -38,18 +40,18 @@ const SettingsScreen = () => {
     }, []);
 
     const handleSaveChanges = (e) => {
-        e.preventDefault(); // Evitar recarga de página por el formulario
+        e.preventDefault();
         setLoading(true);
         setMessage('');
 
-        // Simular envío de datos a una API
         setTimeout(() => {
-            // En una aplicación real, aquí enviarías los estados actuales
-            // a tu backend.
             console.log("Configuraciones guardadas:");
-            console.log("Temperatura Máx.:", tempThreshold);
-            console.log("Humedad Máx.:", humidityThreshold);
-            console.log("Peso Mín.:", weightThreshold);
+            console.log("Temperatura Min.:", minTempThreshold);
+            console.log("Temperatura Máx.:", maxTempThreshold);
+            console.log("Humedad Min.:", minHumidityThreshold);
+            console.log("Humedad Máx.:", maxHumidityThreshold);
+            console.log("Peso Mín.:", minWeightThreshold);
+            console.log("Peso Máx.:", maxWeightThreshold);
             console.log("Notificar Temp:", notifyTemp);
             console.log("Notificar Humedad:", notifyHumidity);
             console.log("Notificar Peso:", notifyWeight);
@@ -57,7 +59,6 @@ const SettingsScreen = () => {
 
             setMessage('¡Configuraciones guardadas con éxito!');
             setLoading(false);
-            // El mensaje desaparecerá después de un tiempo
             setTimeout(() => setMessage(''), 3000);
         }, 1000);
     };
@@ -75,7 +76,6 @@ const SettingsScreen = () => {
         <div className="settings-screen-container">
             <nav className="settings-navbar">
                 <Link to="/dashboard" className="nav-link"><FaArrowLeft /> Volver al Dashboard</Link>
-                {/* Puedes añadir más enlaces aquí si es necesario */}
             </nav>
             <div className="settings-content">
                 <div className="settings-header-section">
@@ -138,38 +138,92 @@ const SettingsScreen = () => {
                     <div className="settings-section">
                         <h2 className="section-title">Umbrales de Alerta Personalizados</h2>
                         <div className="form-group-grid">
-                            <div className="form-group">
-                                <label htmlFor="tempThreshold"><FaThermometerHalf /> Temp. Alta (°C):</label>
-                                <input
-                                    type="number"
-                                    id="tempThreshold"
-                                    value={tempThreshold}
-                                    onChange={(e) => setTempThreshold(parseFloat(e.target.value))}
-                                    step="0.1"
-                                    className="setting-input"
-                                />
+                            <div className="form-group threshold-group">
+                                <label><FaThermometerHalf /> Temperatura (°C):</label>
+                                <div className="input-range">
+                                    <div className="input-field-wrapper">
+                                        <label htmlFor="minTempThreshold">Mín.</label>
+                                        <input
+                                            type="number"
+                                            id="minTempThreshold"
+                                            value={minTempThreshold}
+                                            onChange={(e) => setMinTempThreshold(parseFloat(e.target.value))}
+                                            step="0.1"
+                                            className="setting-input"
+                                            placeholder="Mín."
+                                        />
+                                    </div>
+                                    <div className="input-field-wrapper">
+                                        <label htmlFor="maxTempThreshold">Máx.</label>
+                                        <input
+                                            type="number"
+                                            id="maxTempThreshold"
+                                            value={maxTempThreshold}
+                                            onChange={(e) => setMaxTempThreshold(parseFloat(e.target.value))}
+                                            step="0.1"
+                                            className="setting-input"
+                                            placeholder="Máx."
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="humidityThreshold"><FaTint /> Humedad Alta (%):</label>
-                                <input
-                                    type="number"
-                                    id="humidityThreshold"
-                                    value={humidityThreshold}
-                                    onChange={(e) => setHumidityThreshold(parseFloat(e.target.value))}
-                                    step="0.1"
-                                    className="setting-input"
-                                />
+                            <div className="form-group threshold-group">
+                                <label><FaTint /> Humedad (%):</label>
+                                <div className="input-range">
+                                    <div className="input-field-wrapper">
+                                        <label htmlFor="minHumidityThreshold">Mín.</label>
+                                        <input
+                                            type="number"
+                                            id="minHumidityThreshold"
+                                            value={minHumidityThreshold}
+                                            onChange={(e) => setMinHumidityThreshold(parseFloat(e.target.value))}
+                                            step="0.1"
+                                            className="setting-input"
+                                            placeholder="Mín."
+                                        />
+                                    </div>
+                                    <div className="input-field-wrapper">
+                                        <label htmlFor="maxHumidityThreshold">Máx.</label>
+                                        <input
+                                            type="number"
+                                            id="maxHumidityThreshold"
+                                            value={maxHumidityThreshold}
+                                            onChange={(e) => setMaxHumidityThreshold(parseFloat(e.target.value))}
+                                            step="0.1"
+                                            className="setting-input"
+                                            placeholder="Máx."
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="weightThreshold"><FaWeightHanging /> Peso Bajo (kg):</label>
-                                <input
-                                    type="number"
-                                    id="weightThreshold"
-                                    value={weightThreshold}
-                                    onChange={(e) => setWeightThreshold(parseFloat(e.target.value))}
-                                    step="0.1"
-                                    className="setting-input"
-                                />
+                            <div className="form-group threshold-group">
+                                <label><FaWeightHanging /> Peso (kg):</label>
+                                <div className="input-range">
+                                    <div className="input-field-wrapper">
+                                        <label htmlFor="minWeightThreshold">Mín.</label>
+                                        <input
+                                            type="number"
+                                            id="minWeightThreshold"
+                                            value={minWeightThreshold}
+                                            onChange={(e) => setMinWeightThreshold(parseFloat(e.target.value))}
+                                            step="0.1"
+                                            className="setting-input"
+                                            placeholder="Mín."
+                                        />
+                                    </div>
+                                    <div className="input-field-wrapper">
+                                        <label htmlFor="maxWeightThreshold">Máx.</label>
+                                        <input
+                                            type="number"
+                                            id="maxWeightThreshold"
+                                            value={maxWeightThreshold}
+                                            onChange={(e) => setMaxWeightThreshold(parseFloat(e.target.value))}
+                                            step="0.1"
+                                            className="setting-input"
+                                            placeholder="Máx."
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -180,7 +234,6 @@ const SettingsScreen = () => {
                             Aquí se podría integrar la edición de tu información personal o del apiario.
                             (Funcionalidad no implementada en este ejemplo, pero fácilmente expandible).
                         </p>
-                        {/* Puedes añadir campos de input para nombre, ubicación, etc. */}
                     </div>
 
                     <button type="submit" className="save-settings-button" disabled={loading}>
