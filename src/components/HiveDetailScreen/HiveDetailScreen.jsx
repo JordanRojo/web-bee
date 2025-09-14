@@ -332,7 +332,7 @@ const HiveDetailScreen = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [filterAlerts, setFilterAlerts] = useState("active");
   const [lastSyncTime, setLastSyncTime] = useState(null);
-
+  const [alertasColmena, setAlertasColmena] = useState([]);
   const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
   const [selectedSensorData, setSelectedSensorData] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -366,8 +366,28 @@ const HiveDetailScreen = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Hive state updated:", hive);
-  }, [hive]);
+    const getAlertas = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/alertas/obtener-alertas-particular/${hiveId}`,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        if (response.status === 200) {
+          console.log(response.data);
+          setAlertasColmena(response.data);
+        } else if (response.status === 204) {
+          alert("No hay alertas actualmente.");
+        }
+      } catch (error) {
+        console.error("ERROR: ", error);
+      }
+    };
+    getAlertas();
+  }, []);
 
   const openImageModal = (imageUrl) => {
     setCurrentImageModalUrl(imageUrl);
@@ -549,11 +569,15 @@ const HiveDetailScreen = () => {
 
   const getFilteredAlerts = () => {
     if (filterAlerts === "active") {
-      return hive.alerts.filter((alert) => !alert.resolved);
+      return alertasColmena.filter(
+        (alerta) => alerta.estado_alerta === "pendiente"
+      );
     } else if (filterAlerts === "resolved") {
-      return hive.alerts.filter((alert) => alert.resolved);
+      return alertasColmena.filter(
+        (alerta) => alerta.estado_alerta === "resuelta"
+      );
     }
-    return hive.alerts;
+    return alertasColmena;
   };
 
   return (
@@ -621,14 +645,14 @@ const HiveDetailScreen = () => {
           >
             Datos Históricos
           </button>
-          {/* <button
+          <button
             className={
               activeTab === "alerts" ? "tab-button active" : "tab-button"
             }
             onClick={() => setActiveTab("alerts")}
           >
-            Alertas ({hive.alerts.filter((a) => !a.resolved).length})
-          </button> */}
+            Alertas
+          </button>
         </div>
 
         {activeTab === "overview" && (
@@ -792,7 +816,12 @@ const HiveDetailScreen = () => {
                 }
                 onClick={() => setFilterAlerts("active")}
               >
-                Activas ({hive.alerts.filter((a) => !a.resolved).length})
+                Activas (
+                {
+                  alertasColmena.filter((a) => a.estado_alerta === "pendiente")
+                    .length
+                }
+                ) {/* Cantidad de alertas en estado "pendiente"*/}
               </button>
               <button
                 className={
@@ -802,7 +831,12 @@ const HiveDetailScreen = () => {
                 }
                 onClick={() => setFilterAlerts("resolved")}
               >
-                Resueltas ({hive.alerts.filter((a) => a.resolved).length})
+                Resueltas (
+                {
+                  alertasColmena.filter((a) => a.estado_alerta === "resuelta")
+                    .length
+                }
+                ) {/* Cantidad de alertas en estado "resuelta" */}
               </button>
               <button
                 className={
@@ -812,7 +846,8 @@ const HiveDetailScreen = () => {
                 }
                 onClick={() => setFilterAlerts("all")}
               >
-                Todas ({hive.alerts.length})
+                Todas ({alertasColmena.length}){" "}
+                {/* Cantidad total de alertas. */}
               </button>
             </div>
             {getFilteredAlerts().length === 0 ? (
@@ -827,29 +862,31 @@ const HiveDetailScreen = () => {
               </p>
             ) : (
               <div className="alerts-list">
-                {getFilteredAlerts().map((alert) => (
+                {getFilteredAlerts().map((alerta) => (
                   <div
-                    key={alert.id}
+                    key={alerta._id}
                     className={`alert-item ${
                       alert.resolved ? "resolved" : "active"
                     }`}
                   >
                     <div className="alert-icon-wrapper">
-                      {alert.resolved ? (
+                      {alerta.estado_alerta === "resuelta" ? (
                         <FaCheckCircle className="alert-status-icon resolved-icon" />
                       ) : (
                         <FaExclamationTriangle className="alert-status-icon active-icon" />
                       )}
                     </div>
                     <div className="alert-details">
-                      <h3 className="alert-type">{alert.type}</h3>
-                      <p className="alert-description">{alert.description}</p>
+                      <h3 className="alert-type">{alerta.titulo_alerta}</h3>
+                      <p className="alert-description">
+                        {alerta.descripcion_alerta}
+                      </p>
                       <span className="alert-timestamp">
                         <FaCalendarAlt />{" "}
-                        {new Date(alert.timestamp).toLocaleString()}
+                        {/* {new Date(alert.timestamp).toLocaleString()} */}
                       </span>
                     </div>
-                    {!alert.resolved && (
+                    {alerta.estado_alerta === "pendiente" && (
                       <button className="resolve-button">
                         Marcar como Resuelta
                       </button>
