@@ -892,3 +892,244 @@ html, body, #root {
 .hive-detail-image:hover {
     transform: scale(1.02); /* Ligeramente más grande al pasar el mouse */
 }
+
+.sensor-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Contenido del modal */
+.sensor-modal-content {
+    background-color: var(--color-surface);
+    color: var(--color-dark-text);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+    transform: translateY(0);
+    animation: slideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 1px solid var(--color-border-light);
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+}
+
+/* Encabezado del modal */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--color-primary-gold);
+}
+
+.modal-icon {
+    font-size: 3.5rem;
+    color: var(--color-primary-gold);
+}
+
+.modal-header-text {
+    text-align: center;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-dark-text);
+    line-height: 1.2;
+}
+
+.modal-subtitle {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-mid-text);
+    font-weight: 500;
+}
+
+/* Botón de cierre */
+.modal-close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--color-background-soft);
+    border: none;
+    color: var(--color-mid-text);
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    box-shadow: var(--shadow-subtle);
+}
+
+.modal-close-button:hover {
+    color: var(--color-status-critical);
+    transform: rotate(90deg) scale(1.1);
+    background-color: var(--color-hover);
+}
+
+/* Contenedor de la tabla con scroll */
+.data-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: var(--shadow-inset);
+    background-color: var(--color-background-soft);
+}
+
+/* Tabla de datos */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.05rem;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-border-light);
+    border-right: 1px solid var(--color-border-light);
+}
+
+.data-table th:last-child, .data-table td:last-child {
+    border-right: none;
+}
+
+.data-table th {
+    background-color: var(--color-primary-gold);
+    color: var(--color-dark-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.data-table tbody tr:nth-child(odd) {
+    background-color: rgba(255, 193, 7, 0.05);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--color-hover-overlay);
+    color: var(--color-dark-text);
+    transform: scale(1.01);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Estilos de estado de las filas */
+.row-status-ok {
+    border-left: 5px solid var(--color-status-ok);
+}
+.row-status-alert {
+    border-left: 5px solid var(--color-status-alert);
+}
+.row-status-critical {
+    border-left: 5px solid var(--color-status-critical);
+}
+
+/* Estilos para la celda de estado */
+.status-cell {
+    text-align: center;
+}
+
+.status-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.status-label svg {
+    font-size: 1.1em;
+}
+
+.status-ok { background-color: var(--color-status-ok); color: white; }
+.status-alert { background-color: var(--color-status-alert); color: var(--color-dark-text); }
+.status-critical { background-color: var(--color-status-critical); color: white; }
+
+/* Mensaje de no hay datos */
+.no-data-message {
+    text-align: center;
+    color: var(--color-light-text);
+    font-style: italic;
+    padding: 40px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.no-data-message svg {
+    color: var(--color-primary-gold);
+    font-size: 1.4em;
+}
+
+/* Animaciones del modal */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px) scale(0.9); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .sensor-modal-content {
+        padding: 20px;
+        max-width: 95%;
+    }
+    .modal-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+        padding-bottom: 15px;
+    }
+    .modal-title {
+        font-size: 1.8rem;
+    }
+    .modal-subtitle {
+        font-size: 0.9rem;
+    }
+    .modal-icon {
+        font-size: 2.5rem;
+    }
+    .data-table th, .data-table td {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    .modal-close-button {
+        top: 10px;
+        right: 10px;
+    }
+}
