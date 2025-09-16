@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog, FaTimes, FaTimesCircle } from 'react-icons/fa';
+import { FaHive, FaArrowLeft, FaCheckCircle, FaExclamationTriangle, FaBell, FaCalendarAlt, FaThermometerHalf, FaTint, FaWeightHanging, FaFileAlt, FaCog, FaTimes, FaTimesCircle, FaDownload } from 'react-icons/fa';
 import { MdOutlineThermostat, MdOutlineWaterDrop, MdOutlineScale, MdAccessTime } from 'react-icons/md';
 import { GiBee } from 'react-icons/gi';
 import './HiveDetailScreen.css';
@@ -112,7 +112,6 @@ const HiveDetailScreen = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [filterAlerts, setFilterAlerts] = useState('active');
     const [lastSyncTime, setLastSyncTime] = useState(null);
-
     const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
     const [selectedSensorData, setSelectedSensorData] = useState(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -242,6 +241,41 @@ const HiveDetailScreen = () => {
         });
         setIsSensorModalOpen(true);
     };
+    
+    const handleDownloadReport = () => {
+        if (!hive || !hive.historicalData || hive.historicalData.length === 0) {
+            alert('No hay datos históricos para generar el reporte.');
+            return;
+        }
+
+        const headers = ['Fecha', 'Hora', 'Temperatura (°C)', 'Humedad (%)', 'Peso (kg)'];
+        const rows = hive.historicalData.map(d => [
+            d.date,
+            d.time,
+            d.temp,
+            d.humidity,
+            d.weight
+        ]);
+
+        let csvContent = headers.join(',') + '\n';
+        rows.forEach(row => {
+            csvContent += row.join(',') + '\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${hive.name.replace(/\s/g, '_')}_Reporte_Historico.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            alert('Tu navegador no soporta la descarga de archivos. Por favor, intenta con otro navegador.');
+        }
+    };
 
     if (!hive) {
         return (
@@ -323,6 +357,12 @@ const HiveDetailScreen = () => {
                         onClick={() => setActiveTab('alerts')}
                     >
                         Alertas ({hive.alerts.filter(a => !a.resolved).length})
+                    </button>
+                    <button
+                        className="tab-button download-button"
+                        onClick={handleDownloadReport}
+                    >
+                        <FaDownload /> Descargar Reporte
                     </button>
                 </div>
 
