@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginScreen from "./components/LoginScreen/LoginScreen";
+import ForgotPasswordScreen from "./components/ForgotPasswordScreen/ForgotPasswordScreen";
 import DashboardScreen from "./components/DashboardScreen/DashboardScreen";
 import HiveDetailScreen from "./components/HiveDetailScreen/HiveDetailScreen";
 import ReportsScreen from "./components/ReportsScreen/ReportsScreen";
@@ -22,6 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<WelcomeScreen />} />
             <Route path="/login" element={<LoginScreen />} />
+            <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
             <Route path="/dashboard" element={<DashboardScreen />} />
             <Route path="/colmena/:hiveId" element={<HiveDetailScreen />} />
             <Route path="/reports" element={<ReportsScreen />} />

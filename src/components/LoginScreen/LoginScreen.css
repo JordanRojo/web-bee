@@ -707,3 +707,203 @@
     font-size: 0.8em;
   }
 }
+
+
+
+/* Forgot Password*/
+
+.form-group.code-input-container {
+  position: relative;
+  width: 100%;
+  max-width: 280px; /* Ancho máximo para el contenedor */
+  margin: 0 auto 20px; /* Centra el contenedor y agrega espacio abajo */
+  display: flex; /* Añadido para asegurar el centrado del contenido */
+  justify-content: center;
+}
+
+/* El contenedor visible de los cuadros */
+.code-display {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  z-index: 1; /* Los cuadros están debajo del input */
+}
+
+.code-box {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--color-bee-black);
+  background-color: var(--color-background-light);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Input real: invisible y superpuesto */
+.form-group.code-input-container .login-input.code-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+ 
+/* Propiedades para hacerlo invisible e interactivo */
+  opacity: 0 !important; /* Fuerza la transparencia */
+  border: none !important; /* Elimina cualquier borde */
+  outline: none !important; /* Elimina el contorno de enfoque */
+  background-color: transparent !important; /* Fondo transparente */
+  color: transparent !important; /* Color de texto transparente */
+  caret-color: transparent !important; /* Oculta el cursor parpadeante */
+  cursor: text;
+  z-index: 2; /* Lo coloca por encima de los cuadros */
+
+/* Propiedades de alineación de texto, usa las mismas que las de las cajas para un mejor ajuste */
+  font-size: 2em !important; 
+  letter-spacing: 50px; /* Ajusta este valor si la alineación no es perfecta */
+}
+
+/* Estilo para el borde de enfoque del contenedor cuando el input está activo */
+.code-input-container:focus-within .code-box {
+  border-color: var(--color-focus-accent);
+  box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+}
+
+/* Ocultar el label para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.success-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  animation: fadeInScale var(--transition-medium) forwards; /* Usa la misma animación de entrada */
+}
+
+
+/* Animación de escala para el ícono de éxito */
+@keyframes scaleIn {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Mensaje de descripción ajustado */
+.success-message-container .form-description {
+  margin-bottom: 10px;
+}
+
+/* Nuevo estilo para el mensaje de redirección */
+.redirect-message {
+  font-size: 0.9em;
+  color: var(--color-text-light);
+  margin-top: 10px;
+  font-style: italic;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+  animation-delay: 2s; /* El mensaje aparece después de que el ícono está visible */
+}
+
+/* Animación de opacidad para el mensaje de redirección */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* La animación 'fly-away' ya no se usa, pero la mantengo aquí por si la quieres reutilizar */
+@keyframes fly-away {
+  0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: translate(50vw, -50vh) scale(1.2) rotate(30deg); opacity: 1; }
+  100% { transform: translate(150vw, -150vh) scale(0) rotate(180deg); opacity: 0; }
+}
+
+.success-icon-wrapper {
+  margin-bottom: 20px;
+  animation: scale-up 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Un rebote más dinámico */
+}
+
+.success-check-icon {
+  font-size: 80px;
+  color: #4CAF50; /* Un color verde para indicar éxito */
+}
+
+/* Animación de rebote para el ícono */
+@keyframes scale-up {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mejoras en el texto del mensaje */
+.success-message-container .form-subtitle {
+  color: #2c3e50; /* Color del texto más oscuro para mejor contraste */
+  font-size: 2em; /* Título más grande */
+}
+
+.success-message-container .form-description {
+  color: #7f8c8d; /* Color gris para el texto secundario */
+  font-size: 1.1em;
+}
+
+.success-message-container .redirect-message {
+  font-style: italic;
+  color: #bdc3c7; /* Color aún más claro para un mensaje menos prominente */
+  margin-top: 20px;
+}
+
+.forgot-password-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Espacio entre la abeja y el texto */
+}
+
+/* Modifica el tamaño y la posición de la abeja dentro del nuevo contenedor */
+.forgot-password-logo-container .login-bee-icon {
+    font-size: 30px; /* Tamaño más pequeño para que no domine el diseño */
+    position: static; /* Asegura que la abeja siga el flujo normal de la caja flexible */
+    transform: none; /* Elimina cualquier transformación de posición previa */
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Ícono para alternar la visibilidad de la contraseña */
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #a0a0a0;
+  font-size: 1.2em;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-icon:hover {
+  color: #2c3e50;
+}
+
+/* Forgot Password
