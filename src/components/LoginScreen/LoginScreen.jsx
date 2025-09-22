@@ -1,12 +1,10 @@
-import React, { useState, useContext, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import React, { useState, useRef, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginScreen.css";
-
-// Importa los iconos necesarios de React Icons
 import { GiBee } from "react-icons/gi";
 import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
-import axios from "axios";
 import AuthContext from "../../context/AuthProvider";
+import axios from "axios";
 import { API_URL } from "../../helpers/apiURL";
 
 // --- Funciones de validación y formateo de RUT (sin cambios) ---
@@ -72,10 +70,9 @@ function LoginScreen() {
   const [forgotPasswordRut, setForgotPasswordRut] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const { setToken, setUser } = useContext(AuthContext);
-
   const rutInputRef = useRef(null);
   const forgotRutInputRef = useRef(null);
-  const navigate = useNavigate(); // Inicializa el hook de navegación
+  const navigate = useNavigate();
 
   const handleRutChange = (e) => {
     const input = e.target;
@@ -118,9 +115,10 @@ function LoginScreen() {
     setError("");
     setLoading(true);
 
-    const rutDePrueba = "21.371.531-3";
-    const contrasenaDePrueba = "12345";
+    // Se limpia el RUT ingresado por el usuario para la comparación
+    const rutLimpio = rut.replace(/[^0-9kK-]/g, "").toUpperCase();
 
+    console.log(rut, rutLimpio);
     if (!rut) {
       setError("Por favor, ingresa tu RUT.");
       setLoading(false);
@@ -138,27 +136,18 @@ function LoginScreen() {
       setLoading(false);
       return;
     }
-    // if (rut !== rutDePrueba) {
-    //   setError("RUT incorrecto. Por favor, inténtalo de nuevo.");
-    //   setLoading(false);
-    //   return;
-    // }
-    // if (password !== contrasenaDePrueba) {
-    //   setError("Contraseña incorrecta. Por favor, inténtalo de nuevo.");
-    //   setLoading(false);
-    //   return;
-    // }
 
     try {
-      const data = { rut, password };
+      const data = { rut: rutLimpio, password };
       const response = await axios.post(`${API_URL}/auth/login`, data);
-      if (response.status === 201) {
-        console.log("Inicio de sesión exitoso.");
+
+      if (response.status === 200) {
+        console.log("Inicio de sesión exitoso:", response.message);
         setToken(response.data[0].token);
         setUser(response.data[0].user);
-        navigate("/dashboard"); // Redirige al dashboard
+        navigate("/dashboard");
       } else {
-        setError(response.error);
+        setError("Error al iniciar sesión.");
       }
     } catch (err) {
       setError("Ocurrió un error de conexión. Por favor, inténtalo de nuevo.");

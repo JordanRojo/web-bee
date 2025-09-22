@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useContext } from "react";
 import { Link } from "react-router-dom";
 import {
   BarChart,
@@ -32,6 +32,7 @@ import { GiBee } from "react-icons/gi";
 import "./ReportsScreen.css";
 import axios from "axios";
 import { API_URL } from "../../helpers/apiURL";
+import AuthContext from "../../context/AuthProvider";
 
 // --- Datos de ejemplo para el reporte ---
 const allSampleReportsData = {
@@ -220,7 +221,7 @@ const ReportsScreen = () => {
   );
   const [selectedHive, setSelectedHive] = useState("all");
   const [colmenas, setColmenas] = useState([]);
-
+  const { config } = useContext(AuthContext);
   const getFilteredReportData = useMemo(() => {
     return (date, hiveId) => {
       const filteredDailySensorData =
@@ -349,9 +350,7 @@ const ReportsScreen = () => {
         const response = await axios.get(
           `${API_URL}/colmenas/obtener-todas-colmenas`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            config,
           }
         );
         if (response.data && response.status === 200) {
@@ -382,9 +381,7 @@ const ReportsScreen = () => {
         )}`,
         {
           responseType: "blob", // Important for binary data
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          config,
         }
       );
       // Create a blob URL and trigger download

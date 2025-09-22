@@ -35,7 +35,6 @@ const ColonySummaryCard = ({
   let statusClass = "";
   let statusText = "";
   let statusIcon = null;
-
   // switch (status) {
   //   case "OK":
   //     statusClass = "colony-status-ok";
@@ -176,17 +175,14 @@ const DashboardScreen = () => {
   ).length;
   const activeAlertsCount = sampleColonies.filter((c) => c.hasAlerts).length;
   const [colmenas, setColmenas] = useState([]);
+  const { config } = useContext(AuthContext);
 
   useEffect(() => {
     const getColmenas = async () => {
       try {
         const response = await axios.get(
           `${API_URL}/colmenas/obtener-todas-colmenas`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+          config
         );
         if (response.data && response.status === 200) {
           console.log(response.data);

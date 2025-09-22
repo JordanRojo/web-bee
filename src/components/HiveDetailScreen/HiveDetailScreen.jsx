@@ -35,6 +35,7 @@ import { GiBee } from "react-icons/gi";
 import "./HiveDetailScreen.css";
 import axios from "axios";
 import { API_URL } from "../../helpers/apiURL";
+import AuthContext from "../../context/AuthProvider";
 
 // Datos de ejemplo (sin cambios)
 const sampleHiveData = {
@@ -337,17 +338,13 @@ const HiveDetailScreen = () => {
   const [selectedSensorData, setSelectedSensorData] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [currentImageModalUrl, setCurrentImageModalUrl] = useState("");
-
+  const { config } = useContext(AuthContext);
   useEffect(() => {
     const getColmenaEspecifica = async () => {
       try {
         const response = await axios.get(
           `${API_URL}/colmenas/obtener-colmena-particular/${hiveId}`,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
+          config
         );
         if (response.status === 200) {
           console.log(response.data);

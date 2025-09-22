@@ -69,7 +69,7 @@ const HiveManagementScreen = () => {
   // Nuevos estados para la ampliación de imagen
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageToDisplayInModal, setImageToDisplayInModal] = useState("");
-  const { userToken, userId } = useContext(AuthContext);
+  const { userToken, userId, config } = useContext(AuthContext);
 
   const navigate = useNavigate();
   const formRef = useRef(null);
@@ -81,11 +81,7 @@ const HiveManagementScreen = () => {
       try {
         const response = await axios.get(
           `${API_URL}/colmenas/obtener-todas-colmenas`,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
+          config
         );
         if (response.status === 200) {
           setHives(response.data);
@@ -164,7 +160,7 @@ const HiveManagementScreen = () => {
     newHiveData.append("nombre_colmena", hiveName);
     newHiveData.append("nombre_apiario", apiaryName);
     newHiveData.append("foto_colmena", hiveImageFile);
-    newHiveData.append("id_apicultor", localStorage.getItem("userId"));
+    newHiveData.append("id_apicultor", userId);
     console.log(newHiveData);
     setTimeout(async () => {
       if (editingHive) {
@@ -172,11 +168,7 @@ const HiveManagementScreen = () => {
           const response = await axios.put(
             `${API_URL}/colmenas/actualizar-colmena/${editingHive.colmena_id}`,
             newHiveData,
-            {
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
-              },
-            }
+            config
           );
           if (response.status === 200) {
             setHives(response.data);
@@ -195,11 +187,7 @@ const HiveManagementScreen = () => {
           const response = await axios.post(
             `${API_URL}/colmenas/agregar-colmena`,
             newHiveData,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
+            config
           );
           if (response.data && response.status === 201) {
             setHives(response.data);
@@ -254,11 +242,7 @@ const HiveManagementScreen = () => {
         try {
           const response = await axios.delete(
             `${API_URL}/colmenas/eliminar-colmena/${hiveToDelete}`,
-            {
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
-              },
-            }
+            config
           );
           if (response.status === 200) {
             setAlert({
