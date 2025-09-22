@@ -24,6 +24,7 @@ import {
   FaCog,
   FaTimes,
   FaTimesCircle,
+  FaDownload,
 } from "react-icons/fa";
 import {
   MdOutlineThermostat,
@@ -649,6 +650,9 @@ const HiveDetailScreen = () => {
             onClick={() => setActiveTab("alerts")}
           >
             Alertas
+          </button>
+          <button className="tab-button download-button">
+            <FaDownload /> Descargar Reporte
           </button>
         </div>
 
