@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
     localStorage.clear();
   };
 
-  const config = { headers: { Authorization: `Bearer ${userToken}` } };
+  const config = { headers: { Authorization: "Bearer " + `${userToken}` } };
 
   return (
     <AuthContext.Provider
