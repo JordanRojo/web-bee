@@ -378,7 +378,7 @@ const HiveDetailScreen = () => {
           console.log(response.data);
           setAlertasColmena(response.data);
         } else if (response.status === 204) {
-          alert("No hay alertas actualmente.");
+          console.log("No hay alertas actualmente.");
         }
       } catch (error) {
         console.error("ERROR: ", error);
