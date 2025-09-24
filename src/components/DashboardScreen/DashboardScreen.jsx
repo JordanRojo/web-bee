@@ -215,7 +215,7 @@ const DashboardScreen = () => {
           <Link to="/hives" className="nav-link">
             <FaHive /> Gestionar Colmenas
           </Link>
-          <Link to="/" className="nav-link logout-link">
+          <Link to="/logout" className="nav-link logout-link">
             <FaSignOutAlt /> Cerrar Sesión
           </Link>
         </div>

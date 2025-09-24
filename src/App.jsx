@@ -13,6 +13,7 @@ import ReportsScreen from "./components/ReportsScreen/ReportsScreen";
 import SettingsScreen from "./components/SettingsScreen/SettingsScreen";
 import HiveManagementScreen from "./components/HiveManagementScreen/HiveManagementScreen"; // <-- Nueva importación
 import WelcomeScreen from "./components/WelcomeScreen/WelcomeScreen";
+import LogOut from "./components/LogoutScreen/Logout";
 import { AuthProvider } from "./context/AuthProvider";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             <Route path="/reports" element={<ReportsScreen />} />
             <Route path="/settings" element={<SettingsScreen />} />
             <Route path="/hives" element={<HiveManagementScreen />} />{" "}
+            <Route path="/logout" element={<LogOut />} />
             {/* <-- Nueva ruta */}
           </Routes>
         </div>

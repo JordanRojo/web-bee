@@ -339,7 +339,8 @@ const HiveDetailScreen = () => {
   const [selectedSensorData, setSelectedSensorData] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [currentImageModalUrl, setCurrentImageModalUrl] = useState("");
-  const { config } = useContext(AuthContext);
+  const { config, userId } = useContext(AuthContext);
+
   useEffect(() => {
     const getColmenaEspecifica = async () => {
       try {
@@ -559,6 +560,36 @@ const HiveDetailScreen = () => {
     );
   }
 
+  const descargarReporte = async (hiveId) => {
+    console.log(config.headers);
+    try {
+      const response = await axios.get(
+        `${API_URL}/reportes/obtener-reporte/${hiveId}/${userId}`,
+        {
+          responseType: "blob", // Important for binary data
+          headers: config.headers,
+        }
+      );
+      // Create a blob URL and trigger download
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" })
+      );
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `reporte_colmena_${hiveId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert(
+        "No se pudo descargar el reporte. " +
+          (error.response?.data?.message || "")
+      );
+      console.error(error);
+    }
+  };
+
   // 👇 MOVER ESTA LÓGICA AQUÍ, DESPUÉS DE LA COMPROBACIÓN DE `hive`
   const tempStatus = getMetricStatus("temperature", hive.temperatura);
   const humidityStatus = getMetricStatus("humidity", hive.humedad);
@@ -651,7 +682,10 @@ const HiveDetailScreen = () => {
           >
             Alertas
           </button>
-          <button className="tab-button download-button">
+          <button
+            onClick={() => descargarReporte(hiveId)}
+            className="tab-button download-button"
+          >
             <FaDownload /> Descargar Reporte
           </button>
         </div>

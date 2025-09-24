@@ -372,9 +372,7 @@ const ReportsScreen = () => {
     return `${day}-${month}-${year}`;
   }
   const generarReporte = async (colmena_id) => {
-    console.log(formatDateToDMY(reportDate), colmena_id);
     try {
-      const token = localStorage.getItem("token");
       const response = await axios.get(
         `${API_URL}/reportes/descargar-reporte/${colmena_id}/${formatDateToDMY(
           reportDate
