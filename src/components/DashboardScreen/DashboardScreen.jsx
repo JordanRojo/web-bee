@@ -1,52 +1,69 @@
 // src/components/DashboardScreen/DashboardScreen.jsx
-import React from 'react';
-import './DashboardScreen.css';
+import React, { useState, useEffect, useContext } from "react";
+import "./DashboardScreen.css";
 import {
-  FaHive, FaCheckCircle, FaExclamationTriangle, FaBell,
+  FaHive,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaBell,
   FaFileAlt, // Nuevo: Para Reportes
-  FaCog,     // Nuevo: Para Configuración
-  FaSignOutAlt // Nuevo: Para Cerrar Sesión
-} from 'react-icons/fa';
-import { GiBee } from 'react-icons/gi';
-import { MdOutlineThermostat, MdOutlineWaterDrop, MdOutlineScale, MdAnalytics } from 'react-icons/md';
-
-import { Link } from 'react-router-dom';
+  FaCog, // Nuevo: Para Configuración
+  FaSignOutAlt, // Nuevo: Para Cerrar Sesión
+} from "react-icons/fa";
+import { GiBee } from "react-icons/gi";
+import {
+  MdOutlineThermostat,
+  MdOutlineWaterDrop,
+  MdOutlineScale,
+  MdAnalytics,
+} from "react-icons/md";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import AuthContext from "../../context/AuthProvider";
+import { API_URL } from "../../helpers/apiURL";
 
 // --- Componente re-utilizable: ColonySummaryCard ---
-const ColonySummaryCard = ({ name, id, status, temperature, humidity, weight, hasAlerts }) => {
-  let statusClass = '';
-  let statusText = '';
+const ColonySummaryCard = ({
+  name,
+  id,
+  status,
+  temperature,
+  humidity,
+  weight,
+  hasAlerts,
+}) => {
+  let statusClass = "";
+  let statusText = "";
   let statusIcon = null;
-
-  switch (status) {
-    case 'OK':
-      statusClass = 'colony-status-ok';
-      statusText = 'Saludable';
-      statusIcon = <FaCheckCircle className="status-icon" />;
-      break;
-    case 'ALERT':
-      statusClass = 'colony-status-alert';
-      statusText = 'Alerta';
-      statusIcon = <FaExclamationTriangle className="status-icon" />;
-      break;
-    case 'CRITICAL':
-      statusClass = 'colony-status-critical';
-      statusText = 'Crítico';
-      statusIcon = <FaExclamationTriangle className="status-icon" />;
-      break;
-    default:
-      statusClass = 'colony-status-unknown';
-      statusText = 'Desconocido';
-      statusIcon = <FaExclamationTriangle className="status-icon" />;
-  }
+  // switch (status) {
+  //   case "OK":
+  //     statusClass = "colony-status-ok";
+  //     statusText = "Saludable";
+  //     statusIcon = <FaCheckCircle className="status-icon" />;
+  //     break;
+  //   case "ALERT":
+  //     statusClass = "colony-status-alert";
+  //     statusText = "Alerta";
+  //     statusIcon = <FaExclamationTriangle className="status-icon" />;
+  //     break;
+  //   case "CRITICAL":
+  //     statusClass = "colony-status-critical";
+  //     statusText = "Crítico";
+  //     statusIcon = <FaExclamationTriangle className="status-icon" />;
+  //     break;
+  //   default:
+  //     statusClass = "colony-status-unknown";
+  //     statusText = "Desconocido";
+  //     statusIcon = <FaExclamationTriangle className="status-icon" />;
+  // }
 
   return (
     <Link to={`/colmena/${id}`} className="colony-card-link">
-      <div className={`colony-summary-card ${statusClass}`}>
+      <div className={`colony-summary-card`}>
         <div className="card-header">
           <FaHive className="hive-icon" />
           <h3 className="colony-name">{name}</h3>
-          {hasAlerts && <FaBell className="alert-bell-icon" />}
+          {/* {hasAlerts && <FaBell className="alert-bell-icon" />} */}
         </div>
         <div className="card-body">
           <div className="status-display">
@@ -77,20 +94,108 @@ const ColonySummaryCard = ({ name, id, status, temperature, humidity, weight, ha
 // --- Componente principal: DashboardScreen ---
 const DashboardScreen = () => {
   const sampleColonies = [
-    { id: 'h1', name: 'Colmena 001', status: 'OK', temperature: 35, humidity: 60, weight: 45, hasAlerts: false },
-    { id: 'h2', name: 'Colmena 002', status: 'ALERT', temperature: 38, humidity: 75, weight: 42, hasAlerts: true },
-    { id: 'h3', name: 'Colmena 003', status: 'OK', temperature: 34, humidity: 58, weight: 50, hasAlerts: false },
-    { id: 'h4', name: 'Colmena 004', status: 'CRITICAL', temperature: 40, humidity: 80, weight: 38, hasAlerts: true },
-    { id: 'h5', name: 'Colmena 005', status: 'OK', temperature: 36, humidity: 62, weight: 48, hasAlerts: false },
-    { id: 'h6', name: 'Colmena 006', status: 'ALERT', temperature: 37, humidity: 68, weight: 40, hasAlerts: true },
-    { id: 'h7', name: 'Colmena 007', status: 'OK', temperature: 35, humidity: 61, weight: 46, hasAlerts: false },
-    { id: 'h8', name: 'Colmena 008', status: 'ALERT', temperature: 39, humidity: 72, weight: 41, hasAlerts: true },
+    {
+      id: "h1",
+      name: "Colmena 001",
+      status: "OK",
+      temperature: 35,
+      humidity: 60,
+      weight: 45,
+      hasAlerts: false,
+    },
+    {
+      id: "h2",
+      name: "Colmena 002",
+      status: "ALERT",
+      temperature: 38,
+      humidity: 75,
+      weight: 42,
+      hasAlerts: true,
+    },
+    {
+      id: "h3",
+      name: "Colmena 003",
+      status: "OK",
+      temperature: 34,
+      humidity: 58,
+      weight: 50,
+      hasAlerts: false,
+    },
+    {
+      id: "h4",
+      name: "Colmena 004",
+      status: "CRITICAL",
+      temperature: 40,
+      humidity: 80,
+      weight: 38,
+      hasAlerts: true,
+    },
+    {
+      id: "h5",
+      name: "Colmena 005",
+      status: "OK",
+      temperature: 36,
+      humidity: 62,
+      weight: 48,
+      hasAlerts: false,
+    },
+    {
+      id: "h6",
+      name: "Colmena 006",
+      status: "ALERT",
+      temperature: 37,
+      humidity: 68,
+      weight: 40,
+      hasAlerts: true,
+    },
+    {
+      id: "h7",
+      name: "Colmena 007",
+      status: "OK",
+      temperature: 35,
+      humidity: 61,
+      weight: 46,
+      hasAlerts: false,
+    },
+    {
+      id: "h8",
+      name: "Colmena 008",
+      status: "ALERT",
+      temperature: 39,
+      humidity: 72,
+      weight: 41,
+      hasAlerts: true,
+    },
   ];
 
   const totalColonies = sampleColonies.length;
-  const okColonies = sampleColonies.filter(c => c.status === 'OK').length;
-  const alertColonies = sampleColonies.filter(c => c.status === 'ALERT' || c.status === 'CRITICAL').length;
-  const activeAlertsCount = sampleColonies.filter(c => c.hasAlerts).length;
+  const okColonies = sampleColonies.filter((c) => c.status === "OK").length;
+  const alertColonies = sampleColonies.filter(
+    (c) => c.status === "ALERT" || c.status === "CRITICAL"
+  ).length;
+  const activeAlertsCount = sampleColonies.filter((c) => c.hasAlerts).length;
+  const [colmenas, setColmenas] = useState([]);
+  const { config } = useContext(AuthContext);
+
+  useEffect(() => {
+    const getColmenas = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/colmenas/obtener-todas-colmenas`,
+          config
+        );
+        if (response.data && response.status === 200) {
+          console.log(response.data);
+          setColmenas(response.data);
+        } else if (response.status === 204) {
+          alert("No hay colmenas registradas en la base de datos.");
+        }
+      } catch (error) {
+        console.error("Error: ", error);
+      }
+    };
+    getColmenas();
+  }, []);
 
   return (
     <div className="dashboard-screen-container">
@@ -101,10 +206,18 @@ const DashboardScreen = () => {
         </div>
         <div className="navbar-links">
           {/* Íconos añadidos a cada Link */}
-          <Link to="/reports" className="nav-link"><FaFileAlt /> Reportes</Link>
-          <Link to="/settings" className="nav-link"><FaCog /> Configuración</Link>
-          <Link to="/hives" className="nav-link"><FaHive /> Gestionar Colmenas</Link>
-          <Link to="/" className="nav-link logout-link"><FaSignOutAlt /> Cerrar Sesión</Link>
+          <Link to="/reports" className="nav-link">
+            <FaFileAlt /> Reportes
+          </Link>
+          <Link to="/settings" className="nav-link">
+            <FaCog /> Configuración
+          </Link>
+          <Link to="/hives" className="nav-link">
+            <FaHive /> Gestionar Colmenas
+          </Link>
+          <Link to="/logout" className="nav-link logout-link">
+            <FaSignOutAlt /> Cerrar Sesión
+          </Link>
         </div>
       </nav>
 
@@ -137,16 +250,16 @@ const DashboardScreen = () => {
 
         <h2 className="section-title">Mis Colmenas</h2>
         <div className="colonies-grid">
-          {sampleColonies.map(colony => (
+          {colmenas.map((colmena) => (
             <ColonySummaryCard
-              key={colony.id}
-              id={colony.id}
-              name={colony.name}
-              status={colony.status}
-              temperature={colony.temperature}
-              humidity={colony.humidity}
-              weight={colony.weight}
-              hasAlerts={colony.hasAlerts}
+              key={colmena._id}
+              id={colmena.colmena_id}
+              name={colmena.nombre_colmena}
+              // status={colmena.status}
+              temperature={colmena.temperatura}
+              humidity={colmena.humedad}
+              weight={colmena.peso}
+              // hasAlerts={colmena.hasAlerts}
             />
           ))}
         </div>
