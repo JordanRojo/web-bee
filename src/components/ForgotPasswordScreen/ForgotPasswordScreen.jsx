@@ -1,10 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaCheckCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { GiBee } from 'react-icons/gi';
 import Confetti from 'react-confetti';
 import useWindowSize from 'react-use/lib/useWindowSize';
 import '../LoginScreen/LoginScreen.css';
+import AuthContext from '../../context/AuthProvider';
+import axios from 'axios';
+import { API_URL } from '../../helpers/apiURL';
 
 function ForgotPasswordScreen() {
     // Stage 1: Ingresar correo
@@ -22,9 +25,9 @@ function ForgotPasswordScreen() {
     
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [stage, setStage] = useState('email'); // Estado actual del flujo
+    const [stage, setStage] = useState('code'); // Estado actual del flujo
     const navigate = useNavigate();
-
+    const {correo, codigo, setCorreo, setCodigo} = useContext(AuthContext);
     // Ref para el input de código
     const codeInputRef = useRef(null);
     
@@ -40,34 +43,6 @@ function ForgotPasswordScreen() {
     }, [stage]);
 
 
-    // Simula el envío de un correo y un código
-    const handleEmailSubmit = async (event) => {
-        event.preventDefault();
-        setError('');
-        setLoading(true);
-
-        // Validación simple de correo
-        if (!email.includes('@')) {
-            setError('Por favor, ingresa un correo electrónico válido.');
-            setLoading(false);
-            return;
-        }
-
-        try {
-            // Lógica de simulación para enviar un correo con el código
-            console.log('Simulando envío de código a:', email);
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Si tiene éxito, avanza al siguiente stage
-            setStage('code');
-            setError(''); // Limpia cualquier error anterior
-        } catch (err) {
-            setError('Error al enviar el correo. Por favor, inténtalo de nuevo.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     // Simula la verificación del código
     const handleCodeSubmit = async (event) => {
         event.preventDefault();
@@ -79,15 +54,16 @@ function ForgotPasswordScreen() {
             setLoading(false);
             return;
         }
-
         try {
             // Lógica de simulación para verificar el código
             console.log('Verificando código:', code);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (code === codigo) {
+                // Si el código es correcto (aquí simulamos que siempre lo es), avanza
+                setStage('new-password');
+                setError('');
+                setCodigo("");
+            }
             
-            // Si el código es correcto (aquí simulamos que siempre lo es), avanza
-            setStage('new-password');
-            setError('');
         } catch (err) {
             setError('El código ingresado es incorrecto. Por favor, inténtalo de nuevo.');
         } finally {
@@ -116,18 +92,19 @@ function ForgotPasswordScreen() {
         try {
             // Lógica de simulación para guardar la nueva contraseña
             console.log('Restableciendo contraseña...');
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Si tiene éxito, activa el confeti y cambia a la etapa de éxito
-            setStage('success');
-            setShowConfetti(true);
-            
-            // Oculta el confeti y redirige después de un breve momento
-            setTimeout(() => {
-                setShowConfetti(false);
-                navigate('/login');
-            }, 5000);
-            
+            const data = {nueva_password: newPassword, email: correo}
+            const response = await axios.post(`${API_URL}/auth/resetear-clave`, data);
+            if (response.status === 200){
+                // Si tiene éxito, activa el confeti y cambia a la etapa de éxito
+                setStage('success');
+                setShowConfetti(true);
+                setCorreo("");
+                // Oculta el confeti y redirige después de un breve momento
+                setTimeout(() => {
+                    setShowConfetti(false);
+                    navigate('/login');
+                }, 5000);
+            }
         } catch (err) {
             setError('Ocurrió un error al restablecer la contraseña. Inténtalo de nuevo.');
         } finally {
@@ -147,37 +124,6 @@ function ForgotPasswordScreen() {
     // Renderiza el componente según el "stage" actual
     const renderContent = () => {
         switch (stage) {
-            case 'email':
-                return (
-                    <>
-                        <h3 className="form-subtitle">Restablecer Contraseña</h3>
-                        <p className="form-description">Ingresa tu correo y te enviaremos un código de verificación.</p>
-                        <form onSubmit={handleEmailSubmit} className="login-form">
-                            <div className="form-group">
-                                <label htmlFor="email" className="input-label">Correo Electrónico:</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    className="login-input"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    placeholder="ejemplo@correo.com"
-                                    autoComplete="email"
-                                />
-                            </div>
-                            {error && <p className={`error-message ${error ? 'show' : ''}`} role="alert">{error}</p>}
-                            <button type="submit" className="login-button" disabled={loading}>
-                                {loading ? 'Enviando...' : 'Enviar Código'}
-                            </button>
-                            <p className="back-to-login">
-                                <a href="#" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>
-                                    <FaArrowLeft className="back-icon" /> Volver al Inicio de Sesión
-                                </a>
-                            </p>
-                        </form>
-                    </>
-                );
             case 'code':
                 return (
                     <>
