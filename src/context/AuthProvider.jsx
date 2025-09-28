@@ -6,8 +6,8 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [userToken, setUserToken] = useState(null);
   const [userId, setUserId] = useState(null);
-  // const [resetPswCode, setRestorePswCode] = useState(null);
-  // const [emailReset, setEmailRestore] = useState(null);
+  const [correo, setCorreo] = useState(null);
+  const [codigo, setCodigo] = useState(null);
 
   useEffect(() => {
     const checkLS = () => {
@@ -49,6 +49,10 @@ export function AuthProvider({ children }) {
         userId,
         setUserId,
         setUser,
+        correo,
+        setCorreo,
+        codigo,
+        setCodigo,
         config,
       }}
     >

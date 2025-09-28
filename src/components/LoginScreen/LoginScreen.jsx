@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import AuthContext from "../../context/AuthProvider";
 import axios from "axios";
 import { API_URL } from "../../helpers/apiURL";
+import generaCodigo from "../../helpers/generaCodigo";
 
 // --- Funciones de validación y formateo de RUT (sin cambios) ---
 const formatRut = (rut) => {
@@ -69,7 +70,7 @@ function LoginScreen() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordRut, setForgotPasswordRut] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const { setToken, setUser } = useContext(AuthContext);
+  const { setToken, setUser, setCorreo, setCodigo} = useContext(AuthContext);
   const rutInputRef = useRef(null);
   const forgotRutInputRef = useRef(null);
   const navigate = useNavigate();
@@ -162,13 +163,13 @@ function LoginScreen() {
     setError("");
     setSuccessMessage("");
     setLoading(true);
-
-    if (!forgotPasswordRut) {
+    const rutLimpio = forgotPasswordRut.replace(/[^0-9kK-]/g, "").toUpperCase();
+    if (!rutLimpio) {
       setError("Por favor, ingresa tu RUT para recuperar la contraseña.");
       setLoading(false);
       return;
     }
-    if (!validateRut(forgotPasswordRut)) {
+    if (!validateRut(rutLimpio)) {
       setError(
         "El RUT ingresado no es válido. Por favor, verifica el formato y el dígito verificador."
       );
@@ -176,26 +177,15 @@ function LoginScreen() {
       return;
     }
     try {
-      const response = await new Promise((resolve) =>
-        setTimeout(() => {
-          if (validateRut(forgotPasswordRut)) {
-            resolve({
-              success: true,
-              message:
-                "Si el RUT está registrado, recibirás un correo electrónico con instrucciones para restablecer tu contraseña.",
-            });
-          } else {
-            resolve({
-              success: false,
-              message:
-                "Si el RUT está registrado, recibirás un correo electrónico con instrucciones para restablecer tu contraseña.",
-            });
-          }
-        }, 2500)
-      );
-      if (response.success) {
+      const codigo = generaCodigo();
+      const data = {rut: rutLimpio, codigo};
+      const response = await axios.post(`${API_URL}/auth/envia-correo-codigo`, data);
+      if (response.status === 200) {
         setSuccessMessage(response.message);
         setForgotPasswordRut("");
+        setCorreo(response.data.email);
+        setCodigo(codigo)
+        navigate("/forgot-password");
       } else {
         setError(response.message);
       }
