@@ -339,6 +339,7 @@ const HiveDetailScreen = () => {
   const [selectedSensorData, setSelectedSensorData] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [currentImageModalUrl, setCurrentImageModalUrl] = useState("");
+  const [sensoresPorDia, setSensoresPorDia] = useState(null); // Estado a utilizar para los datos del grafico.
   const { config, userId } = useContext(AuthContext);
 
   useEffect(() => {
@@ -387,6 +388,23 @@ const HiveDetailScreen = () => {
     };
     getAlertas();
   }, []);
+
+  useEffect(() => {
+    const getSensoresPorDia = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/sensores/obtener-historial-diario/${hiveId}`, config);
+        if (response.status === 200) {
+          console.log(response.data);
+          setSensoresPorDia(response.data);
+        } else if (response.status === 204) {
+          console.log("No hay datos de sensores registrados.");
+        }
+      } catch (error) {
+        console.error("ERROR:", error);
+      }
+    }
+    getSensoresPorDia()
+  }, [hiveId])
 
   const openImageModal = (imageUrl) => {
     setCurrentImageModalUrl(imageUrl);

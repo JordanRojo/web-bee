@@ -184,7 +184,7 @@ const DashboardScreen = () => {
           `${API_URL}/colmenas/obtener-todas-colmenas`,
           config
         );
-        if (response.data && response.status === 200) {
+        if (response.status === 200) {
           console.log(response.data);
           setColmenas(response.data);
         } else if (response.status === 204) {
