@@ -195,7 +195,7 @@ const DashboardScreen = () => {
       }
     };
     getColmenas();
-  }, []);
+  }, [config]);
 
   return (
     <div className="dashboard-screen-container">

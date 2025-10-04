@@ -96,7 +96,7 @@ const HiveManagementScreen = () => {
         setLoading(false);
       }
     }, 500);
-  }, []);
+  }, [config]);
 
   // Limpiar la URL de objeto cuando el componente se desmonte o la imagen de previsualización cambie
   useEffect(() => {
@@ -189,7 +189,7 @@ const HiveManagementScreen = () => {
             newHiveData,
             config
           );
-          if (response.data && response.status === 201) {
+          if (response.status === 201) {
             setHives(response.data);
             setAlert({
               message: "¡Nueva colmena agregada con éxito!",
@@ -591,7 +591,7 @@ const HiveManagementScreen = () => {
         message={
           hiveToDelete
             ? `Estás a punto de eliminar la colmena "${
-                hives.find((h) => h._id === hiveToDelete)?.nombre_colmena
+                hives.find((h) => h.colmena_id === hiveToDelete)?.nombre_colmena
               }". Esta acción es irreversible.`
             : "¿Estás seguro de que quieres eliminar este elemento? Esta acción es irreversible."
         }
