@@ -65,6 +65,9 @@ const HiveManagementScreen = () => {
   const [removingHiveId, setRemovingHiveId] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [hiveToDelete, setHiveToDelete] = useState(null);
+  
+  // MODIFICACIÓN 1: El estado disparador para la recarga
+  const [shouldRefetch, setShouldRefetch] = useState(false);
 
   // Nuevos estados para la ampliación de imagen
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -75,28 +78,41 @@ const HiveManagementScreen = () => {
   const formRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
+  // Función de carga de datos extraída para ser reutilizada
+  const fetchHives = async () => {
     setLoading(true);
-    setTimeout(async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/colmenas/obtener-todas-colmenas`,
-          config
-        );
-        if (response.status === 200) {
-          setHives(response.data);
-          console.log(response.data);
-        } else if (response.status === 204) {
-          alert("No hay colmenas registradas en la base de datos.");
-          setHives(initialHives);
-        }
-      } catch (error) {
-        console.error("Error encontrado: ", error);
-      } finally {
-        setLoading(false);
+    try {
+      const response = await axios.get(
+        `${API_URL}/colmenas/obtener-todas-colmenas`,
+        config
+      );
+      if (response.status === 200) {
+        setHives(response.data);
+      } else if (response.status === 204) {
+        setHives([]); // Limpiar la lista si el backend dice que no hay contenido
+        setAlert({
+            message: "No hay colmenas registradas en la base de datos.",
+            type: "info",
+        });
       }
     }, 500);
   }, [config]);
+    } catch (error) {
+      console.error("Error encontrado: ", error);
+      // Opcional: manejar el error con un mensaje de alerta
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // MODIFICACIÓN 2: El useEffect ahora depende de shouldRefetch
+  useEffect(() => {
+    // Usamos setTimeout para mantener la pequeña pausa de carga visual (500ms)
+    setTimeout(fetchHives, 500); 
+    
+  }, [shouldRefetch]); // <--- Dependencia añadida. Se ejecuta al montar y cuando shouldRefetch cambia.
+
 
   // Limpiar la URL de objeto cuando el componente se desmonte o la imagen de previsualización cambie
   useEffect(() => {
@@ -159,31 +175,33 @@ const HiveManagementScreen = () => {
     const newHiveData = new FormData();
     newHiveData.append("nombre_colmena", hiveName);
     newHiveData.append("nombre_apiario", apiaryName);
-    newHiveData.append("foto_colmena", hiveImageFile);
+    // Solo enviar el archivo si existe
+    if (hiveImageFile) {
+        newHiveData.append("foto_colmena", hiveImageFile);
+    }
     newHiveData.append("id_apicultor", userId);
-    console.log(newHiveData);
+    
     setTimeout(async () => {
-      if (editingHive) {
-        try {
+      try {
+        if (editingHive) {
+          // --- Lógica de Edición (PUT) ---
           const response = await axios.put(
             `${API_URL}/colmenas/actualizar-colmena/${editingHive.colmena_id}`,
             newHiveData,
             config
           );
           if (response.status === 200) {
-            setHives(response.data);
+            // MODIFICACIÓN 3A: Disparar recarga después de editar
+            setShouldRefetch(prev => !prev);
             setAlert({
               message: "¡Colmena actualizada con éxito!",
               type: "success",
             });
           } else if (response.status === 204) {
-            alert("No se realizaron cambios en la colmena.");
+            setAlert({ message: "No se realizaron cambios en la colmena.", type: "info" });
           }
-        } catch (error) {
-          console.error("Error encontrado: ", error);
-        }
-      } else {
-        try {
+        } else {
+          // --- Lógica de Creación (POST) ---
           const response = await axios.post(
             `${API_URL}/colmenas/agregar-colmena`,
             newHiveData,
@@ -191,20 +209,25 @@ const HiveManagementScreen = () => {
           );
           if (response.status === 201) {
             setHives(response.data);
+          if (response.data && response.status === 201) {
+            // MODIFICACIÓN 3B: Disparar recarga después de agregar
+            setShouldRefetch(prev => !prev);
             setAlert({
               message: "¡Nueva colmena agregada con éxito!",
               type: "success",
             });
           } else {
-            console.log("Error al agregar la colmena");
+            setAlert({ message: "Error al agregar la colmena.", type: "error" });
           }
-        } catch (error) {
-          console.error("Error: ", error);
         }
+      } catch (error) {
+        console.error("Error: ", error);
+        setAlert({ message: "Error al guardar la colmena.", type: "error" });
+      } finally {
+        setLoading(false);
+        setShowForm(false);
+        resetForm(); // Esto limpiará la URL blob: y Base64 de la previsualización del formulario.
       }
-      setLoading(false);
-      setShowForm(false);
-      resetForm(); // Esto limpiará la URL blob: y Base64 de la previsualización del formulario.
     }, 800);
   };
 
@@ -215,9 +238,6 @@ const HiveManagementScreen = () => {
     setApiaryName(hive.nombre_apiario || "");
     setHiveImagePreview(hive.foto_colmena_url || ""); // Muestra la URL existente (sea remota o Base64) o vacía
     setHiveImageFile(null); // Asegura que no haya un archivo pendiente de una carga anterior
-    // setHiveImageBase64(
-    //   hive.foto_colmena_url && hive.foto_colmena_urlo.startsWith("data:") ? hive.hiveImage : ""
-    // ); // Carga Base64 si ya existía
     setShowForm(true);
 
     setTimeout(() => {
@@ -245,15 +265,18 @@ const HiveManagementScreen = () => {
             config
           );
           if (response.status === 200) {
+            // 🟢 MODIFICACIÓN 4: Disparar recarga después de eliminar
+            setShouldRefetch(prev => !prev);
             setAlert({
               message: "Colmena eliminada con éxito.",
               type: "success",
             });
           } else if (response.status === 404) {
-            alert("No se pudo eliminar la colmena.");
+            setAlert({ message: "No se pudo eliminar la colmena (No encontrada).", type: "error" });
           }
         } catch (error) {
           console.error(error);
+          setAlert({ message: "Error al eliminar la colmena.", type: "error" });
         } finally {
           setLoading(false);
           setRemovingHiveId(null);

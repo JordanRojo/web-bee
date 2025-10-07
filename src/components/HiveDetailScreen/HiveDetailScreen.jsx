@@ -1,36 +1,36 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
 } from "recharts";
 import {
-  FaHive,
-  FaArrowLeft,
-  FaCheckCircle,
-  FaExclamationTriangle,
-  FaBell,
-  FaCalendarAlt,
-  FaThermometerHalf,
-  FaTint,
-  FaWeightHanging,
-  FaFileAlt,
-  FaCog,
-  FaTimes,
-  FaTimesCircle,
-  FaDownload,
+    FaHive,
+    FaArrowLeft,
+    FaCheckCircle,
+    FaExclamationTriangle,
+    FaBell,
+    FaCalendarAlt,
+    FaThermometerHalf,
+    FaTint,
+    FaWeightHanging,
+    FaFileAlt,
+    FaCog,
+    FaTimes,
+    FaTimesCircle,
+    FaDownload,
 } from "react-icons/fa";
 import {
-  MdOutlineThermostat,
-  MdOutlineWaterDrop,
-  MdOutlineScale,
-  MdAccessTime,
+    MdOutlineThermostat,
+    MdOutlineWaterDrop,
+    MdOutlineScale,
+    MdAccessTime,
 } from "react-icons/md";
 import { GiBee } from "react-icons/gi";
 import "./HiveDetailScreen.css";
@@ -38,997 +38,929 @@ import axios from "axios";
 import { API_URL } from "../../helpers/apiURL";
 import AuthContext from "../../context/AuthProvider";
 
-// Datos de ejemplo (sin cambios)
-const sampleHiveData = {
-  h1: {
-    id: "h1",
-    name: "Colmena 001 - Prado Verde",
-    location: "Sector Norte, Apiario A",
-    hiveImage:
-      "https://images.unsplash.com/photo-1616053303666-888941f173b9?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    status: "OK",
-    currentMetrics: {
-      temperature: 34.8,
-      humidity: 61.2,
-      weight: 47.5,
-      queenStatus: "Activa",
-    },
-    historicalData: [
-      {
-        date: "2025-09-12",
-        time: "08:00 AM",
-        temp: 34.2,
-        humidity: 60.5,
-        weight: 47.9,
-      },
-      {
-        date: "2025-09-12",
-        time: "09:00 AM",
-        temp: 34.5,
-        humidity: 61.1,
-        weight: 47.8,
-      },
-      {
-        date: "2025-09-12",
-        time: "10:00 AM",
-        temp: 36.1,
-        humidity: 62.0,
-        weight: 47.7,
-      },
-      {
-        date: "2025-09-12",
-        time: "11:00 AM",
-        temp: 38.8,
-        humidity: 62.8,
-        weight: 47.5,
-      },
-      {
-        date: "2025-09-12",
-        time: "12:00 PM",
-        temp: 36.5,
-        humidity: 63.5,
-        weight: 47.4,
-      },
-      {
-        date: "2025-09-12",
-        time: "01:00 PM",
-        temp: 35.5,
-        humidity: 63.0,
-        weight: 47.3,
-      },
-      {
-        date: "2025-09-12",
-        time: "02:00 PM",
-        temp: 34.0,
-        humidity: 62.5,
-        weight: 47.2,
-      },
-      {
-        date: "2025-09-12",
-        time: "03:00 PM",
-        temp: 34.8,
-        humidity: 62.1,
-        weight: 47.1,
-      },
-      {
-        date: "2025-09-12",
-        time: "04:00 PM",
-        temp: 34.5,
-        humidity: 61.8,
-        weight: 47.0,
-      },
-      {
-        date: "2025-09-12",
-        time: "05:00 PM",
-        temp: 33.2,
-        humidity: 61.5,
-        weight: 46.9,
-      },
-    ],
-    alerts: [
-      {
-        id: 1,
-        type: "Temperatura Alta",
-        description: "La temperatura ha superado los 38°C durante 30 min.",
-        timestamp: "2025-07-17 14:30",
-        resolved: false,
-      },
-      {
-        id: 2,
-        type: "Humedad Anormal",
-        description: "Humedad por encima del 70% por 2 horas.",
-        timestamp: "2025-07-16 09:15",
-        resolved: true,
-      },
-      {
-        id: 3,
-        type: "Pérdida de Peso",
-        description: "Caída significativa de peso en las últimas 24 horas.",
-        timestamp: "2025-07-15 18:00",
-        resolved: false,
-      },
-    ],
-  },
-  h2: {
-    id: "h2",
-    name: "Colmena 002 - Bosque Nativo",
-    location: "Sector Oeste, Apiario B",
-    hiveImage:
-      "https://images.unsplash.com/photo-1613133610996-03714b7e9c90?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    status: "ALERT",
-    currentMetrics: {
-      temperature: 39.1,
-      humidity: 78.0,
-      weight: 32.5,
-      queenStatus: "Inactiva (Posible Alerta)",
-    },
-    historicalData: [
-      {
-        date: "2025-09-12",
-        time: "10:00 AM",
-        temp: 37,
-        humidity: 70,
-        weight: 43.0,
-      },
-      {
-        date: "2025-09-12",
-        time: "11:00 AM",
-        temp: 38.2,
-        humidity: 75,
-        weight: 42.8,
-      },
-      {
-        date: "2025-09-12",
-        time: "12:00 PM",
-        temp: 38.5,
-        humidity: 78,
-        weight: 42.5,
-      },
-      {
-        date: "2025-09-12",
-        time: "01:00 PM",
-        temp: 38.1,
-        humidity: 77,
-        weight: 42.3,
-      },
-      {
-        date: "2025-09-12",
-        time: "02:00 PM",
-        temp: 37.9,
-        humidity: 76,
-        weight: 42.1,
-      },
-      {
-        date: "2025-09-12",
-        time: "03:00 PM",
-        temp: 38.3,
-        humidity: 75,
-        weight: 42.0,
-      },
-      {
-        date: "2025-09-12",
-        time: "04:00 PM",
-        temp: 38.0,
-        humidity: 77,
-        weight: 41.8,
-      },
-      {
-        date: "2025-09-12",
-        time: "05:00 PM",
-        temp: 38.4,
-        humidity: 78,
-        weight: 41.5,
-      },
-    ],
-    alerts: [
-      {
-        id: 4,
-        type: "Temperatura Crítica",
-        description:
-          "¡ADVERTENCIA! Temperatura constante > 38.5°C. Actuar de inmediato.",
-        timestamp: "2025-07-17 10:00",
-        resolved: false,
-      },
-      {
-        id: 5,
-        type: "Humedad Extrema",
-        description: "Humedad muy alta, riesgo de moho y enfermedades.",
-        timestamp: "2025-07-17 11:30",
-        resolved: false,
-      },
-    ],
-  },
-  h3: {
-    id: "h3",
-    name: "Colmena 003 - Campo de Flores",
-    location: "Sector Este, Apiario C",
-    hiveImage:
-      "https://images.unsplash.com/photo-1627883907797-17072a2e411b?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    status: "OK",
-    currentMetrics: {
-      temperature: 36.5,
-      humidity: 68.0,
-      weight: 40.0,
-      queenStatus: "Activa",
-    },
-    historicalData: [
-      {
-        date: "2025-09-12",
-        time: "10:00 AM",
-        temp: 35,
-        humidity: 60,
-        weight: 41.0,
-      },
-      {
-        date: "2025-09-12",
-        time: "11:00 AM",
-        temp: 35.5,
-        humidity: 62,
-        weight: 40.8,
-      },
-      {
-        date: "2025-09-12",
-        time: "12:00 PM",
-        temp: 36.0,
-        humidity: 65,
-        weight: 40.5,
-      },
-      {
-        date: "2025-09-12",
-        time: "01:00 PM",
-        temp: 36.5,
-        humidity: 68,
-        weight: 40.0,
-      },
-      {
-        date: "2025-09-12",
-        time: "02:00 PM",
-        temp: 36.2,
-        humidity: 67,
-        weight: 39.8,
-      },
-      {
-        date: "2025-09-12",
-        time: "03:00 PM",
-        temp: 36.0,
-        humidity: 66,
-        weight: 39.7,
-      },
-      {
-        date: "2025-09-12",
-        time: "04:00 PM",
-        temp: 36.1,
-        humidity: 67,
-        weight: 39.6,
-      },
-      {
-        date: "2025-09-12",
-        time: "05:00 PM",
-        temp: 36.3,
-        humidity: 67,
-        weight: 39.5,
-      },
-    ],
-    alerts: [],
-  },
-  h4: {
-    id: "h4",
-    name: "Colmena 004 - Apiario de la Montaña",
-    location: "Zona Alpina, Apiario D",
-    hiveImage: "https://placehold.co/150x150/D3D3D3/000000?text=Colmena004",
-    status: "OK",
-    currentMetrics: {
-      temperature: 33.0,
-      humidity: 55.0,
-      weight: 45.0,
-      queenStatus: "Activa",
-    },
-    historicalData: [],
-    alerts: [],
-  },
+
+// =========================================================================
+// FUNCIÓN AUXILIAR: CUSTOM TOOLTIP
+// =========================================================================
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        // El 'label' aquí es el timestamp numérico
+        const dateString = new Date(label).toLocaleString('es-ES', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+
+        return (
+            <div className="custom-tooltip" style={{ 
+                backgroundColor: 'var(--color-surface)', 
+                border: '1px solid var(--color-border-light)', 
+                padding: '10px', 
+                borderRadius: '8px' 
+            }}>
+                <p className="label" style={{ 
+                    color: 'var(--color-dark-text)', 
+                    fontWeight: 'bold' 
+                }}>{dateString}</p>
+                {payload.map((p, index) => (
+                    <p key={index} style={{ color: p.stroke }}>
+                        {p.dataKey}: {p.value} {p.dataKey === 'temperatura' ? '°C' : p.dataKey === 'humedad' ? '%' : 'kg'}
+                    </p>
+                ))}
+            </div>
+        );
+    }
+    return null;
 };
+// =========================================================================
+
 
 const HiveDetailScreen = () => {
-  const { hiveId } = useParams();
-  const [hive, setHive] = useState(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [filterAlerts, setFilterAlerts] = useState("active");
-  const [lastSyncTime, setLastSyncTime] = useState(null);
-  const [alertasColmena, setAlertasColmena] = useState([]);
-  const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
-  const [selectedSensorData, setSelectedSensorData] = useState(null);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [currentImageModalUrl, setCurrentImageModalUrl] = useState("");
-  const [sensoresPorDia, setSensoresPorDia] = useState(null); // Estado a utilizar para los datos del grafico.
-  const { config, userId } = useContext(AuthContext);
+    const { hiveId } = useParams();
+    const [hive, setHive] = useState(null);
+    const [activeTab, setActiveTab] = useState("overview");
+    const [filterAlerts, setFilterAlerts] = useState("active");
+    const [lastSyncTime, setLastSyncTime] = useState(null);
+    const [alertasColmena, setAlertasColmena] = useState([]);
+    const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
+    const [selectedSensorData, setSelectedSensorData] = useState(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [currentImageModalUrl, setCurrentImageModalUrl] = useState("");
+    
+    // ESTADO 1: Datos de las últimas 24h
+    const [sensoresPorDia, setSensoresPorDia] = useState(null); 
+    
+    // ESTADO 2: Todos los datos históricos
+    const [sensoresHistoricoCompleto, setSensoresHistoricoCompleto] = useState(null); 
+    
+    // Indicador de carga para la pestaña de historial
+    const [isHistoricalLoading, setIsHistoricalLoading] = useState(false); 
+    
+    const { config, userId } = useContext(AuthContext);
 
-  useEffect(() => {
-    const getColmenaEspecifica = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/colmenas/obtener-colmena-particular/${hiveId}`,
-          config
-        );
-        if (response.status === 200) {
-          console.log(response.data);
-          setHive(response.data[0]);
-          console.log(hive);
-          setLastSyncTime(Date.now());
+    const POLLING_INTERVAL = 5000; 
+    const metricsSectionRef = useRef(null);
+
+    // Función auxiliar para restaurar el scroll
+    const restoreScrollPosition = () => {
+        if (activeTab === 'overview' && metricsSectionRef.current && window.scrollY > 50) {
+            const yOffset = metricsSectionRef.current.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({ top: yOffset - 80, behavior: 'smooth' }); 
+        }
+    };
+
+    // Función unificada para obtener datos de la colmena y alertas
+    const fetchAllData = async (isPolling = false) => {
+        try {
+            // 1. Obtener la Colmena Específica (incluye métricas actuales)
+            const hiveResponse = await axios.get(
+                `${API_URL}/colmenas/obtener-colmena-particular/${hiveId}`,
+                config
+            );
+            if (hiveResponse.status === 200 && hiveResponse.data.length > 0) {
+                setHive(hiveResponse.data[0]);
+                setLastSyncTime(Date.now());
+                
+                if (isPolling) {
+                    restoreScrollPosition();
+                }
+            } else {
+                setHive(null);
+            }
+
+            // 2. Obtener Alertas
+            const alertsResponse = await axios.get(
+                `${API_URL}/alertas/obtener-alertas-particular/${hiveId}`,
+                { headers: { Authorization: "Bearer " + localStorage.getItem("token") } }
+            );
+            if (alertsResponse.status === 200) {
+                setAlertasColmena(alertsResponse.data);
+            } else if (alertsResponse.status === 204) {
+                setAlertasColmena([]);
+            }
+
+        } catch (error) {
+            console.error("ERROR en la obtención de datos de la colmena: ", error);
+        }
+    };
+
+
+    // useEffect para la carga inicial y el polling de métricas/alertas
+    useEffect(() => {
+        // 1. Carga inicial
+        fetchAllData(false);
+
+        // 2. POLLING: Configurar el intervalo para actualizaciones periódicas
+        const intervalId = setInterval(() => {
+            fetchAllData(true); // Pasamos 'true' para indicar que es una actualización de polling
+        }, POLLING_INTERVAL);
+
+        // 3. LIMPIEZA
+        return () => clearInterval(intervalId);
+        
+    }, [hiveId, config]); 
+
+    // useEffect 1: Obtener SOLO los datos del día (para el modal y el gráfico en Overview)
+    useEffect(() => {
+        const getSensoresPorDia = async () => {
+            try {
+                // Endpoint que trae solo los datos de las últimas 24h
+                const response = await axios.get(`${API_URL}/sensores/obtener-historial-diario/${hiveId}`, config);
+                if (response.status === 200) {
+                    setSensoresPorDia(response.data);
+                } else if (response.status === 204) {
+                    setSensoresPorDia([]); // Establecer como array vacío si no hay datos.
+                }
+            } catch (error) {
+                console.error("ERROR al obtener historial diario:", error);
+                setSensoresPorDia([]); 
+            }
+        }
+        getSensoresPorDia()
+    }, [hiveId, config])
+
+
+    // useEffect 2: Cargar el historial completo solo si se activa la pestaña
+    useEffect(() => {
+        // 💡 DEBUG: Confirma que la función se llama al cambiar de pestaña.
+        console.log(`[Historical Load] activeTab: ${activeTab}, loaded: ${sensoresHistoricoCompleto !== null}, loading: ${isHistoricalLoading}`);
+
+        const getSensoresHistoricoCompleto = async () => {
+            // 1. Evitar carga si ya está cargado o si no estamos en la pestaña
+            if (activeTab !== "historical" || sensoresHistoricoCompleto !== null || isHistoricalLoading) {
+                 console.log("[Historical Load] Abortada por condición.");
+                 return;
+            }
+            
+            console.log("[Historical Load] Iniciando carga de datos históricos...");
+            setIsHistoricalLoading(true); // Iniciar estado de carga
+            
+            try {
+                // Usamos el endpoint para obtener TODO el historial
+                const response = await axios.get(`${API_URL}/sensores/obtener-historial-completo/${hiveId}`, config);
+                if (response.status === 200) {
+                    setSensoresHistoricoCompleto(response.data);
+                    console.log("[Historical Load] Datos cargados:", response.data.length, "registros.");
+                } else if (response.status === 204) {
+                    setSensoresHistoricoCompleto([]);
+                    console.log("[Historical Load] No Content (204). Array vacío.");
+                }
+            } catch (error) {
+                console.error("ERROR al obtener el historial completo:", error);
+                setSensoresHistoricoCompleto([]);
+            } finally {
+                setIsHistoricalLoading(false); // Detener estado de carga
+            }
+        }
+        
+        // 2. Ejecutar la función
+        getSensoresHistoricoCompleto();
+        
+    }, [hiveId, config, activeTab]); 
+
+    // ------------------------------------------
+    // Funciones Auxiliares (sin cambios)
+    // ------------------------------------------
+
+    const openImageModal = (imageUrl) => {
+        setCurrentImageModalUrl(imageUrl);
+        setIsImageModalOpen(true);
+    };
+
+    const closeImageModal = () => {
+        setIsImageModalOpen(false);
+        setCurrentImageModalUrl("");
+    };
+
+    const closeSensorModal = () => {
+        setIsSensorModalOpen(false);
+        setSelectedSensorData(null);
+    };
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case "OK":
+                return "status-ok";
+            case "ALERT":
+                return "status-alert";
+            case "CRITICAL":
+                return "status-critical";
+            default:
+                return "status-unknown";
+        }
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case "OK":
+                return "Saludable";
+            case "ALERT":
+            case "CRITICAL":
+                return "Alerta"; 
+            default:
+                return "Desconocido";
+        }
+    };
+
+    const getMetricStatus = (metricType, value) => {
+        switch (metricType) {
+            case "temperature":
+                if (value >= 32 && value <= 36)
+                    return { status: "ok", icon: <FaCheckCircle />, label: "Normal" };
+                if ((value >= 30 && value < 32) || (value > 36 && value <= 38))
+                    return {
+                        status: "alert",
+                        icon: <FaExclamationTriangle />,
+                        label: "Alerta",
+                    };
+                if (value < 30 || value > 38)
+                    return {
+                        status: "critical",
+                        icon: <FaTimesCircle />,
+                        label: "Crítico",
+                    };
+                return { status: "unknown", icon: null, label: "Desconocido" };
+
+            case "humidity":
+                if (value >= 50 && value <= 70)
+                    return { status: "ok", icon: <FaCheckCircle />, label: "Normal" };
+                if ((value >= 40 && value < 50) || (value > 70 && value <= 75))
+                    return {
+                        status: "alert",
+                        icon: <FaExclamationTriangle />,
+                        label: "Alerta",
+                    };
+                if (value < 40 || value > 75)
+                    return {
+                        status: "critical",
+                        icon: <FaTimesCircle />,
+                        label: "Crítico",
+                    };
+                return { status: "unknown", icon: null, label: "Desconocido" };
+
+            case "weight":
+                if (value > 40)
+                    return { status: "ok", icon: <FaCheckCircle />, label: "Normal" };
+                if (value >= 30 && value <= 40)
+                    return {
+                        status: "alert",
+                        icon: <FaExclamationTriangle />,
+                        label: "Alerta",
+                    };
+                if (value < 30)
+                    return {
+                        status: "critical",
+                        icon: <FaTimesCircle />,
+                        label: "Crítico",
+                    };
+                return { status: "unknown", icon: null, label: "Desconocido" };
+
+            case "queenStatus":
+                if (value === "Activa")
+                    return { status: "ok", icon: <GiBee />, label: "Activa" };
+                return {
+                    status: "alert",
+                    icon: <FaExclamationTriangle />,
+                    label: "Alerta",
+                };
+            default:
+                return { status: "unknown", icon: null, label: "Desconocido" };
+        }
+    };
+
+    const formatLastSyncTime = (timestamp) => {
+        if (!timestamp) return "N/A";
+        const now = Date.now();
+        const diffSeconds = Math.floor((now - timestamp) / 1000);
+
+        if (diffSeconds < 60) {
+            return `hace ${diffSeconds} segundo${diffSeconds === 1 ? "" : "s"}`;
+        } else if (diffSeconds < 3600) {
+            const minutes = Math.floor(diffSeconds / 60);
+            return `hace ${minutes} minuto${minutes === 1 ? "" : "s"}`;
+        } else if (diffSeconds < 86400) {
+            const hours = Math.floor(diffSeconds / 3600);
+            return `hace ${hours} hora${hours === 1 ? "" : "s"}`;
         } else {
-          console.log("Colmena no encontrada.");
-          setHive(null);
+            const days = Math.floor(diffSeconds / 86400);
+            return `hace ${days} día${days === 1 ? "" : "s"}`;
         }
-      } catch (error) {
-        console.error("ERROR: ", error);
-      }
     };
-    getColmenaEspecifica();
-  }, []);
+    
+    // FUNCIÓN DE FILTRO: Compara solo la fecha para asegurar que sea "hoy"
+    const isToday = (dateString) => {
+        if (!dateString) return false;
+        
+        // Crea una fecha a partir del string, usando la zona horaria local del navegador.
+        const recordDate = new Date(dateString);
+        const today = new Date();
 
-  useEffect(() => {
-    const getAlertas = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/alertas/obtener-alertas-particular/${hiveId}`,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
+        // Compara el año, el mes y el día (basado en la hora local)
+        return (
+            recordDate.getFullYear() === today.getFullYear() &&
+            recordDate.getMonth() === today.getMonth() &&
+            recordDate.getDate() === today.getDate()
         );
-        if (response.status === 200) {
-          console.log(response.data);
-          setAlertasColmena(response.data);
-        } else if (response.status === 204) {
-          console.log("No hay alertas actualmente.");
-        }
-      } catch (error) {
-        console.error("ERROR: ", error);
-      }
     };
-    getAlertas();
-  }, []);
 
-  useEffect(() => {
-    const getSensoresPorDia = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/sensores/obtener-historial-diario/${hiveId}`, config);
-        if (response.status === 200) {
-          console.log(response.data);
-          setSensoresPorDia(response.data);
-        } else if (response.status === 204) {
-          console.log("No hay datos de sensores registrados.");
-        }
-      } catch (error) {
-        console.error("ERROR:", error);
-      }
-    }
-    getSensoresPorDia()
-  }, [hiveId])
-
-  const openImageModal = (imageUrl) => {
-    setCurrentImageModalUrl(imageUrl);
-    setIsImageModalOpen(true);
-  };
-
-  const closeImageModal = () => {
-    setIsImageModalOpen(false);
-    setCurrentImageModalUrl("");
-  };
-
-  const closeSensorModal = () => {
-    setIsSensorModalOpen(false);
-    setSelectedSensorData(null);
-  };
-
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "OK":
-        return "status-ok";
-      case "ALERT":
-        return "status-alert";
-      case "CRITICAL":
-        return "status-critical";
-      default:
-        return "status-unknown";
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case "OK":
-        return "Saludable";
-      case "ALERT":
-        return "Alerta";
-      case "CRITICAL":
-        return "Crítico";
-      default:
-        return "Desconocido";
-    }
-  };
-
-  const getMetricStatus = (metricType, value) => {
-    switch (metricType) {
-      case "temperature":
-        if (value >= 32 && value <= 36)
-          return { status: "ok", icon: <FaCheckCircle />, label: "Normal" };
-        if ((value >= 30 && value < 32) || (value > 36 && value <= 38))
-          return {
-            status: "alert",
-            icon: <FaExclamationTriangle />,
-            label: "Alerta",
-          };
-        if (value < 30 || value > 38)
-          return {
-            status: "critical",
-            icon: <FaTimesCircle />,
-            label: "Crítico",
-          };
-        return { status: "unknown", icon: null, label: "Desconocido" };
-
-      case "humidity":
-        if (value >= 50 && value <= 70)
-          return { status: "ok", icon: <FaCheckCircle />, label: "Normal" };
-        if ((value >= 40 && value < 50) || (value > 70 && value <= 75))
-          return {
-            status: "alert",
-            icon: <FaExclamationTriangle />,
-            label: "Alerta",
-          };
-        if (value < 40 || value > 75)
-          return {
-            status: "critical",
-            icon: <FaTimesCircle />,
-            label: "Crítico",
-          };
-        return { status: "unknown", icon: null, label: "Desconocido" };
-
-      case "weight":
-        if (value > 40)
-          return { status: "ok", icon: <FaCheckCircle />, label: "Normal" };
-        if (value >= 30 && value <= 40)
-          return {
-            status: "alert",
-            icon: <FaExclamationTriangle />,
-            label: "Alerta",
-          };
-        if (value < 30)
-          return {
-            status: "critical",
-            icon: <FaTimesCircle />,
-            label: "Crítico",
-          };
-        return { status: "unknown", icon: null, label: "Desconocido" };
-
-      case "queenStatus":
-        if (value === "Activa")
-          return { status: "ok", icon: <GiBee />, label: "Activa" };
-        return {
-          status: "alert",
-          icon: <FaExclamationTriangle />,
-          label: "Alerta",
+    // openSensorModal MODIFICADO: Usa el estado de las últimas 24h y lo filtra por fecha de hoy
+    const openSensorModal = (sensorType) => {
+        const sensorDetails = {
+            temperature: {
+                title: "Temperatura - Registros de Hoy", 
+                dataKey: "temperatura", 
+                unit: "°C",
+                icon: <FaThermometerHalf className="modal-icon" />,
+            },
+            humidity: {
+                title: "Humedad - Registros de Hoy", 
+                dataKey: "humedad", 
+                unit: "%",
+                icon: <FaTint className="modal-icon" />,
+            },
+            weight: {
+                title: "Peso - Registros de Hoy", 
+                dataKey: "peso", 
+                unit: " kg",
+                icon: <FaWeightHanging className="modal-icon" />,
+            },
         };
-      default:
-        return { status: "unknown", icon: null, label: "Desconocido" };
-    }
-  };
 
-  const formatLastSyncTime = (timestamp) => {
-    if (!timestamp) return "N/A";
-    const now = Date.now();
-    const diffSeconds = Math.floor((now - timestamp) / 1000);
+        // Usar los datos del día (sensoresPorDia) y filtrarlos por la fecha actual
+        const rawData = sensoresPorDia || [];
+        
+        // Filtra los datos para que solo incluyan registros que sean "hoy"
+        const todayData = rawData.filter(record => isToday(record.fecha)); // 🚨 CORREGIDO: Usar record.fecha
+        
+        // Mapeo y formateo de datos (usando solo los datos de hoy)
+        const enhancedData = todayData
+        .filter(record => record[sensorDetails[sensorType].dataKey] !== undefined) // Filtrar registros sin el dato del sensor
+        .map((record) => {
+            const dateObj = new Date(record.fecha); // 🚨 CORREGIDO: Usar record.fecha
 
-    if (diffSeconds < 60) {
-      return `hace ${diffSeconds} segundo${diffSeconds === 1 ? "" : "s"}`;
-    } else if (diffSeconds < 3600) {
-      const minutes = Math.floor(diffSeconds / 60);
-      return `hace ${minutes} minuto${minutes === 1 ? "" : "s"}`;
-    } else if (diffSeconds < 86400) {
-      const hours = Math.floor(diffSeconds / 3600);
-      return `hace ${hours} hora${hours === 1 ? "" : "s"}`;
-    } else {
-      const days = Math.floor(diffSeconds / 86400);
-      return `hace ${days} día${days === 1 ? "" : "s"}`;
-    }
-  };
+            // Formatear Fecha y Hora (usando la zona horaria del usuario)
+            const date = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const time = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-  const openSensorModal = (sensorType) => {
-    const sensorDetails = {
-      temperature: {
-        title: "Temperatura Diaria",
-        dataKey: "temp",
-        unit: "°C",
-        icon: <FaThermometerHalf className="modal-icon" />,
-      },
-      humidity: {
-        title: "Humedad Diaria",
-        dataKey: "humidity",
-        unit: "%",
-        icon: <FaTint className="modal-icon" />,
-      },
-      weight: {
-        title: "Peso Diario",
-        dataKey: "weight",
-        unit: " kg",
-        icon: <FaWeightHanging className="modal-icon" />,
-      },
+            const value = record[sensorDetails[sensorType].dataKey];
+
+            return {
+                date,
+                time,
+                value,
+                statusInfo: getMetricStatus(
+                    sensorType,
+                    value
+                ),
+            };
+        }).sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)); // Ordenar por fecha y hora (más reciente primero);
+
+
+        setSelectedSensorData({
+            ...sensorDetails[sensorType],
+            historicalData: enhancedData,
+        });
+        setIsSensorModalOpen(true);
     };
 
-    const enhancedData = hive.historicalData.map((record) => ({
-      ...record,
-      statusInfo: getMetricStatus(
-        sensorType,
-        record[sensorDetails[sensorType].dataKey]
-      ),
-    }));
+    // =========================================================================
+    // LÓGICA DE DATOS DEL GRÁFICO (CORREGIDA PARA MANEJAR FORMATOS DE FECHA)
+    // =========================================================================
+    const chartData = (activeTab === "historical" 
+        ? (sensoresHistoricoCompleto || []) 
+        : (sensoresPorDia || [])
+    )
+        .map(record => {
+            
+            // 🚨 CLAVE DE CORRECCIÓN: Usar record.fecha
+            let dateString = record.fecha; 
 
-    setSelectedSensorData({
-      ...sensorDetails[sensorType],
-      historicalData: enhancedData,
-    });
-    setIsSensorModalOpen(true);
-  };
+            // Manejo de formatos de fecha complejos (como el que mencionas)
+            let dateObj = new Date(dateString);
+            
+            if (isNaN(dateObj.getTime())) {
+                // Intentar limpiar la cadena de fecha si new Date() falló
+                 console.error(`[Date Error] Formato de fecha original falló: ${dateString}. Intentando parseo estricto.`);
+                 // Esto intenta corregir el formato de offset, e.g., de +01:00 a +0100
+                 const cleanDateString = dateString.replace(/([+-]\d{2}):(\d{2})$/, '$1$2').replace(/\.\d+/, '');
+                 dateObj = new Date(cleanDateString);
 
-  if (!hive) {
-    return (
-      <div className="loading-screen">
-        <p>Cargando detalles de la colmena...</p>
-        <div className="spinner"></div>
-      </div>
-    );
-  }
+                 if (isNaN(dateObj.getTime())) {
+                     console.error(`[Date Error] Parseo estricto también falló para: ${cleanDateString}. Este registro será ignorado.`);
+                     return null; 
+                 }
+            }
 
-  const descargarReporte = async (hiveId) => {
-    console.log(config.headers);
-    try {
-      const response = await axios.get(
-        `${API_URL}/reportes/obtener-reporte/${hiveId}/${userId}`,
-        {
-          responseType: "blob", // Important for binary data
-          headers: config.headers,
+            const timestamp = dateObj.getTime(); 
+            
+            // 💡 DEBUG: Confirma que el timestamp ahora es un número válido
+            if (activeTab === "historical" && (sensoresHistoricoCompleto || []).length > 0) {
+                console.log("[Punto Histórico Debug]", {
+                    timestamp: timestamp, 
+                    isTimestampValid: !isNaN(timestamp),
+                    temperatura: record.temperatura,
+                    sourceDate: dateString
+                });
+            }
+
+            // Si el timestamp no es un número válido, ignorar el punto
+            if (isNaN(timestamp)) {
+                 return null;
+            }
+
+
+            return {
+                ...record,
+                timestamp: timestamp, 
+                formattedTime: dateObj.toLocaleString('es-ES', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }),
+            };
+        })
+        // Filtrar los registros nulos si el parseo de fecha falló
+        .filter(record => record !== null) 
+        // Ordenar por el timestamp numérico
+        .sort((a, b) => a.timestamp - b.timestamp); 
+    // =========================================================================
+
+
+    // Lógica de carga para el historial
+    if (!hive || (activeTab === "historical" && isHistoricalLoading)) {
+        return (
+            <div className="loading-screen">
+                <p>Cargando detalles de la colmena...</p>
+                <div className="spinner"></div>
+            </div>
+        );
+    }
+    
+    // Manejo de estado: si estamos en historial, pero los datos aún no llegan (aunque no haya error)
+    if (activeTab === "historical" && sensoresHistoricoCompleto === null && !isHistoricalLoading) {
+        return (
+            <div className="loading-screen">
+                <p>Preparando datos históricos...</p>
+                <div className="spinner"></div>
+                <p>Esto puede tardar unos segundos si es la primera carga.</p>
+            </div>
+        );
+    }
+
+    const descargarReporte = async (hiveId) => {
+        console.log(config.headers);
+        try {
+            const response = await axios.get(
+                `${API_URL}/reportes/obtener-reporte/${hiveId}/${userId}`,
+                {
+                    responseType: "blob", // Important for binary data
+                    headers: config.headers,
+                }
+            );
+            // Create a blob URL and trigger download
+            const url = window.URL.createObjectURL(
+                new Blob([response.data], { type: "application/pdf" })
+            );
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `reporte_colmena_${hiveId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            alert(
+                "No se pudo descargar el reporte. " +
+                    (error.response?.data?.message || "")
+            );
+            console.error(error);
         }
-      );
-      // Create a blob URL and trigger download
-      const url = window.URL.createObjectURL(
-        new Blob([response.data], { type: "application/pdf" })
-      );
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `reporte_colmena_${hiveId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      alert(
-        "No se pudo descargar el reporte. " +
-          (error.response?.data?.message || "")
-      );
-      console.error(error);
-    }
-  };
+    };
 
-  // 👇 MOVER ESTA LÓGICA AQUÍ, DESPUÉS DE LA COMPROBACIÓN DE `hive`
-  const tempStatus = getMetricStatus("temperature", hive.temperatura);
-  const humidityStatus = getMetricStatus("humidity", hive.humedad);
-  const weightStatus = getMetricStatus("weight", hive.peso);
-  const queenStatusInfo = getMetricStatus("queenStatus", hive.sonido);
+    const tempStatus = getMetricStatus("temperature", hive.temperatura);
+    const humidityStatus = getMetricStatus("humidity", hive.humedad);
+    const weightStatus = getMetricStatus("weight", hive.peso);
+    const queenStatusInfo = getMetricStatus("queenStatus", hive.sonido);
 
-  const getFilteredAlerts = () => {
-    if (filterAlerts === "active") {
-      return alertasColmena.filter(
-        (alerta) => alerta.estado_alerta === "pendiente"
-      );
-    } else if (filterAlerts === "resolved") {
-      return alertasColmena.filter(
-        (alerta) => alerta.estado_alerta === "resuelta"
-      );
-    }
-    return alertasColmena;
-  };
+    const getFilteredAlerts = () => {
+        if (filterAlerts === "active") {
+            return alertasColmena.filter(
+                (alerta) => alerta.estado_alerta === "pendiente"
+            );
+        } else if (filterAlerts === "resolved") {
+            return alertasColmena.filter(
+                (alerta) => alerta.estado_alerta === "resuelta"
+            );
+        }
+        return alertasColmena;
+    };
 
-  return (
-    <div className="hive-detail-screen-container">
-      <nav className="detail-navbar">
-        <div className="navbar-logo">
-          <GiBee className="nav-bee-icon" />
-          <span>Monitor Beehive</span>
-        </div>
-        <div className="navbar-links">
-          <Link to="/dashboard" className="nav-link">
-            <FaArrowLeft /> Volver al Dashboard
-          </Link>
-          <Link to="/reports" className="nav-link">
-            <FaFileAlt /> Reportes
-          </Link>
-          <Link to="/settings" className="nav-link">
-            <FaCog /> Configuración
-          </Link>
-        </div>
-      </nav>
+    return (
+        <div className="hive-detail-screen-container">
+            <nav className="detail-navbar">
+                <div className="navbar-logo">
+                    <GiBee className="nav-bee-icon" />
+                    <span>Monitor Beehive</span>
+                </div>
+                <div className="navbar-links">
+                    <Link to="/dashboard" className="nav-link">
+                        <FaArrowLeft /> Volver al Dashboard
+                    </Link>
+                    <Link to="/reports" className="nav-link">
+                        <FaFileAlt /> Reportes
+                    </Link>
+                    <Link to="/settings" className="nav-link">
+                        <FaCog /> Configuración
+                    </Link>
+                </div>
+            </nav>
 
-      <div className="detail-content">
-        <div className="hive-header-section">
-          <div className="hive-header-info">
-            {hive.foto_colmena_url && (
-              <img
-                src={hive.foto_colmena_url}
-                alt={`Imagen de ${hive.nombre_colmena}`}
-                className="hive-detail-image"
-                onClick={() => openImageModal(hive.foto_colmena_url)}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src =
-                    "https://placehold.co/150x150/CCCCCC/000000?text=No+Image";
-                }}
-              />
-            )}
-            <FaHive className="hive-detail-icon" />
-            <div className="hive-title-group">
-              <h1 className="hive-detail-title">{hive.nombre_colmena}</h1>
-              <p className="hive-location">{hive.nombre_apiario}</p>
-            </div>
-          </div>
-          {/* <div className={`hive-detail-status ${getStatusClass(hive.status)}`}>
-            <FaCheckCircle />
-            <span>Estado: {getStatusText(hive.status)}</span>
-          </div> */}
-        </div>
-
-        <div className="detail-tabs">
-          <button
-            className={
-              activeTab === "overview" ? "tab-button active" : "tab-button"
-            }
-            onClick={() => setActiveTab("overview")}
-          >
-            Resumen Actual
-          </button>
-          <button
-            className={
-              activeTab === "historical" ? "tab-button active" : "tab-button"
-            }
-            onClick={() => setActiveTab("historical")}
-          >
-            Datos Históricos
-          </button>
-          <button
-            className={
-              activeTab === "alerts" ? "tab-button active" : "tab-button"
-            }
-            onClick={() => setActiveTab("alerts")}
-          >
-            Alertas
-          </button>
-          <button
-            onClick={() => descargarReporte(hiveId)}
-            className="tab-button download-button"
-          >
-            <FaDownload /> Descargar Reporte
-          </button>
-        </div>
-
-        {activeTab === "overview" && (
-          <div className="tab-content overview-content">
-            <h2 className="current-metrics-title">Métricas Actuales</h2>
-            <div className="current-metrics-grid">
-              <div
-                className={`metric-card ${tempStatus.status}`}
-                onClick={() => openSensorModal("temperature")}
-              >
-                {tempStatus.icon}
-                <span className="metric-value">{hive.temperatura}°C</span>
-                <span className="metric-label">Temperatura</span>
-                <span className="metric-status-label">{tempStatus.label}</span>
-              </div>
-              <div
-                className={`metric-card ${humidityStatus.status}`}
-                onClick={() => openSensorModal("humidity")}
-              >
-                {humidityStatus.icon}
-                <span className="metric-value">{hive.humedad}%</span>
-                <span className="metric-label">Humedad</span>
-                <span className="metric-status-label">
-                  {humidityStatus.label}
-                </span>
-              </div>
-              <div
-                className={`metric-card ${weightStatus.status}`}
-                onClick={() => openSensorModal("weight")}
-              >
-                {weightStatus.icon}
-                <span className="metric-value">{hive.peso} kg</span>
-                <span className="metric-label">Peso</span>
-                <span className="metric-status-label">
-                  {weightStatus.label}
-                </span>
-              </div>
-              <div className={`metric-card ${queenStatusInfo.status}`}>
-                {queenStatusInfo.icon}
-                <span className="metric-value">{hive.sonido}</span>
-                <span className="metric-label">Estado de la Reina</span>
-                <span className="metric-status-label">
-                  {queenStatusInfo.label}
-                </span>
-              </div>
-            </div>
-            <p className="last-sync-time">
-              Última sincronización: <MdAccessTime />{" "}
-              {formatLastSyncTime(lastSyncTime)}
-            </p>
-          </div>
-        )}
-
-        {activeTab === "historical" && (
-          <div className="tab-content historical-content">
-            <h2 className="historical-chart-title">
-              Gráfico de Datos Históricos (Últimas 8 Horas)
-            </h2>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart
-                  data={hive.historicalData}
-                  margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={getComputedStyle(
-                      document.documentElement
-                    ).getPropertyValue("--color-border-light")}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    stroke={getComputedStyle(
-                      document.documentElement
-                    ).getPropertyValue("--color-mid-text")}
-                  />
-                  <YAxis
-                    yAxisId="left"
-                    stroke={getComputedStyle(
-                      document.documentElement
-                    ).getPropertyValue("--color-accent-orange")}
-                    label={{
-                      value: "Temperatura (°C)",
-                      angle: -90,
-                      position: "insideLeft",
-                      fill: getComputedStyle(
-                        document.documentElement
-                      ).getPropertyValue("--color-accent-orange"),
-                    }}
-                  />
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    stroke={getComputedStyle(
-                      document.documentElement
-                    ).getPropertyValue("--color-status-ok")}
-                    label={{
-                      value: "Humedad (%) / Peso (kg)",
-                      angle: 90,
-                      position: "insideRight",
-                      fill: getComputedStyle(
-                        document.documentElement
-                      ).getPropertyValue("--color-status-ok"),
-                    }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--color-surface)",
-                      border: "1px solid var(--color-border-light)",
-                      borderRadius: "8px",
-                    }}
-                    labelStyle={{
-                      color: "var(--color-dark-text)",
-                      fontWeight: "bold",
-                    }}
-                    itemStyle={{ color: "var(--color-mid-text)" }}
-                  />
-                  <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                  <Line
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="temp"
-                    stroke="var(--color-accent-orange)"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 8 }}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="humidity"
-                    stroke="var(--color-status-ok)"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 8 }}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="weight"
-                    stroke="var(--color-status-critical)"
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "alerts" && (
-          <div className="tab-content alerts-content">
-            <h2 className="alerts-title">Alertas Registradas</h2>
-            <div className="alert-filter-buttons">
-              <button
-                className={
-                  filterAlerts === "active"
-                    ? "filter-button active"
-                    : "filter-button"
-                }
-                onClick={() => setFilterAlerts("active")}
-              >
-                Activas (
-                {
-                  alertasColmena.filter((a) => a.estado_alerta === "pendiente")
-                    .length
-                }
-                ) {/* Cantidad de alertas en estado "pendiente"*/}
-              </button>
-              <button
-                className={
-                  filterAlerts === "resolved"
-                    ? "filter-button active"
-                    : "filter-button"
-                }
-                onClick={() => setFilterAlerts("resolved")}
-              >
-                Resueltas (
-                {
-                  alertasColmena.filter((a) => a.estado_alerta === "resuelta")
-                    .length
-                }
-                ) {/* Cantidad de alertas en estado "resuelta" */}
-              </button>
-              <button
-                className={
-                  filterAlerts === "all"
-                    ? "filter-button active"
-                    : "filter-button"
-                }
-                onClick={() => setFilterAlerts("all")}
-              >
-                Todas ({alertasColmena.length}){" "}
-                {/* Cantidad total de alertas. */}
-              </button>
-            </div>
-            {getFilteredAlerts().length === 0 ? (
-              <p className="no-alerts-message">
-                No hay alertas{" "}
-                {filterAlerts === "active"
-                  ? "activas"
-                  : filterAlerts === "resolved"
-                  ? "resueltas"
-                  : ""}{" "}
-                para mostrar.
-              </p>
-            ) : (
-              <div className="alerts-list">
-                {getFilteredAlerts().map((alerta) => (
-                  <div
-                    key={alerta._id}
-                    className={`alert-item ${
-                      alert.resolved ? "resolved" : "active"
-                    }`}
-                  >
-                    <div className="alert-icon-wrapper">
-                      {alerta.estado_alerta === "resuelta" ? (
-                        <FaCheckCircle className="alert-status-icon resolved-icon" />
-                      ) : (
-                        <FaExclamationTriangle className="alert-status-icon active-icon" />
-                      )}
+            <div className="detail-content">
+                <div className="hive-header-section">
+                    <div className="hive-header-info">
+                        {hive.foto_colmena_url && (
+                            <img
+                                src={hive.foto_colmena_url}
+                                alt={`Imagen de ${hive.nombre_colmena}`}
+                                className="hive-detail-image"
+                                onClick={() => openImageModal(hive.foto_colmena_url)}
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src =
+                                        "https://placehold.co/150x150/CCCCCC/000000?text=No+Image";
+                                }}
+                            />
+                        )}
+                        <FaHive className="hive-detail-icon" />
+                        <div className="hive-title-group">
+                            <h1 className="hive-detail-title">{hive.nombre_colmena}</h1>
+                            <p className="hive-location">{hive.nombre_apiario}</p>
+                        </div>
                     </div>
-                    <div className="alert-details">
-                      <h3 className="alert-type">{alerta.titulo_alerta}</h3>
-                      <p className="alert-description">
-                        {alerta.descripcion_alerta}
-                      </p>
-                      <span className="alert-timestamp">
-                        <FaCalendarAlt />{" "}
-                        {/* {new Date(alert.timestamp).toLocaleString()} */}
-                      </span>
+                </div>
+
+                <div className="detail-tabs">
+                    <button
+                        className={
+                            activeTab === "overview" ? "tab-button active" : "tab-button"
+                        }
+                        onClick={() => setActiveTab("overview")}
+                    >
+                        Resumen Actual
+                    </button>
+                    <button
+                        className={
+                            activeTab === "historical" ? "tab-button active" : "tab-button"
+                        }
+                        onClick={() => setActiveTab("historical")}
+                    >
+                        Datos Históricos
+                    </button>
+                    <button
+                        className={
+                            activeTab === "alerts" ? "tab-button active" : "tab-button"
+                        }
+                        onClick={() => setActiveTab("alerts")}
+                    >
+                        Alertas
+                    </button>
+                    <button
+                        onClick={() => descargarReporte(hiveId)}
+                        className="tab-button download-button"
+                    >
+                        <FaDownload /> Descargar Reporte
+                    </button>
+                </div>
+
+                {activeTab === "overview" && (
+                    <div className="tab-content overview-content">
+                        <h2 className="current-metrics-title" ref={metricsSectionRef}>Métricas Actuales</h2>
+                        <div className="current-metrics-grid">
+                            <div
+                                className={`metric-card ${tempStatus.status}`}
+                                onClick={() => openSensorModal("temperature")}
+                            >
+                                {tempStatus.icon}
+                                <span className="metric-value">{hive.temperatura}°C</span>
+                                <span className="metric-label">Temperatura</span>
+                                <span className="metric-status-label">{tempStatus.label}</span>
+                            </div>
+                            <div
+                                className={`metric-card ${humidityStatus.status}`}
+                                onClick={() => openSensorModal("humidity")}
+                            >
+                                {humidityStatus.icon}
+                                <span className="metric-value">{hive.humedad}%</span>
+                                <span className="metric-label">Humedad</span>
+                                <span className="metric-status-label">
+                                    {humidityStatus.label}
+                                </span>
+                            </div>
+                            <div
+                                className={`metric-card ${weightStatus.status}`}
+                                onClick={() => openSensorModal("weight")}
+                            >
+                                {weightStatus.icon}
+                                <span className="metric-value">{hive.peso} kg</span>
+                                <span className="metric-label">Peso</span>
+                                <span className="metric-status-label">
+                                    {weightStatus.label}
+                                </span>
+                            </div>
+                            <div className={`metric-card ${queenStatusInfo.status}`}>
+                                {queenStatusInfo.icon}
+                                <span className="metric-value">{hive.sonido}</span>
+                                <span className="metric-label">Estado de la Reina</span>
+                                <span className="metric-status-label">
+                                    {queenStatusInfo.label}
+                                </span>
+                            </div>
+                        </div>
+                        <p className="last-sync-time">
+                            Última sincronización: <MdAccessTime />{" "}
+                            {formatLastSyncTime(lastSyncTime)}
+                        </p>
                     </div>
-                    {alerta.estado_alerta === "pendiente" && (
-                      <button className="resolve-button">
-                        Marcar como Resuelta
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
+                )}
+
+                {activeTab === "historical" && (
+                    <div className="tab-content historical-content">
+                        <h2 className="historical-chart-title">
+                            Gráfico de Datos Históricos (Todos los Registros)
+                        </h2>
+                        {/* Mensaje de "No hay datos" si el historial está vacío */}
+                        {chartData.length === 0 && !isHistoricalLoading ? (
+                            <p className="no-data-message">
+                                <FaBell /> No hay datos históricos para esta colmena.
+                            </p>
+                        ) : (
+                            <div className="chart-container">
+                                <ResponsiveContainer width="100%" height={400}>
+                                    {/* Usa chartData, que se basa en sensoresHistoricoCompleto para esta pestaña */}
+                                    <LineChart
+                                        data={chartData}
+                                        margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
+                                    >
+                                        <CartesianGrid
+                                            strokeDasharray="3 3"
+                                            stroke={getComputedStyle(
+                                                document.documentElement
+                                            ).getPropertyValue("--color-border-light")}
+                                        />
+                                        <XAxis
+                                            dataKey="timestamp" 
+                                            type="number" 
+                                            scale="time" 
+                                            domain={['auto', 'auto']} 
+                                            tickFormatter={(tick) => 
+                                                new Date(tick).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                                            } 
+                                            stroke={getComputedStyle(
+                                                document.documentElement
+                                            ).getPropertyValue("--color-mid-text")}
+                                        />
+                                        <YAxis
+                                            yAxisId="left"
+                                            domain={['auto', 'auto']} 
+                                            stroke={getComputedStyle(
+                                                document.documentElement
+                                            ).getPropertyValue("--color-accent-orange")}
+                                            label={{
+                                                value: "Temperatura (°C)",
+                                                angle: -90,
+                                                position: "insideLeft",
+                                                fill: getComputedStyle(
+                                                    document.documentElement
+                                                ).getPropertyValue("--color-accent-orange"),
+                                            }}
+                                        />
+                                        <YAxis
+                                            yAxisId="right"
+                                            orientation="right"
+                                            domain={['auto', 'auto']} 
+                                            stroke={getComputedStyle(
+                                                document.documentElement
+                                            ).getPropertyValue("--color-status-ok")}
+                                            label={{
+                                                value: "Humedad (%) / Peso (kg)",
+                                                angle: 90,
+                                                position: "insideRight",
+                                                fill: getComputedStyle(
+                                                    document.documentElement
+                                                ).getPropertyValue("--color-status-ok"),
+                                            }}
+                                        />
+                                        <Tooltip content={<CustomTooltip />} /> 
+                                        <Legend wrapperStyle={{ paddingTop: "20px" }} />
+                                        <Line
+                                            yAxisId="left"
+                                            type="monotone"
+                                            dataKey="temperatura" 
+                                            stroke="var(--color-accent-orange)"
+                                            strokeWidth={3}
+                                            dot={{ r: 4 }}
+                                            activeDot={{ r: 8 }}
+                                        />
+                                        <Line
+                                            yAxisId="right"
+                                            type="monotone"
+                                            dataKey="humedad" 
+                                            stroke="var(--color-status-ok)"
+                                            strokeWidth={3}
+                                            dot={{ r: 4 }}
+                                            activeDot={{ r: 8 }}
+                                        />
+                                        <Line
+                                            yAxisId="right"
+                                            type="monotone"
+                                            dataKey="peso" 
+                                            stroke="var(--color-status-critical)"
+                                            strokeWidth={3}
+                                            dot={{ r: 4 }}
+                                            activeDot={{ r: 8 }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === "alerts" && (
+                    <div className="tab-content alerts-content">
+                        <h2 className="alerts-title">Alertas Registradas</h2>
+                        <div className="alert-filter-buttons">
+                            <button
+                                className={
+                                    filterAlerts === "active"
+                                        ? "filter-button active"
+                                        : "filter-button"
+                                }
+                                onClick={() => setFilterAlerts("active")}
+                            >
+                                Activas (
+                                {
+                                    alertasColmena.filter((a) => a.estado_alerta === "pendiente")
+                                        .length
+                                }
+                                ) 
+                            </button>
+                            <button
+                                className={
+                                    filterAlerts === "resolved"
+                                        ? "filter-button active"
+                                        : "filter-button"
+                                }
+                                onClick={() => setFilterAlerts("resolved")}
+                            >
+                                Resueltas (
+                                {
+                                    alertasColmena.filter((a) => a.estado_alerta === "resuelta")
+                                        .length
+                                }
+                                ) 
+                            </button>
+                            <button
+                                className={
+                                    filterAlerts === "all"
+                                        ? "filter-button active"
+                                        : "filter-button"
+                                }
+                                onClick={() => setFilterAlerts("all")}
+                            >
+                                Todas ({alertasColmena.length}){" "}
+                            </button>
+                        </div>
+                        {getFilteredAlerts().length === 0 ? (
+                            <p className="no-alerts-message">
+                                No hay alertas{" "}
+                                {filterAlerts === "active"
+                                    ? "activas"
+                                    : filterAlerts === "resolved"
+                                    ? "resueltas"
+                                    : ""}{" "}
+                                para mostrar.
+                            </p>
+                        ) : (
+                            <div className="alerts-list">
+                                {getFilteredAlerts().map((alerta) => (
+                                    <div
+                                        key={alerta._id}
+                                        className={`alert-item ${
+                                            alerta.estado_alerta === "resuelta" ? "resolved" : "active"
+                                        }`}
+                                    >
+                                        <div className="alert-icon-wrapper">
+                                            {alerta.estado_alerta === "resuelta" ? (
+                                                <FaCheckCircle className="alert-status-icon resolved-icon" />
+                                            ) : (
+                                                <FaExclamationTriangle className="alert-status-icon active-icon" />
+                                            )}
+                                        </div>
+                                        <div className="alert-details">
+                                            <h3 className="alert-type">{alerta.titulo_alerta}</h3>
+                                            <p className="alert-description">
+                                                {alerta.descripcion_alerta}
+                                            </p>
+                                            <span className="alert-timestamp">
+                                                <FaCalendarAlt />{" "}
+                                                {/* Asumo que tienes una propiedad fecha_creacion o similar para las alertas */}
+                                                {new Date(alerta.fecha_creacion || Date.now()).toLocaleString('es-ES', { 
+                                                    year: 'numeric', 
+                                                    month: 'short', 
+                                                    day: 'numeric', 
+                                                    hour: '2-digit', 
+                                                    minute: '2-digit' 
+                                                })}
+                                            </span>
+                                        </div>
+                                        {alerta.estado_alerta === "pendiente" && (
+                                            <button className="resolve-button">
+                                                Marcar como Resuelta
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {isImageModalOpen && (
+                <div className="image-modal" onClick={closeImageModal}>
+                    <FaTimes className="image-modal-close" onClick={closeImageModal} />
+                    <img
+                        className="image-modal-content"
+                        src={currentImageModalUrl}
+                        alt="Imagen ampliada de la colmena"
+                    />
+                </div>
             )}
-          </div>
-        )}
-      </div>
 
-      {isImageModalOpen && (
-        <div className="image-modal" onClick={closeImageModal}>
-          <FaTimes className="image-modal-close" onClick={closeImageModal} />
-          <img
-            className="image-modal-content"
-            src={currentImageModalUrl}
-            alt="Imagen ampliada de la colmena"
-          />
+            {isSensorModalOpen && selectedSensorData && (
+                <div className="sensor-modal-overlay" onClick={closeSensorModal}>
+                    <div
+                        className="sensor-modal-content"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button className="modal-close-button" onClick={closeSensorModal}>
+                            <FaTimes />
+                        </button>
+                        <div className="modal-header">
+                            {selectedSensorData.icon}
+                            <div className="modal-header-text">
+                                <h2 className="modal-title">{selectedSensorData.title}</h2>
+                                <p className="modal-subtitle">
+                                    Últimos Registros del Día
+                                </p>
+                            </div>
+                        </div>
+                        <div className="data-table-container">
+                            {selectedSensorData.historicalData.length > 0 ? (
+                                <table className="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Valor ({selectedSensorData.unit})</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {selectedSensorData.historicalData.map((data, index) => (
+                                            <tr
+                                                key={index}
+                                                className={`row-status-${data.statusInfo.status}`}
+                                            >
+                                                <td>{data.date}</td>
+                                                <td>{data.time}</td>
+                                                <td>{data.value}</td> 
+                                                <td className="status-cell">
+                                                    <span
+                                                        className={`status-label status-${data.statusInfo.status}`}
+                                                    >
+                                                        {data.statusInfo.icon} {data.statusInfo.label}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p className="no-data-message">
+                                    <FaBell /> No hay registros del día disponibles para este sensor.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-      )}
-
-      {isSensorModalOpen && selectedSensorData && (
-        <div className="sensor-modal-overlay" onClick={closeSensorModal}>
-          <div
-            className="sensor-modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button className="modal-close-button" onClick={closeSensorModal}>
-              <FaTimes />
-            </button>
-            <div className="modal-header">
-              {selectedSensorData.icon}
-              <div className="modal-header-text">
-                <h2 className="modal-title">{selectedSensorData.title}</h2>
-                <p className="modal-subtitle">
-                  Registros del día:{" "}
-                  {new Date().toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
-            <div className="data-table-container">
-              {selectedSensorData.historicalData.length > 0 ? (
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Valor ({selectedSensorData.unit})</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedSensorData.historicalData.map((data, index) => (
-                      <tr
-                        key={index}
-                        className={`row-status-${data.statusInfo.status}`}
-                      >
-                        <td>{data.date}</td>
-                        <td>{data.time}</td>
-                        <td>{data[selectedSensorData.dataKey]}</td>
-                        <td className="status-cell">
-                          <span
-                            className={`status-label status-${data.statusInfo.status}`}
-                          >
-                            {data.statusInfo.icon} {data.statusInfo.label}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className="no-data-message">
-                  <FaBell /> No hay registros disponibles para este sensor en el
-                  día.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default HiveDetailScreen;
