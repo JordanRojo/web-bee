@@ -184,7 +184,7 @@ const HiveDetailScreen = () => {
 
     // useEffect 2: Cargar el historial completo solo si se activa la pestaña
     useEffect(() => {
-        // 💡 DEBUG: Confirma que la función se llama al cambiar de pestaña.
+        // DEBUG: Confirma que la función se llama al cambiar de pestaña.
         console.log(`[Historical Load] activeTab: ${activeTab}, loaded: ${sensoresHistoricoCompleto !== null}, loading: ${isHistoricalLoading}`);
 
         const getSensoresHistoricoCompleto = async () => {
@@ -392,13 +392,13 @@ const HiveDetailScreen = () => {
         const rawData = sensoresPorDia || [];
         
         // Filtra los datos para que solo incluyan registros que sean "hoy"
-        const todayData = rawData.filter(record => isToday(record.fecha)); // 🚨 CORREGIDO: Usar record.fecha
+        const todayData = rawData.filter(record => isToday(record.fecha)); // CORREGIDO: Usar record.fecha
         
         // Mapeo y formateo de datos (usando solo los datos de hoy)
         const enhancedData = todayData
         .filter(record => record[sensorDetails[sensorType].dataKey] !== undefined) // Filtrar registros sin el dato del sensor
         .map((record) => {
-            const dateObj = new Date(record.fecha); // 🚨 CORREGIDO: Usar record.fecha
+            const dateObj = new Date(record.fecha); // CORREGIDO: Usar record.fecha
 
             // Formatear Fecha y Hora (usando la zona horaria del usuario)
             const date = dateObj.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -434,7 +434,7 @@ const HiveDetailScreen = () => {
     )
         .map(record => {
             
-            // 🚨 CLAVE DE CORRECCIÓN: Usar record.fecha
+            // CLAVE DE CORRECCIÓN: Usar record.fecha
             let dateString = record.fecha; 
 
             // Manejo de formatos de fecha complejos (como el que mencionas)
@@ -455,7 +455,7 @@ const HiveDetailScreen = () => {
 
             const timestamp = dateObj.getTime(); 
             
-            // 💡 DEBUG: Confirma que el timestamp ahora es un número válido
+            // DEBUG: Confirma que el timestamp ahora es un número válido
             if (activeTab === "historical" && (sensoresHistoricoCompleto || []).length > 0) {
                 console.log("[Punto Histórico Debug]", {
                     timestamp: timestamp, 
