@@ -158,6 +158,8 @@ const DashboardScreen = () => {
             }
         }
     };
+    getColmenas();
+  }, [config]);
 
     // Carga INICIAL
     fetchColmenas();

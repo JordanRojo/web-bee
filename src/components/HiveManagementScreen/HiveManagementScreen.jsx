@@ -95,6 +95,8 @@ const HiveManagementScreen = () => {
             type: "info",
         });
       }
+    }, 500);
+  }, [config]);
     } catch (error) {
       console.error("Error encontrado: ", error);
       // Opcional: manejar el error con un mensaje de alerta
@@ -205,6 +207,8 @@ const HiveManagementScreen = () => {
             newHiveData,
             config
           );
+          if (response.status === 201) {
+            setHives(response.data);
           if (response.data && response.status === 201) {
             // MODIFICACIÓN 3B: Disparar recarga después de agregar
             setShouldRefetch(prev => !prev);
