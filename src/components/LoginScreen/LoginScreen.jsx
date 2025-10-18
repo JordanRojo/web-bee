@@ -70,7 +70,7 @@ function LoginScreen() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordRut, setForgotPasswordRut] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const { setToken, setUser, setCorreo, setCodigo} = useContext(AuthContext);
+  const { setToken, setUser, setCorreo, setCodigo } = useContext(AuthContext);
   const rutInputRef = useRef(null);
   const forgotRutInputRef = useRef(null);
   const navigate = useNavigate();
@@ -143,10 +143,14 @@ function LoginScreen() {
       const response = await axios.post(`${API_URL}/auth/login`, data);
 
       if (response.status === 200) {
-        console.log("Inicio de sesión exitoso:", response.message);
+        console.log("Inicio de sesión exitoso:", response);
         setToken(response.data[0].token);
         setUser(response.data[0].user);
-        navigate("/dashboard");
+        if (response.data[0].rol === "Apicultor") {
+          alert("Esta pagina es solo de uso para administradores.");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         setError("Error al iniciar sesión.");
       }
@@ -178,13 +182,16 @@ function LoginScreen() {
     }
     try {
       const codigo = generaCodigo();
-      const data = {rut: rutLimpio, codigo};
-      const response = await axios.post(`${API_URL}/auth/envia-correo-codigo`, data);
+      const data = { rut: rutLimpio, codigo };
+      const response = await axios.post(
+        `${API_URL}/auth/envia-correo-codigo`,
+        data
+      );
       if (response.status === 200) {
         setSuccessMessage(response.message);
         setForgotPasswordRut("");
         setCorreo(response.data.email);
-        setCodigo(codigo)
+        setCodigo(codigo);
         navigate("/forgot-password");
       } else {
         setError(response.message);
