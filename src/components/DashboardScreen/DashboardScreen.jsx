@@ -175,17 +175,16 @@ const DashboardScreen = () => {
   ).length;
   const activeAlertsCount = sampleColonies.filter((c) => c.hasAlerts).length;
   const [colmenas, setColmenas] = useState([]);
-  const { config } = useContext(AuthContext);
+  const { config, userId } = useContext(AuthContext);
 
   useEffect(() => {
     const getColmenas = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/colmenas/obtener-todas-colmenas`,
+          `${API_URL}/colmenas/obtener-colmenas/${userId}`,
           config
         );
         if (response.status === 200) {
-          console.log(response.data);
           setColmenas(response.data);
         } else if (response.status === 204) {
           alert("No hay colmenas registradas en la base de datos.");
