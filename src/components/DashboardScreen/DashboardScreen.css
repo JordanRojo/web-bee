@@ -671,3 +671,344 @@ html, body, #root {
     .metric-item svg { font-size: 1.8em; }
     .last-updated { font-size: 0.8em; padding-top: 10px; }
 }
+
+
+
+/* ------------------------------------- */
+/* ESTILOS DEL Gráfico Total Colmenas  */
+/* ------------------------------------- */
+
+/* Estilos para el Widget que ahora es un Botón */
+.button-as-widget {
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    text-align: left;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button-as-widget:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos del Overlay/Fondo del Modal */
+.chart-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Estilos del Contenido del Modal */
+.chart-modal-content {
+    background: var(--card-background-color, white);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 1100px;
+    height: 85vh;
+    max-height: 700px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: var(--text-color-primary, #333);
+}
+
+.modal-title-chart {
+    font-size: 1.6em;
+    color: var(--primary-color, #007bff);
+    margin-top: 10px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-subtitle-chart {
+    color: var(--text-color-secondary, #666);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-chart-area {
+    flex-grow: 1; /* Hace que el gráfico ocupe el espacio restante */
+    min-height: 0; /* Necesario para el comportamiento de flexbox con ResponsiveContainer */
+}
+
+.modal-no-data {
+    text-align: center;
+    padding: 100px 20px;
+    color: #999;
+    font-style: italic;
+}
+
+
+/* ------------------------------------- */
+/* ESTILOS GENERALES DE MODAL (Overlay) */
+/* ------------------------------------- */
+
+.chart-modal-overlay,
+.alerts-modal-overlay {
+    /* Fija el modal sobre todo el contenido */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Fondo semi-transparente para oscurecer el fondo */
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Asegura que esté por encima de la mayoría de los elementos */
+    z-index: 1000; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ------------------------------------- */
+/* ESTILOS DEL CONTENIDO DEL MODAL */
+/* ------------------------------------- */
+
+.chart-modal-content,
+.alerts-modal-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-width: 90%; 
+    height: 90%; /* Altura para el modal de alertas o gráfico */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permite scroll si el contenido es demasiado largo */
+}
+
+/* Ajustes específicos para el modal de Alertas */
+.alerts-modal-content {
+    max-width: 600px;
+    height: auto; /* Altura auto para ajustarse al contenido de las alertas */
+    max-height: 90vh; /* Máxima altura de la vista */
+    overflow-y: auto;
+}
+
+/* ------------------------------------- */
+/* BOTÓN DE CIERRE */
+/* ------------------------------------- */
+
+.modal-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #9e9e9e;
+    transition: color 0.2s;
+}
+
+.modal-close-button:hover {
+    color: #f44336;
+}
+
+/* ------------------------------------- */
+/* ESTILOS DEL MODAL DE GRÁFICO */
+/* ------------------------------------- */
+
+.modal-title-chart, .modal-title-alerts {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2196f3;
+    border-bottom: 2px solid #eeeeee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-chart-area {
+    flex-grow: 1; /* Ocupa el espacio restante en el modal */
+    min-height: 400px; /* Altura mínima para asegurar el espacio del gráfico */
+}
+
+.average-metrics-display {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border: 1px dashed #cfd8dc;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+}
+
+.avg-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #455a64;
+}
+
+.avg-item span {
+    font-weight: bold;
+    color: #000000;
+}
+
+
+/* ------------------------------------- */
+/* ESTILOS DEL MODAL DE ALERTAS (NUEVO) */
+/* ------------------------------------- */
+
+.alerts-modal-content {
+    /* ANCHO MEJORADO: Usando 850px para aprovechar mejor el espacio */
+    max-width: 850px; 
+    width: 90%; /* Asegura que se adapte a pantallas pequeñas */
+    height: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff; /* Fondo blanco para mejor contraste */
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-title-alerts {
+    color: #ff9800; /* Naranja de abeja */
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-subtitle-alerts {
+    color: #666;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.alerts-list-container {
+    padding-top: 5px;
+}
+
+/* --- ESTILOS POR COLMENA (Modificado) --- */
+.colmena-alerts-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.colmena-alert-name {
+    font-size: 1.3rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    border-left: 5px solid #ffc107; /* Línea de color de énfasis */
+    padding-left: 10px;
+}
+
+.alert-count-tag { /* Nuevo nombre de clase para el contador */
+    font-size: 0.8rem;
+    background-color: #ffe0b2;
+    color: #e65100;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-left: auto; /* Para alinear a la derecha */
+}
+
+.colmena-separator {
+    border: 0;
+    border-top: 1px solid #f0f0f0;
+    margin: 20px 0 0 0;
+}
+
+/* --- ESTILOS DE LA CUADRÍCULA DE ALERTAS (Nuevo) --- */
+.alert-items-grid {
+    display: grid;
+    /* Mostrará 3 alertas por fila en pantallas anchas, 2 en medianas */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 15px;
+}
+
+.alert-item-card { /* La tarjeta individual de alerta */
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.alert-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-severity-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.card-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-alert-type {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.card-alert-value {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* --- ESTILOS POR SEVERIDAD (Colores) --- */
+.alert-high {
+    background-color: #ffcdd2; /* Rojo claro */
+    border-left: 5px solid #f44336; /* Rojo */
+}
+.alert-high .card-severity-icon {
+    color: #d32f2f; /* Rojo oscuro */
+}
+
+.alert-medium {
+    background-color: #ffe0b2; /* Naranja claro */
+    border-left: 5px solid #ff9800; /* Naranja */
+}
+.alert-medium .card-severity-icon {
+    color: #f57c00; /* Naranja oscuro */
+}
+
+.alert-low {
+    background-color: #c8e6c9; /* Verde claro */
+    border-left: 5px solid #4caf50; /* Verde */
+}
+.alert-low .card-severity-icon {
+    color: #388e3c; /* Verde oscuro */
+}
