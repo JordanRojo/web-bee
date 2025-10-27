@@ -926,10 +926,8 @@ const HiveDetailScreen = () => {
                       )}
                     </div>
                     <div className="alert-details">
-                      <h3 className="alert-type">{alerta.titulo_alerta}</h3>
-                      <p className="alert-description">
-                        {alerta.descripcion_alerta}
-                      </p>
+                      <h3 className="alert-type">{alerta.titulo}</h3>
+                      <p className="alert-description">{alerta.descripcion}</p>
                       <span className="alert-timestamp">
                         <FaCalendarAlt />{" "}
                         {/* {new Date(alert.timestamp).toLocaleString()} */}
