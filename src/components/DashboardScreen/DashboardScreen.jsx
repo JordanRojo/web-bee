@@ -66,7 +66,7 @@ const useSimulatedHistoricalData = (avgMetrics) => {
 // ------------------------------------------------------------------------------------
 
 
-// --- NUEVO COMPONENTE: BARRA DE SELECCIÓN DE GRÁFICOS ---
+// --- NUEVO COMPONENTE: BARRA DE SELECCIÓN DE GRÁFICOS (Sin cambios) ---
 const TrendSelectorBar = ({ activeTrend, setActiveTrend }) => {
     const trendOptions = [
         { key: 'Global', name: 'Global (Actual)', icon: MdAnalytics },
@@ -94,7 +94,7 @@ const TrendSelectorBar = ({ activeTrend, setActiveTrend }) => {
 // -----------------------------------------------------------------
 
 
-// --- COMPONENTE BASE PARA UN GRÁFICO DE LÍNEAS ÚNICO (Tendencias) ---
+// --- COMPONENTE BASE PARA UN GRÁFICO DE LÍNEAS ÚNICO (Tendencias) (Sin cambios) ---
 const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain }) => (
     <div className="trend-chart-container">
         <h2 className="section-title chart-title">
@@ -114,10 +114,9 @@ const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain
                         <XAxis 
                             dataKey="time"
                             interval={3}
-                            // ⬇️ MODIFICACIÓN para que los valores estén rectos
                             angle={0} 
                             textAnchor="middle" 
-                            height={30} // Altura reducida ya que no hay ángulo
+                            height={30} 
                             style={{ fontSize: '10px' }}
                         />
                         <YAxis 
@@ -153,7 +152,7 @@ const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain
 // ------------------------------------------------------------------------------------
 
 
-// --- COMPONENTE DE GRÁFICO GLOBAL DE BARRAS ---
+// --- COMPONENTE DE GRÁFICO GLOBAL DE BARRAS (Sin cambios) ---
 const GlobalChart = ({ chartData, totalColonies }) => (
     <div className="trend-chart-container">
         <h2 className="section-title chart-title">
@@ -174,10 +173,9 @@ const GlobalChart = ({ chartData, totalColonies }) => (
                         <XAxis 
                             dataKey="name" 
                             interval={0} 
-                            // ⬇️ MODIFICACIÓN para que los valores estén rectos
                             angle={0} 
                             textAnchor="middle" 
-                            height={30} // Altura reducida ya que no hay ángulo
+                            height={30} 
                             style={{ fontSize: '10px' }}
                         />
                         <YAxis />
@@ -208,6 +206,40 @@ const AverageMetricWidget = ({ icon: Icon, value, label, unit, className }) => (
         <span className="widget-label">{label} {unit}</span>
     </div>
 );
+
+
+// --- 🐝 COMPONENTE: AlertButtonWidget (Reubicado en este archivo) 🐝 ---
+const AlertButtonWidget = ({ count, onClick }) => {
+    const isAlert = count > 0;
+    // Utilizamos un estilo de card más ancho para esta sección
+    const className = `alert-summary-card ${isAlert ? 'active-alerts' : 'no-alerts'}`; 
+    const Icon = isAlert ? FaExclamationTriangle : FaBell;
+    const label = isAlert ? `¡Atención! Hay ${count} Alertas Activas` : "Todas las Colmenas en orden";
+
+    return (
+        <div className={className} onClick={isAlert ? onClick : null}>
+            <div className="card-content-wrapper">
+                <Icon className="widget-icon" />
+                <div className="alert-details">
+                    <span className="alert-label">
+                        **{label}**
+                    </span>
+                    {isAlert && (
+                        <span className="alert-action-text">
+                            Clic para ver detalles en las {count} alertas.
+                        </span>
+                    )}
+                </div>
+                {isAlert && (
+                    <button className="view-alerts-button" onClick={onClick}>
+                        Ver Alertas
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+// --------------------------------------------------------------------
 
 
 // --- Componente re-utilizable: ColonySummaryCard (Sin cambios) ---
@@ -389,7 +421,8 @@ const DashboardScreen = () => {
         if (activeAlertsCount > 0) {
             setIsAlertsModalOpen(true);
         } else {
-            alert("No hay alertas activas.");
+            // Este caso es menos probable ya que el botón no debería ser clickable
+            console.log("No hay alertas activas para abrir el modal.");
         }
     };
     const closeAlertsModal = () => {
@@ -405,7 +438,7 @@ const DashboardScreen = () => {
         );
     }
     
-    // --- LÓGICA DE RENDERIZADO DEL GRÁFICO ACTIVO ---
+    // --- LÓGICA DE RENDERIZADO DEL GRÁFICO ACTIVO (Sin cambios) ---
     const renderActiveTrendChart = () => {
         switch (activeTrend) {
             case 'Global':
@@ -480,28 +513,21 @@ const DashboardScreen = () => {
             <div className="dashboard-content">
                 <h1 className="dashboard-title">Resumen del Apiario</h1>
                 
-                {/* 1. SECCIÓN DE GRÁFICOS */}
+                {/* 1. SECCIÓN DE GRÁFICOS (Sin cambios) */}
                 <section className="section-trend-visualization-flow"> 
-                    
-                    {/* Contenedor del Gráfico Activo */}
                     <div className="active-chart-display-full">
                         {renderActiveTrendChart()}
                     </div>
-                    
-                    {/* BARRA DE SELECCIÓN DEBAJO DEL GRÁFICO */}
                     <TrendSelectorBar 
                         activeTrend={activeTrend} 
                         setActiveTrend={setActiveTrend} 
                     />
-
                 </section>
                 <hr className="section-separator" />
                 
-                {/* 2. CUADRANTES DE PROMEDIOS */}
+                {/* 2. CUADRANTES DE PROMEDIOS (Sin cambios) */}
                 <h2 className="section-title">Promedios de Métricas Globales</h2>
                 <div className="global-summary-widgets metrics-only-grid">
-                    
-                    {/* Cuadrantes de promedio... */}
                     <AverageMetricWidget
                         icon={MdOutlineThermostat}
                         value={avgTemp.toFixed(1)}
@@ -525,12 +551,16 @@ const DashboardScreen = () => {
                         unit="kg"
                         className="weight-avg"
                     />
-                    
                 </div>
                 {/* ------------------------------------------------------------------ */}
 
                 <hr className="section-separator" />
 
+                {/* 🐝 WIDGET DE ALERTA UBICADO EN LA SECCIÓN DE COLMENAS 🐝 */}
+                <AlertButtonWidget
+                    count={activeAlertsCount}
+                    onClick={openAlertsModal}
+                />
                 <h2 className="section-title">Mis Colmenas</h2>
                 <div className="colonies-grid">
                     {colmenas.map((colmena) => (
@@ -547,7 +577,7 @@ const DashboardScreen = () => {
                 </div>
             </div>
 
-            {/* [MODAL DE ALERTAS] */}
+            {/* [MODAL DE ALERTAS] (Sin cambios) */}
             {isAlertsModalOpen && (
                 <div className="alerts-modal-overlay" onClick={closeAlertsModal}>
                     <div 

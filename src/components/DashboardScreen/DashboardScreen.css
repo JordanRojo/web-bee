@@ -1144,3 +1144,98 @@ html, body, #root {
 .trend-chart-container {
     /* (Se mantiene sin estilos aquí ya que se gestiona a través de .active-chart-display-full) */
 }
+
+/* ------------------------------------- */
+/* ESTILOS DE WIDGETS DE RESUMEN (NUEVO) */
+/* ------------------------------------- */
+
+/* Estilo para el nuevo diseño de barra de alerta (AlertButtonWidget) */
+.alert-summary-card {
+    margin: 20px 0 30px 0;
+    padding: 15px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: default;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
+    transition: all 0.3s ease;
+}
+
+.alert-summary-card .card-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.alert-summary-card .widget-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.alert-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-label {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.alert-action-text {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Estilos para ALERTS ACTIVAS */
+.alert-summary-card.active-alerts {
+    background-color: #fff8e1; /* Fondo amarillo claro */
+    border: 2px solid #ffb300;
+    cursor: pointer;
+}
+
+.alert-summary-card.active-alerts:hover {
+    background-color: #ffe0b2;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 152, 0, 0.2);
+}
+
+.alert-summary-card.active-alerts .widget-icon {
+    color: #ff9800; /* Naranja principal */
+}
+
+.alert-summary-card.active-alerts .alert-action-text {
+    color: #e65100; /* Naranja oscuro para el texto de acción */
+}
+
+.view-alerts-button {
+    padding: 8px 15px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.view-alerts-button:hover {
+    background-color: #e65100;
+    transform: scale(1.02);
+}
+
+/* Estilos para NO ALERTS */
+.alert-summary-card.no-alerts {
+    background-color: #e8f5e9; /* Fondo verde claro */
+    border: 1px solid #a5d6a7;
+    color: #388e3c; /* Verde oscuro */
+}
+
+.alert-summary-card.no-alerts .widget-icon {
+    color: #4caf50;
+}
+
+.alert-summary-card.no-alerts .alert-label {
+    color: #388e3c;
+}
