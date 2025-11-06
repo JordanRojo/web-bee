@@ -62,7 +62,7 @@
 }
 /* ------------------------------------------------ */
 
-/* --- Estilos Generales del Dashboard (MODIFICADO para desplazamiento) --- */
+/* --- Estilos Generales del Dashboard --- */
 .dashboard-screen-container {
     display: flex;
     flex-direction: column;
@@ -120,9 +120,8 @@ html, body, #root {
     font-weight: 700;
     color: var(--color-mid-text);
     text-align: center;
-    /* REDUCCIÓN DE ESPACIO */
-    margin-top: 40px; /* Antes 80px */
-    margin-bottom: 30px; /* Antes 50px */
+    margin-top: 40px; 
+    margin-bottom: 30px; 
     position: relative;
     padding-bottom: 20px;
 }
@@ -169,8 +168,7 @@ html, body, #root {
 .navbar-logo {
     display: flex;
     align-items: center;
-    /* AJUSTADO: Disminuido el tamaño de la fuente */
-    font-size: 2em; /* Antes 2.2em */
+    font-size: 2em; 
     font-weight: 800;
     color: var(--color-dark-text);
     letter-spacing: 0.5px;
@@ -197,10 +195,8 @@ html, body, #root {
     text-decoration: none;
     color: var(--color-mid-text);
     font-weight: 600;
-    /* AJUSTADO: Aumentado el tamaño de la fuente */
-    font-size: 1.05em; /* Antes 1em */
-    /* AJUSTADO: Aumentado el padding */
-    padding: 8px 14px; /* Antes 7px 10px */
+    font-size: 1.05em; 
+    padding: 8px 14px; 
     border-radius: 12px;
     transition: all var(--transition-duration) var(--transition-timing-function);
     position: relative;
@@ -208,7 +204,7 @@ html, body, #root {
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 6px; /* Ajustado de 5px a 6px para un poco más de espacio con el icono */
+    gap: 6px; 
 }
 
 .dashboard-navbar .navbar-links .nav-link::before {
@@ -236,8 +232,7 @@ html, body, #root {
 .dashboard-navbar .navbar-links .logout-link {
     background-color: var(--color-status-critical);
     color: white;
-    /* AJUSTADO: Aumentado el padding */
-    padding: 8px 16px; /* Antes 7px 14px */
+    padding: 8px 16px; 
     border-radius: 15px;
     margin-left: 8px;
     box-shadow: var(--shadow-elevated);
@@ -259,25 +254,22 @@ html, body, #root {
 /* --- Widgets de Resumen Global (2x2 - Total y Alertas) --- */
 .global-summary-widgets {
     display: grid;
-    /* 2 Columnas para Total y Alertas */
     grid-template-columns: repeat(2, minmax(350px, 1fr));
     gap: 40px;
-    /* REDUCCIÓN DE ESPACIO */
-    margin-bottom: 40px; /* Antes 80px */
+    margin-bottom: 40px; 
     justify-content: center;
-    max-width: 800px; /* Reducido para estos 2 widgets */
+    max-width: 800px; 
     margin-left: auto;
     margin-right: auto;
 }
 
 /* --- NUEVO: Grid para solo las métricas (Temperatura, Humedad, Peso) --- */
 .global-summary-widgets.metrics-only-grid {
-    grid-template-columns: repeat(3, minmax(200px, 1fr)); /* 3 columnas */
+    grid-template-columns: repeat(3, minmax(200px, 1fr)); 
     gap: 30px;
-    /* REDUCCIÓN DE ESPACIO */
-    margin-top: 20px; /* Antes 40px */
-    margin-bottom: 40px; /* Antes 80px */
-    max-width: 1200px; /* Permite que sean más anchos */
+    margin-top: 20px; 
+    margin-bottom: 40px; 
+    max-width: 1200px; 
 }
 
 .summary-widget {
@@ -361,41 +353,39 @@ html, body, #root {
 
 /* --- MODIFICACIÓN: Reducción de margen en títulos de gráficos --- */
 .chart-title {
-    /* Sobreescribe el margen del section-title */
     margin-top: 0 !important;
-    /* Reducido a 0 para pegarse al subtítulo/gráfico */
     margin-bottom: 0px !important;
-    padding-bottom: 0px; /* Elimina padding inferior si existe */
+    padding-bottom: 0px; 
 
     font-size: 2.2em;
     color: var(--color-dark-text);
 }
 .chart-title::after {
-    display: none; /* Oculta la línea de la sección */
+    display: none; 
 }
 
 .chart-subtitle {
     text-align: center;
     color: var(--color-mid-text);
-    /* Reducción drástica del margen */
     margin-top: 5px !important;
     margin-bottom: 5px !important;
     font-size: 1.1em;
 }
 
 .chart-area-full {
-    height: 450px; /* Altura fija para el contenedor del gráfico */
+    height: 450px; 
 }
 
 /* --- Contenedor de visualización de tendencia para ajustarse al gráfico --- */
 .active-chart-display-full {
-    /* Mismo estilo de contenedor principal si es necesario */
     padding: 30px;
     background-color: var(--color-surface);
     border-radius: 20px;
     box-shadow: var(--shadow-subtle);
     border: 1px solid var(--color-border-light);
     margin-top: 40px;
+    /* AJUSTE CLAVE DE CSS para asegurar espacio horizontal para el eje Y */
+    min-width: 600px; 
 }
 /* ------------------------------------- */
 
@@ -405,8 +395,7 @@ html, body, #root {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
     gap: 40px;
-    /* REDUCCIÓN DE ESPACIO */
-    padding-bottom: 40px; /* Antes 80px */
+    padding-bottom: 40px; 
 }
 
 .colony-card-link {
@@ -553,7 +542,7 @@ html, body, #root {
     font-weight: 500;
 }
 
-/* --- Media Queries (AJUSTADAS con reducción de espacio) --- */
+/* --- Media Queries --- */
 @media (max-width: 1400px) {
     .global-summary-widgets {
         grid-template-columns: repeat(2, minmax(350px, 1fr));
@@ -565,21 +554,18 @@ html, body, #root {
     .dashboard-navbar {
         padding: 18px 25px;
     }
-    /* AJUSTADO: Disminuido el tamaño de la fuente */
-    .navbar-logo { font-size: 1.9em; } /* Antes 2em */
+    .navbar-logo { font-size: 1.9em; } 
     .nav-bee-icon { font-size: 2.6em; }
     .dashboard-navbar .navbar-links {
         gap: 10px;
     }
     .dashboard-navbar .navbar-links .nav-link {
-        /* AJUSTADO: Aumentado el tamaño de la fuente y padding */
-        font-size: 0.9em; /* Antes 0.85em */
-        padding: 8px 12px; /* Antes 7px 10px */
+        font-size: 0.9em; 
+        padding: 8px 12px; 
         gap: 5px;
     }
     .dashboard-navbar .navbar-links .logout-link {
-        /* AJUSTADO: Aumentado el padding */
-        padding: 9px 16px; /* Antes 8px 15px */
+        padding: 9px 16px; 
         margin-left: 10px;
     }
 
@@ -587,24 +573,20 @@ html, body, #root {
     .dashboard-title { font-size: 3.2em; margin-bottom: 60px; }
     .section-title { 
         font-size: 2.4em; 
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 35px; /* Antes 70px */
-        margin-bottom: 25px; /* Antes 40px */
+        margin-top: 35px; 
+        margin-bottom: 25px; 
     }
 
     .global-summary-widgets {
         grid-template-columns: repeat(2, minmax(320px, 1fr));
         max-width: 700px;
-        /* AJUSTADO: Reducción de espacio */
-        margin-bottom: 30px; /* Antes 80px */
+        margin-bottom: 30px; 
     }
-    /* Grid de métricas en 3 columnas */
     .global-summary-widgets.metrics-only-grid {
         grid-template-columns: repeat(3, minmax(200px, 1fr));
         gap: 25px;
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 15px; /* Antes 40px */
-        margin-bottom: 30px; /* Antes 80px */
+        margin-top: 15px; 
+        margin-bottom: 30px; 
     }
     .summary-widget { padding: 35px; }
     .widget-icon { font-size: 4em; }
@@ -624,8 +606,7 @@ html, body, #root {
     }
     .navbar-logo {
         margin-bottom: 15px;
-        /* AJUSTADO: Disminuido el tamaño de la fuente */
-        font-size: 1.8em; /* Antes 1.9em */
+        font-size: 1.8em; 
     }
     .nav-bee-icon { font-size: 2.5em; }
     .dashboard-navbar .navbar-links {
@@ -636,41 +617,38 @@ html, body, #root {
         width: 100%;
     }
     .dashboard-navbar .navbar-links .nav-link {
-        /* AJUSTADO: Aumentado el tamaño de la fuente y padding */
-        font-size: 0.85em; /* Antes 0.8em */
-        padding: 7px 12px; /* Antes 6px 10px */
+        font-size: 0.85em; 
+        padding: 7px 12px; 
         gap: 5px;
     }
     .dashboard-navbar .navbar-links .logout-link {
-        /* AJUSTADO: Aumentado el padding */
         margin-left: 0;
-        padding: 8px 15px; /* Antes 7px 14px */
+        padding: 8px 15px; 
     }
 
     .dashboard-content { padding: 30px; }
     .dashboard-title { font-size: 2.8em; margin-bottom: 50px; }
     .section-title { 
         font-size: 2.2em; 
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 30px; /* Antes 60px */
-        margin-bottom: 20px; /* Antes 35px */
+        margin-top: 30px; 
+        margin-bottom: 20px; 
+    }
+    .active-chart-display-full {
+        min-width: auto;
     }
 
     .global-summary-widgets {
         grid-template-columns: 1fr;
         gap: 25px;
         max-width: 500px;
-        /* AJUSTADO: Reducción de espacio */
-        margin-bottom: 25px; /* Antes 80px */
+        margin-bottom: 25px; 
     }
-    /* Grid de métricas: 3 columnas en pantallas medianas, 1 en pequeñas */
     .global-summary-widgets.metrics-only-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 15px;
         max-width: 100%;
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 15px; /* Antes 40px */
-        margin-bottom: 25px; /* Antes 80px */
+        margin-top: 15px; 
+        margin-bottom: 25px; 
     }
 
     .summary-widget { padding: 30px; }
@@ -696,8 +674,7 @@ html, body, #root {
     }
     .navbar-logo {
         margin-bottom: 15px;
-        /* AJUSTADO: Disminuido el tamaño de la fuente */
-        font-size: 1.7em; /* Antes 1.8em */
+        font-size: 1.7em; 
     }
     .nav-bee-icon { font-size: 2.4em; }
 
@@ -712,14 +689,12 @@ html, body, #root {
     .dashboard-navbar .navbar-links .nav-link {
         width: calc(100% - 20px);
         justify-content: center;
-        /* AJUSTADO: Aumentado el padding */
-        padding: 9px 14px; /* Antes 8px 12px */
-        font-size: 0.9em; /* Antes 0.85em */
+        padding: 9px 14px; 
+        font-size: 0.9em; 
     }
     .dashboard-navbar .navbar-links .logout-link {
         width: calc(100% - 20px);
-        /* AJUSTADO: Aumentado el padding */
-        padding: 9px 14px; /* Antes 8px 12px */
+        padding: 9px 14px; 
         margin-left: 0;
     }
 
@@ -727,26 +702,22 @@ html, body, #root {
     .dashboard-title { font-size: 2.4em; margin-bottom: 40px; }
     .section-title { 
         font-size: 1.9em; 
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 25px; /* Antes 45px */
-        margin-bottom: 15px; /* Antes 30px */
+        margin-top: 25px; 
+        margin-bottom: 15px; 
     }
 
     .global-summary-widgets {
         grid-template-columns: 1fr;
         gap: 20px;
         max-width: 400px;
-        /* AJUSTADO: Reducción de espacio */
-        margin-bottom: 20px; /* Antes 80px/25px */
+        margin-bottom: 20px; 
     }
-    /* Grid de métricas pasa a 1 columna en móviles */
     .global-summary-widgets.metrics-only-grid {
         grid-template-columns: 1fr;
         gap: 20px;
-        max-width: 400px; /* Consistencia con otros widgets en móvil */
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 10px; /* Antes 40px/15px */
-        margin-bottom: 20px; /* Antes 80px/25px */
+        max-width: 400px; 
+        margin-top: 10px; 
+        margin-bottom: 20px; 
     }
 
     .summary-widget { flex-direction: row; justify-content: space-between; padding: 20px; }
@@ -771,14 +742,12 @@ html, body, #root {
     .dashboard-title { font-size: 2em; margin-bottom: 30px; }
     .section-title { 
         font-size: 1.6em; 
-        /* AJUSTADO: Reducción de espacio */
-        margin-top: 20px; /* Antes 35px */
-        margin-bottom: 15px; /* Antes 20px */
+        margin-top: 20px; 
+        margin-bottom: 15px; 
     }
 
     .navbar-logo {
-        /* AJUSTADO: Disminuido el tamaño de la fuente */
-        font-size: 1.6em; /* Antes 1.7em */
+        font-size: 1.6em; 
     }
     .nav-bee-icon { font-size: 2.2em; }
 
@@ -787,10 +756,8 @@ html, body, #root {
     }
     .dashboard-navbar .navbar-links .nav-link,
     .dashboard-navbar .navbar-links .logout-link {
-        /* AJUSTADO: Aumentado el padding */
-        padding: 7px 12px; /* Antes 6px 10px */
+        padding: 7px 12px; 
     }
-    /* Los widgets de resumen vuelven a un diseño apilado en móvil */
     .summary-widget { padding: 18px; flex-direction: column; text-align: center; }
     .widget-icon { margin-bottom: 10px; margin-right: 0; font-size: 3em; }
     .widget-value { font-size: 2.5em; }
@@ -822,7 +789,7 @@ html, body, #root {
     /* Fondo semi-transparente para oscurecer el fondo */
     background-color: rgba(0, 0, 0, 0.7);
     /* Asegura que esté por encima de la mayoría de los elementos */
-    z-index: 1000; 
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -839,7 +806,7 @@ html, body, #root {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     position: relative;
-    max-width: 90%; 
+    max-width: 90%;
     height: 90%; /* Altura para el modal de alertas o gráfico */
     display: flex;
     flex-direction: column;
@@ -965,7 +932,7 @@ html, body, #root {
 .alert-items-grid {
     display: grid;
     /* Mostrará 3 alertas por fila en pantallas anchas, 2 en medianas */
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 15px;
 }
 
@@ -1030,113 +997,95 @@ html, body, #root {
 
 
 /* ---------------------------------------------------- */
-/* --- ESTILOS PARA LA BARRA FLOTANTE DE GRÁFICOS (MODIFICADO) --- */
+/* --- ESTILOS PARA LA BARRA SUPERIOR FIJA (STICKY) --- */
 /* ---------------------------------------------------- */
 
 /* Contenedor principal para la sección de tendencia */
 .section-trend-visualization {
-    display: flex;
-    justify-content: flex-start;
+    display: block; /* Vuelve a ser un contenedor de bloque normal */
     position: relative;
     margin-bottom: 20px;
-    height: 440px;
+    height: auto; 
 }
 
-/* El contenedor del gráfico ocupa el espacio restante y está desplazado */
+/* El contenedor del gráfico ahora usa el ancho completo */
 .active-chart-display-full {
-    flex-grow: 1;
+    width: 100%; /* Ocupa todo el ancho */
     min-width: 0;
-    margin-left: 70px; /* Espacio para la barra flotante colapsada (50px ancho + 20px margen) */
+    margin-left: 0; 
     background: white;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     padding: 20px;
-    transition: margin-left 0.3s ease; /* Añadida transición para el margen */
+    transition: none; 
 }
 
-/* Expande el margen cuando la barra se expande */
-.section-trend-visualization:hover .active-chart-display-full {
-    margin-left: 220px; /* 200px (ancho expandido) + 20px (margen) */
-}
-
-/* Estilos de la Barra Flotante Colapsable */
+/* ⭐ ESTILOS DE LA BARRA STICKY (Tendencia) ⭐ */
 .trend-selector-bar-floating {
-    position: absolute;
-    left: 0;
-    top: 20px;
-    z-index: 10;
+    /* CLAVE: Hacemos que la barra flote y se fije al hacer scroll */
+    position: sticky;
+    
+    /* POSICIÓN CLAVE: Fíjala justo debajo de la barra de navegación principal (asumiendo 60px) */
+    top: 60px; 
+    
+    z-index: 50; 
+    
+    /* Estilos de apariencia de la barra superior */
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 5px;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(2px);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    /* Animación del ancho para la expansión */
-    width: 50px; /* Ancho colapsado (solo iconos) */
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Curva de animación más moderna */
-}
-
-/* Expande la barra al pasar el cursor por el contenedor */
-.trend-selector-bar-floating:hover {
-    width: 200px; /* Ancho expandido (iconos + texto) */
+    justify-content: center; /* Centramos los botones */
+    gap: 15px; 
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    background-color: var(--dashboard-bg-color, #f4f7f9); 
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    transition: none; 
 }
 
 /* Estilos de los botones individuales */
 .trend-button {
-    height: 45px;
-    padding: 0;
+    height: 40px; 
+    padding: 0 15px; 
     background: transparent;
     border: none;
     cursor: pointer;
-    text-align: left;
+    text-align: center; 
     white-space: nowrap;
-    overflow: hidden; /* Mantiene el texto oculto cuando está colapsado */
+    overflow: visible; 
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-radius: 8px;
-    padding-left: 10px;
-    padding-right: 10px;
-    transition: background 0.2s ease, color 0.2s ease, padding 0.3s ease;
-    color: #333;
+    justify-content: center; 
+    gap: 8px;
+    border-radius: 20px; /* Botón de píldora */
+    transition: background 0.2s ease, color 0.2s ease;
+    color: #555;
+    font-weight: 600;
 }
 
+/* ⭐ ELIMINADO: Se borran los estilos de iconos ⭐ */
 .trend-icon {
-    font-size: 24px;
-    min-width: 24px;
-    color: #888;
-    transition: color 0.2s ease;
+    display: none; /* Oculta el elemento del icono */
 }
 
 .trend-name {
     font-weight: 600;
     font-size: 14px;
-    /* MODIFICADO: Transición de ancho para deslizarse */
-    max-width: 0; 
-    overflow: hidden;
-    transition: max-width 0.3s ease 0.1s;
+    max-width: none; 
+    overflow: visible;
+    transition: none;
 }
 
-/* Mostrar el nombre al expandirse */
-.trend-selector-bar-floating:hover .trend-name {
-    max-width: 150px; /* Suficiente ancho para el texto */
-}
-
-/* Estados Activos */
+/* Estados Activos (Mantener) */
 .trend-button.active {
     background: #ff9800; /* Naranja abeja */
     color: white;
     box-shadow: 0 2px 5px rgba(255, 152, 0, 0.4);
 }
 
-.trend-button.active .trend-icon {
-    color: white;
-}
-
 .trend-button:not(.active):hover {
     background: #f0f0f0; /* Gris claro al pasar el ratón */
+    color: #333;
 }
 
 /* --- ESTILOS DE GRÁFICO (Mantener para consistencia) --- */
@@ -1146,7 +1095,7 @@ html, body, #root {
 }
 
 /* ------------------------------------- */
-/* ESTILOS DE WIDGETS DE RESUMEN (NUEVO) */
+/* ESTILOS DE WIDGETS DE RESUMEN (CORREGIDO) */
 /* ------------------------------------- */
 
 /* Estilo para el nuevo diseño de barra de alerta (AlertButtonWidget) */
@@ -1156,7 +1105,7 @@ html, body, #root {
     border-radius: 10px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-between; /* CLAVE: Separa el contenido principal del botón */
     cursor: default;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
     transition: all 0.3s ease;
@@ -1166,6 +1115,7 @@ html, body, #root {
     display: flex;
     align-items: center;
     gap: 15px;
+    flex-grow: 1; /* CORRECCIÓN: Permite que el wrapper de contenido ocupe el espacio disponible */
 }
 
 .alert-summary-card .widget-icon {
@@ -1176,6 +1126,7 @@ html, body, #root {
 .alert-details {
     display: flex;
     flex-direction: column;
+    flex-grow: 1; /* CORRECCIÓN: Permite que los detalles se expandan, empujando el botón */
 }
 
 .alert-label {
@@ -1218,6 +1169,8 @@ html, body, #root {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
+    /* Margen añadido para separar el botón del texto cuando el texto está expandido */
+    margin-left: 20px;
 }
 
 .view-alerts-button:hover {
@@ -1230,6 +1183,12 @@ html, body, #root {
     background-color: #e8f5e9; /* Fondo verde claro */
     border: 1px solid #a5d6a7;
     color: #388e3c; /* Verde oscuro */
+    /* CORRECCIÓN: Asegura que si no hay botón, todo se alinee a la izquierda */
+    justify-content: flex-start;
+}
+/* Se asegura que el wrapper en el modo 'no-alerts' se ajuste sin expandirse innecesariamente */
+.alert-summary-card.no-alerts .card-content-wrapper {
+    flex-grow: 0;
 }
 
 .alert-summary-card.no-alerts .widget-icon {
@@ -1238,4 +1197,65 @@ html, body, #root {
 
 .alert-summary-card.no-alerts .alert-label {
     color: #388e3c;
+}
+
+/* ------------------------------------- */
+/* ESTILOS DEL BOTÓN FLOTANTE DE ALERTA */
+/* ------------------------------------- */
+
+.floating-alert-btn {
+    /* Posicionamiento fijo para que permanezca visible */
+    position: fixed;
+    bottom: 30px; /* Separación del borde inferior */
+    right: 30px; /* Separación del borde derecho */
+    z-index: 100; /* Asegura que esté sobre otros elementos */
+    
+    /* Diseño del botón */
+    background-color: #e74c3c; /* Rojo para visibilidad */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px; /* Forma de píldora */
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    
+    /* Animación y transición */
+    opacity: 0.9;
+    transition: opacity 0.3s, transform 0.3s;
+    animation: pulse 1.5s infinite; /* Animación de latido para llamar la atención */
+}
+
+.floating-alert-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    animation: none;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+/* ------------------------------------- */
+/* ESTILOS DE EFECTO DE DESTACADO (FLASH) */
+/* ------------------------------------- */
+
+.highlight-alert-flash {
+    /* Agregado al widget de destino para que el usuario sepa dónde aterrizó */
+    animation: flash-highlight 1.5s ease-out;
+}
+
+@keyframes flash-highlight {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(255, 152, 0, 0);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Vuelve a la sombra normal */
+    }
 }

@@ -94,7 +94,7 @@ const TrendSelectorBar = ({ activeTrend, setActiveTrend }) => {
 // -----------------------------------------------------------------
 
 
-// --- COMPONENTE BASE PARA UN GRÁFICO DE LÍNEAS ÚNICO (Tendencias) (Sin cambios) ---
+// --- COMPONENTE BASE PARA UN GRÁFICO DE LÍNEAS ÚNICO (Tendencias) ---
 const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain }) => (
     <div className="trend-chart-container">
         <h2 className="section-title chart-title">
@@ -108,7 +108,8 @@ const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain
                 <ResponsiveContainer width="100%" height={400}>
                     <LineChart
                         data={data}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 30 }} 
+                        // ******* MARGEN IZQUIERDO AJUSTADO A 60 *******
+                        margin={{ top: 20, right: 30, left: 60, bottom: 30 }} 
                     >
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis 
@@ -124,7 +125,8 @@ const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain
                             stroke={strokeColor}
                             domain={domain}
                             tickFormatter={(tick) => tick.toFixed(1)}
-                            label={{ value: `${name} (${unit})`, angle: -90, position: 'insideLeft', fill: strokeColor }}
+                            // Ajuste opcional del label, offset -15 para moverlo a la izquierda
+                            label={{ value: `${name} (${unit})`, angle: -90, position: 'insideLeft', fill: strokeColor, offset: -15 }} 
                         />
                         <Tooltip 
                             formatter={(value) => [`${value.toFixed(1)} ${unit}`, name]}
@@ -152,7 +154,7 @@ const SingleMetricTrendChart = ({ data, dataKey, name, unit, strokeColor, domain
 // ------------------------------------------------------------------------------------
 
 
-// --- COMPONENTE DE GRÁFICO GLOBAL DE BARRAS (Sin cambios) ---
+// --- COMPONENTE DE GRÁFICO GLOBAL DE BARRAS ---
 const GlobalChart = ({ chartData, totalColonies }) => (
     <div className="trend-chart-container">
         <h2 className="section-title chart-title">
@@ -167,7 +169,8 @@ const GlobalChart = ({ chartData, totalColonies }) => (
                 <ResponsiveContainer width="100%" height={400}>
                     <BarChart
                         data={chartData}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                        // ******* MARGEN IZQUIERDO AJUSTADO A 60 *******
+                        margin={{ top: 20, right: 30, left: 60, bottom: 30 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0"/>
                         <XAxis 
@@ -208,8 +211,8 @@ const AverageMetricWidget = ({ icon: Icon, value, label, unit, className }) => (
 );
 
 
-// --- 🐝 COMPONENTE: AlertButtonWidget (Reubicado en este archivo) 🐝 ---
-const AlertButtonWidget = ({ count, onClick }) => {
+// --- COMPONENTE: AlertButtonWidget (Sin cambios) ---
+const AlertButtonWidget = ({ count, onClick, id }) => {
     const isAlert = count > 0;
     // Utilizamos un estilo de card más ancho para esta sección
     const className = `alert-summary-card ${isAlert ? 'active-alerts' : 'no-alerts'}`; 
@@ -217,12 +220,12 @@ const AlertButtonWidget = ({ count, onClick }) => {
     const label = isAlert ? `¡Atención! Hay ${count} Alertas Activas` : "Todas las Colmenas en orden";
 
     return (
-        <div className={className} onClick={isAlert ? onClick : null}>
+        <div className={className} onClick={isAlert ? onClick : null} id={id}>
             <div className="card-content-wrapper">
                 <Icon className="widget-icon" />
                 <div className="alert-details">
                     <span className="alert-label">
-                        **{label}**
+                        {label}
                     </span>
                     {isAlert && (
                         <span className="alert-action-text">
@@ -242,7 +245,7 @@ const AlertButtonWidget = ({ count, onClick }) => {
 // --------------------------------------------------------------------
 
 
-// --- Componente re-utilizable: ColonySummaryCard (Sin cambios) ---
+// --- Componente re-utilizable: ColonySummaryCard (MODIFICADO) ---
 const ColonySummaryCard = ({
     name,
     id,
@@ -251,30 +254,95 @@ const ColonySummaryCard = ({
     weight,
     lastUpdated,
 }) => {
+    // LÓGICA DE ESTADO JERÁRQUICA: Crítica > Alerta > Saludable
     const getStatusClass = () => {
-        if (temperature < 30 || temperature > 38) return 'colony-status-critical';
-        if (humidity < 50 || humidity > 75) return 'colony-status-alert';
-        if (weight < 40) return 'colony-status-alert';
+        // --- UMBRALES IDEALES/ALERTA (para referencia) ---
+        // Temp Ideal: [32, 36] °C
+        // Hum Ideal: [50, 75] %
+        // Peso Ideal: >= 40 kg
+
+        // --- UMBRALES CRÍTICOS (FUERA DE LOS RANGOS DE TRABAJO SEGURO) ---
+        const isCriticalTemp = temperature < 30 || temperature > 38;
+        // Humedad crítica: Fuera de [40, 90]
+        const isCriticalHum = humidity < 40 || humidity > 90; 
+        // Peso crítico: 30kg o menos
+        const isCriticalWeight = weight < 30; 
+
+        // 1. CHEQUEO CRÍTICO (Prioridad más alta)
+        if (isCriticalTemp || isCriticalHum || isCriticalWeight) {
+            return 'colony-status-critical';
+        }
+
+        // 2. CHEQUEO ALERTA (Prioridad media, si no es crítico)
+        // Temperatura en rangos de advertencia [30, 32) o (36, 38]
+        const isAlertTemp = (temperature >= 30 && temperature < 32) || (temperature > 36 && temperature <= 38);
+        
+        // Humedad fuera del rango ideal [50, 75], pero dentro del rango crítico [40, 90]
+        const isAlertHum = (humidity >= 40 && humidity < 50) || (humidity > 75 && humidity <= 90); 
+        
+        // Peso bajo (< 40 kg), pero no crítico
+        const isLowWeight = weight >= 30 && weight < 40; 
+        
+        if (isAlertTemp || isAlertHum || isLowWeight) {
+            return 'colony-status-alert';
+        }
+
+        // 3. ESTADO PREDETERMINADO (Saludable)
         return 'colony-status-ok';
     };
+    
+    const currentStatusClass = getStatusClass();
+
+    const getStatusText = (statusClass) => {
+        switch (statusClass) {
+            case 'colony-status-ok':
+                return 'Saludable';
+            case 'colony-status-alert':
+                return 'En Alerta';
+            case 'colony-status-critical':
+                return 'Crítica';
+            default:
+                return 'Desconocido';
+        }
+    };
+    
+    // NUEVA LÓGICA: Determina el color del icono de la campana
+    const getBellColor = (statusClass) => {
+        switch (statusClass) {
+            case 'colony-status-critical':
+                return '#e74c3c'; // Rojo para Crítico
+            case 'colony-status-alert':
+                return '#f1c40f'; // Amarillo para Alerta
+            default:
+                return 'transparent'; // Ocultar/no mostrar color si está OK
+        }
+    };
+
+    const bellColor = getBellColor(currentStatusClass);
+    const isBellVisible = currentStatusClass !== 'colony-status-ok';
 
     return (
         <Link to={`/colmena/${id}`} className="colony-card-link">
-            <div className={`colony-summary-card ${getStatusClass()}`}>
+            <div className={`colony-summary-card ${currentStatusClass}`}>
                 <div className="card-header">
                     <FaHive className="hive-icon" />
                     <h3 className="colony-name">{name}</h3>
-                    {getStatusClass() !== 'colony-status-ok' && (
-                        <FaBell className="alert-bell-icon" />
+                    {/* LÓGICA MODIFICADA PARA MOSTRAR Y ASIGNAR COLOR AL ÍCONO DE ALERTA */}
+                    {isBellVisible && (
+                        <FaBell 
+                            className="alert-bell-icon" 
+                            style={{ color: bellColor }} // Aplica el color dinámicamente
+                        />
                     )}
+                    {/* FIN LÓGICA MODIFICADA */}
                 </div>
                 <div className="card-body">
-                    <div className={`status-display ${getStatusClass()}`}>
+                    <div className={`status-display ${currentStatusClass}`}>
                         <span className="status-icon">
-                            {getStatusClass() === 'colony-status-ok' ? '✓' : '⚠️'}
+                            {currentStatusClass === 'colony-status-ok' ? '✓' : '⚠️'}
                         </span>
                         <span className="status-text">
-                            {getStatusClass() === 'colony-status-ok' ? 'Saludable' : getStatusClass() === 'colony-status-alert' ? 'En Alerta' : 'Crítica'}
+                            {getStatusText(currentStatusClass)}
                         </span>
                     </div>
                     <div className="metrics-summary">
@@ -312,6 +380,24 @@ const formatDataForChart = (colmenas) => {
 };
 // -----------------------------------------------------------
 
+// --- NUEVO COMPONENTE: Botón Flotante (Sin cambios) ---
+const FloatingAlertButton = ({ count, onClick }) => {
+    if (count === 0) return null;
+
+    return (
+        <button 
+            className="floating-alert-btn" 
+            onClick={onClick}
+            title={`Ver ${count} alertas activas`}
+        >
+            <FaExclamationTriangle />
+            <span className="alert-count-tag-floating"> {count}</span>
+            <span className="alert-text-floating"> ¡Alertas!</span>
+        </button>
+    );
+};
+// -----------------------------------------------------------
+
 
 // --- Componente principal: DashboardScreen ---
 const DashboardScreen = () => {
@@ -324,7 +410,7 @@ const DashboardScreen = () => {
     
     const [activeTrend, setActiveTrend] = useState('Global'); 
     
-    // ... (funciones getColmenas y allAlertsData sin cambios) ...
+    // ... (funciones getColmenas sin cambios) ...
     const getColmenas = async (isInitialLoad = false) => {
         if (isInitialLoad) {
             setLoading(true);
@@ -351,25 +437,44 @@ const DashboardScreen = () => {
         }
     };
     
+    // --- LÓGICA DE ALERTA MODIFICADA (Cambio de 'Low' a 'Medium') ---
     const allAlertsData = useMemo(() => {
         return colmenas
             .map(colmena => {
                 let alerts = [];
+
+                // --- UMBRALES CRÍTICOS ---
                 const isCriticalTemp = colmena.temperatura < 30 || colmena.temperatura > 38;
-                const isAlertHum = colmena.humedad < 50 || colmena.humedad > 75;
-                const isLowWeight = colmena.peso < 40;
+                const isCriticalHum = colmena.humedad < 40 || colmena.humedad > 90;
+                const isCriticalWeight = colmena.peso < 30;
+
+                // --- UMBRALES DE ALERTA (no críticos) ---
+                const isAlertTemp = (colmena.temperatura >= 30 && colmena.temperatura < 32) || (colmena.temperatura > 36 && colmena.temperatura <= 38);
+                const isAlertHum = (colmena.humedad >= 40 && colmena.humedad < 50) || (colmena.humedad > 75 && colmena.humedad <= 90);
+                const isLowWeight = colmena.peso >= 30 && colmena.peso < 40;
+
 
                 if (isCriticalTemp) {
-                    alerts.push({ type: 'Temperatura Extrema', value: colmena.temperatura + '°C', severity: 'Critical' });
-                } else if (colmena.temperatura < 32 || colmena.temperatura > 36) {
+                    alerts.push({ type: 'Temperatura Crítica', value: colmena.temperatura + '°C', severity: 'Critical' });
+                } else if (isAlertTemp) { 
                     alerts.push({ type: 'Temperatura Anormal', value: colmena.temperatura + '°C', severity: 'Medium' });
                 }
-                if (isAlertHum) {
+                
+                if (isCriticalHum) {
+                    alerts.push({ type: 'Humedad Crítica', value: colmena.humedad + '%', severity: 'Critical' });
+                } else if (isAlertHum) {
                     alerts.push({ type: 'Humedad Anormal', value: colmena.humedad + '%', severity: 'Medium' });
                 }
-                if (isLowWeight) {
-                    alerts.push({ type: 'Peso Bajo', value: colmena.peso + 'kg', severity: 'Low' });
+
+                if (isCriticalWeight) {
+                    alerts.push({ type: 'Peso Crítico (Muy Bajo)', value: colmena.peso + 'kg', severity: 'Critical' });
+                } 
+                // AQUI ESTÁ LA MODIFICACIÓN: Cambiar 'Low' por 'Medium'
+                else if (isLowWeight) {
+                    alerts.push({ type: 'Peso Bajo', value: colmena.peso + 'kg', severity: 'Medium' }); 
                 }
+                // --------------------------------------------------------
+                
                 return { id: colmena.colmena_id, name: colmena.nombre_colmena, alerts: alerts, };
             })
             .filter(c => c.alerts.length > 0);
@@ -428,6 +533,27 @@ const DashboardScreen = () => {
     const closeAlertsModal = () => {
         setIsAlertsModalOpen(false);
     };
+
+    // -------------------------------------------------------------
+    // FUNCIÓN PARA EL SCROLL SUAVE (Sin cambios)
+    // -------------------------------------------------------------
+    const scrollToAlertsWidget = () => {
+        const alertsWidget = document.getElementById('alerts-widget');
+        if (alertsWidget) {
+            alertsWidget.scrollIntoView({
+                behavior: 'smooth', 
+                block: 'start'      
+            });
+            
+            // Opcional: Destacar el widget brevemente
+            alertsWidget.classList.add('highlight-alert-flash');
+            setTimeout(() => {
+                alertsWidget.classList.remove('highlight-alert-flash');
+            }, 1500);
+        }
+    };
+    // -------------------------------------------------------------
+
 
     if (loading) {
         return (
@@ -513,7 +639,7 @@ const DashboardScreen = () => {
             <div className="dashboard-content">
                 <h1 className="dashboard-title">Resumen del Apiario</h1>
                 
-                {/* 1. SECCIÓN DE GRÁFICOS (Sin cambios) */}
+                {/* 1. SECCIÓN DE GRÁFICOS */}
                 <section className="section-trend-visualization-flow"> 
                     <div className="active-chart-display-full">
                         {renderActiveTrendChart()}
@@ -525,7 +651,7 @@ const DashboardScreen = () => {
                 </section>
                 <hr className="section-separator" />
                 
-                {/* 2. CUADRANTES DE PROMEDIOS (Sin cambios) */}
+                {/* 2. CUADRANTES DE PROMEDIOS */}
                 <h2 className="section-title">Promedios de Métricas Globales</h2>
                 <div className="global-summary-widgets metrics-only-grid">
                     <AverageMetricWidget
@@ -556,8 +682,9 @@ const DashboardScreen = () => {
 
                 <hr className="section-separator" />
 
-                {/* 🐝 WIDGET DE ALERTA UBICADO EN LA SECCIÓN DE COLMENAS 🐝 */}
+                {/* WIDGET DE ALERTA: ID para el scroll */}
                 <AlertButtonWidget
+                    id="alerts-widget" /* <-- ID AÑADIDO AQUI */
                     count={activeAlertsCount}
                     onClick={openAlertsModal}
                 />
@@ -577,6 +704,12 @@ const DashboardScreen = () => {
                 </div>
             </div>
 
+            {/* NUEVO COMPONENTE: BOTÓN FLOTANTE */}
+            <FloatingAlertButton 
+                count={activeAlertsCount} 
+                onClick={scrollToAlertsWidget} 
+            />
+            
             {/* [MODAL DE ALERTAS] (Sin cambios) */}
             {isAlertsModalOpen && (
                 <div className="alerts-modal-overlay" onClick={closeAlertsModal}>
@@ -599,7 +732,7 @@ const DashboardScreen = () => {
                                 activeAlertsData.map(colmenaAlert => (
                                     <div key={colmenaAlert.id} className="colmena-alerts-group">
                                         <h3 className="colmena-alert-name">
-                                            <FaHive /> **{colmenaAlert.name}**
+                                            <FaHive /> {colmenaAlert.name}
                                             <span className="alert-count-tag">{colmenaAlert.alerts.length} alertas</span>
                                         </h3>
                                         <div className="alert-items-grid">
@@ -609,7 +742,7 @@ const DashboardScreen = () => {
                                                         <FaExclamationTriangle />
                                                     </div>
                                                     <div className="card-details">
-                                                        <span className="card-alert-type">**{alert.type}**</span>
+                                                        <span className="card-alert-type">{alert.type}</span>
                                                         <span className="card-alert-value">Valor: {alert.value}</span>
                                                     </div>
                                                 </div>
