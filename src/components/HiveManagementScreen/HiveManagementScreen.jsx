@@ -56,6 +56,7 @@ const HiveManagementScreen = () => {
       );
       if (response.status === 200 && Array.isArray(response.data)) {
         setHives(response.data);
+        console.log(response.data);
       } else {
         setHives([]);
       }
@@ -197,7 +198,9 @@ const HiveManagementScreen = () => {
     if (hiveImageFile) {
       newHiveData.append("foto_colmena", hiveImageFile);
     }
-
+    newHiveData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
     try {
       let response;
       let successMessage = "";
@@ -210,6 +213,7 @@ const HiveManagementScreen = () => {
           newHiveData,
           config
         );
+        console.log("Response: ", response);
         if (response.status === 200) {
           successMessage = "¡Colmena actualizada con éxito!";
         }
@@ -238,7 +242,6 @@ const HiveManagementScreen = () => {
       });
     } finally {
       if (alert.type !== "success") setLoading(false);
-
       setShowForm(false);
       resetForm();
     }
@@ -425,7 +428,7 @@ const HiveManagementScreen = () => {
                   type="file"
                   id="hiveImageFile"
                   accept="image/*"
-                  name="foto_apiario"
+                  name="foto_colmena"
                   onChange={handleFileChange}
                   ref={fileInputRef}
                   className="form-input-file"
