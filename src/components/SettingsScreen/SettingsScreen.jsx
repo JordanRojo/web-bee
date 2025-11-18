@@ -36,22 +36,106 @@ const SettingsScreen = () => {
   const { config, userId } = useContext(AuthContext);
   const [umbrales, setUmbrales] = useState(null);
 
+  const fetchUmbrales = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/umbrales/obtener-umbrales/${userId}`,
+        config
+      );
+      console.log("STATUS: ", response.status);
+      if (response.status === 204) {
+        setUmbrales([
+          {
+            temperatura_minima: 32,
+            temperatura_maxima: 36,
+            humedad_minima: 50,
+            humedad_maxima: 70,
+            peso_minimo: 20,
+            peso_maximo: 40,
+          },
+        ]);
+      } else if (response.status === 200) {
+        const umbralesCorrectos = response.data.filter(
+          (item) => item.id_apicultor_admin === userId
+        );
+        console.log(userId);
+        console.log(response.data);
+        console.log("UMBRALES CORRECTOS: ", umbralesCorrectos);
+        setUmbrales(umbralesCorrectos);
+      }
+    } catch (error) {
+      console.error("ERROR: ", error);
+    }
+  };
+
+  // call fetchUmbrales when provider config or userId changes
+  useEffect(() => {
+    if (userId && config) {
+      fetchUmbrales();
+    }
+  }, [userId, config]);
+
+  // when `umbrales` arrives, populate the threshold states
   useEffect(() => {
     setLoading(true);
+    if (!umbrales || umbrales.length === 0) return;
+    const u = umbrales[0]; // use first item (adjust if backend returns different shape)
+    if (!u) return;
     setTimeout(() => {
-      setMinTempThreshold(36.0);
-      setMaxTempThreshold(39.0);
-      setMinHumidityThreshold(60.0);
-      setMaxHumidityThreshold(80.0);
-      setMinWeightThreshold(32.0);
-      setMaxWeightThreshold(40.0);
+      setMinTempThreshold(
+        typeof u.temperatura_minima === "number"
+          ? u.temperatura_minima
+          : parseFloat(u.temperatura_minima) || minTempThreshold
+      );
+      setMaxTempThreshold(
+        typeof u.temperatura_maxima === "number"
+          ? u.temperatura_maxima
+          : parseFloat(u.temperatura_maxima) || maxTempThreshold
+      );
+      setMinHumidityThreshold(
+        typeof u.humedad_minima === "number"
+          ? u.humedad_minima
+          : parseFloat(u.humedad_minima) || minHumidityThreshold
+      );
+      setMaxHumidityThreshold(
+        typeof u.humedad_maxima === "number"
+          ? u.humedad_maxima
+          : parseFloat(u.humedad_maxima) || maxHumidityThreshold
+      );
+      setMinWeightThreshold(
+        typeof u.peso_minimo === "number"
+          ? u.peso_minimo
+          : parseFloat(u.peso_minimo) || minWeightThreshold
+      );
+      setMaxWeightThreshold(
+        typeof u.peso_maximo === "number"
+          ? u.peso_maximo
+          : parseFloat(u.peso_maximo) || maxWeightThreshold
+      );
       setNotifyTemp(true);
       setNotifyHumidity(true);
       setNotifyWeight(true);
       setNotifyActivity(false);
       setLoading(false);
     }, 500);
-  }, []);
+  }, [umbrales]);
+
+  // useEffect(() => {
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     setMinTempThreshold(36.0);
+  //     setMaxTempThreshold(39.0);
+  //     setMinHumidityThreshold(60.0);
+  //     setMaxHumidityThreshold(80.0);
+  //     setMinWeightThreshold(32.0);
+  //     setMaxWeightThreshold(40.0);
+  //     setNotifyTemp(true);
+  //     setNotifyHumidity(true);
+  //     setNotifyWeight(true);
+  //     setNotifyActivity(false);
+  //     setLoading(false);
+  //   }, 500);
+  // }, []);
 
   const handleUmbrales = async (
     temperatura_minima,
