@@ -459,6 +459,26 @@ const HiveDetailScreen = () => {
     });
     setIsSensorModalOpen(true);
   };
+
+  const cambiarEstadoAlerta = async (cambioEstado, idAlerta) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/alertas/actualizar-alerta/${idAlerta}`,
+        {
+          estado_alerta:
+            cambioEstado === "pendiente" ? "resuelta" : "pendiente",
+        },
+        config
+      );
+      if (response.status === 200) {
+        alert("Alerta resuelta.");
+      }
+      console.log(response);
+    } catch (error) {
+      console.error("ERROR:", error);
+    }
+  };
+
   const getFilteredAlerts = () => {
     if (filterAlerts === "active") {
       return alertasColmena.filter(
@@ -828,11 +848,11 @@ const HiveDetailScreen = () => {
                                        {" "}
                     <div className="alert-details">
                                            {" "}
-                      <h3 className="alert-type">{alerta.titulo_alerta}</h3>   
-                                       {" "}
+                      <h3 className="alert-type">{alerta.titulo}</h3>           
+                               {" "}
                       <p className="alert-description">
-                                                {alerta.descripcion_alerta}     
-                                       {" "}
+                                                {alerta.descripcion}           
+                                 {" "}
                       </p>
                                            {" "}
                       <span className="alert-timestamp">
@@ -845,7 +865,12 @@ const HiveDetailScreen = () => {
                     </div>
                                        {" "}
                     {alerta.estado_alerta === "pendiente" && (
-                      <button className="resolve-button">
+                      <button
+                        className="resolve-button"
+                        onClick={() =>
+                          cambiarEstadoAlerta(alerta.estado_alerta, alerta._id)
+                        }
+                      >
                                                 Marcar como Resuelta            
                                  {" "}
                       </button>
